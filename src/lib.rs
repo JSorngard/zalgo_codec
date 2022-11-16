@@ -54,7 +54,6 @@ impl UnknownCharacterError {
     fn new(character: u8, line: u64) -> Self {
         UnknownCharacterError { 
             descriptor: if character < 128 {
-                //match UNKNOWN_CHAR_MAP.iter().find(|(k, _)| *k == character) {
                 match get_nonprintable_char_repr(character) {
                     Some(repr) => format!("{line}: Cannot encode {repr} character"),
                     None => format!("{line}: ASCII {character}"),
