@@ -226,10 +226,12 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
 /// Contains a string that references which type of character and which line caused the error.
 pub struct UnencodableCharacterError {
     descriptor: String,
+    character: u8,
+    line: usize,
 }
 
 impl UnencodableCharacterError {
-    fn new(character: u8, line: u64) -> Self {
+    fn new(character: u8, line: usize) -> Self {
         UnencodableCharacterError {
             descriptor: if character < 128 {
                 match get_nonprintable_char_repr(character) {
@@ -239,7 +241,19 @@ impl UnencodableCharacterError {
             } else {
                 format!("line {line}: attempt to encode UTF8 character sequence (this program can only encode non-control ASCII characters and newlines)")
             },
+            character,
+            line,
         }
+    }
+
+    /// Returns the number of the line on which the unencodable character occured.
+    pub fn line_number(&self) -> usize {
+        self.line
+    }
+
+    /// Returns the byte value of the unencodable character.
+    pub fn unencodable_character_value(&self) -> u8 {
+        self.character
     }
 }
 
