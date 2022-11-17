@@ -1,21 +1,21 @@
-use std::{error::Error, fs, path::Path};
+//! This is a crate implementing the zalgo encoding and decoding functions
+//! originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
+//!
+//! Explanation by them:
+//! Characters U+0300–U+036F are the combining characters for unicode Latin.
+//! The fun thing about combining characters is that you can add as many of these characters
+//! as you like to the original character and it does not create any new symbols,
+//! it only adds symbols on top of the character. It's supposed to be used in order to
+//! create characters such as á by taking a normal a and adding another character
+//! to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify
+//! any limit on the number of these characters.
+//! Conveniently, this gives us 112 different characters we can map to,
+//! which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
+//! The only issue is that we can't have new lines in this system, so to fix that,
+//! we can simply map 0x7F (DEL) to 0x0A (LF). Since we want to avoid if elses (for golfing purposes),
+//! this can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
 
-/// This is a crate implementing the zalgo encoding and decoding functions
-/// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
-///
-/// Explanation by them:
-/// Characters U+0300–U+036F are the combining characters for unicode Latin.
-/// The fun thing about combining characters is that you can add as many of these characters
-/// as you like to the original character and it does not create any new symbols,
-/// it only adds symbols on top of the character. It's supposed to be used in order to
-/// create characters such as á by taking a normal a and adding another character
-/// to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify
-/// any limit on the number of these characters.
-/// Conveniently, this gives us 112 different characters we can map to,
-/// which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
-/// The only issue is that we can't have new lines in this system, so to fix that,
-/// we can simply map 0x7F (DEL) to 0x0A (LF). Since we want to avoid if elses (for golfing purposes),
-/// this can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
+use std::{error::Error, fs, path::Path};
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, r"Null (\0)"),
@@ -153,8 +153,8 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, String> {
     }
 }
 
-/// Takes in a path to a file that should be zalgo-encoded and stored in
-/// a file at the path given in the second argument.
+/// Encodes the contents of the file at the path in the first argument and stores 
+/// the result as a file at the path given in the second argument.
 pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
@@ -179,8 +179,8 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     Ok(())
 }
 
-/// Takes in a path to a python file that should be zalgo-encoded and stored in
-/// a file at the path given in the second argument. This file will still work the same
+/// Encodes the contents of the file at the path in the first argument and stores the result
+/// together with a decoder in a file at the path given in the second argument. This file will still work the same
 /// as the original python code.
 pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
