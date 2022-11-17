@@ -1,4 +1,4 @@
-/// This is a crate implementing the zalgo compression and decompression functions
+/// This is a crate implementing the zalgo encoding and decoding functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
 /// 
 /// Explanation by them:
