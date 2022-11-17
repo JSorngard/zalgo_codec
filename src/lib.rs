@@ -1,3 +1,5 @@
+use std::{error::Error, fs, path::Path};
+
 /// This is a crate implementing the zalgo encoding and decoding functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
 ///
@@ -144,6 +146,29 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, String> {
     }
 }
 
+/// Takes in a path to a file that should be zalgo-encoded and stored in
+/// a file at the path given in the second argument.
+pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+    let mut string_to_encode = fs::read_to_string(in_file)?;
+
+    if string_to_encode.contains("\t") {
+        string_to_encode = string_to_encode.replace("\t", "    ");
+    }
+
+    let encoded_string = zalgo_encode(&string_to_encode)?;
+
+    match zalgo_decode(&encoded_string) {
+        Ok(s) => if s != string_to_encode {
+            return Err("unknown error: encoding process corrupted the input string".into())
+        },
+        Err(e) => return Err(e.into()),
+    }
+
+    fs::File::create(&out_file)?;
+    fs::write(out_file, encoded_string)?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -182,5 +207,14 @@ mod tests {
     fn check_errors() {
         assert!(zalgo_encode("We got the Ä Ö Å, you aint got the Ä Ö Å").is_err());
         assert!(zalgo_encode("\t").is_err());
+    }
+
+    #[test]
+    fn file_encoding() {
+        encode_file("src\\romeo.txt", "zalgo.txt").unwrap();
+        let zalgo = fs::read_to_string("zalgo.txt").unwrap();
+        let romeo = fs::read_to_string("src\\romeo.txt").unwrap();
+        assert_eq!(zalgo_decode(&zalgo).unwrap(), romeo);
+        fs::remove_file("zalgo.txt").unwrap();
     }
 }
