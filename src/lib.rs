@@ -6,6 +6,7 @@
 //! The crate also provides functions to encode python code and wrap the result in a decoder that
 //! decodes and executes the encoded string. This way the file looks very different, but executes the same way as before.
 //! This lets you do the mother of all refactoring by converting your entire python program into a single line of code.
+//! Can not encode carriage returns, so files written on non-unix operating systems might not work.
 //!
 //! Explanation by them:  
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
