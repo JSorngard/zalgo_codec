@@ -1,5 +1,18 @@
 /// This is a crate implementing the zalgo encode and decode functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
+/// Explanation by them:
+/// Characters U+0300–U+036F are the combining characters for unicode Latin.
+/// The fun thing about combining characters is that you can add as many of these characters
+/// as you like to the original character and it does not create any new symbols,
+/// it only adds symbols on top of the character. It's supposed to be used in order to
+/// create characters such as á by taking a normal a and adding another character
+/// to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify
+/// any limit on the number of these characters.
+/// Conveniently, this gives us 112 different characters we can map to,
+/// which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
+/// The only issue is that we can't have new lines in this system, so to fix that,
+/// we can simply map 0x7F (DEL) to 0x0A (LF). Since we want to avoid if elses (for golfing purposes),
+/// this can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, "Null (\\0)"),
@@ -45,10 +58,6 @@ fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
     }
 }
 
-fn is_zalgo_encodable(character: u8) -> bool {
-    (32..=126).contains(&character) || character == b'\n'
-}
-
 struct UnknownCharacterError {
     descriptor: String,
 }
@@ -74,10 +83,11 @@ impl std::string::ToString for UnknownCharacterError {
     }
 }
 
-pub fn zalgo_compress(s: &str) -> Result<String, String> {
+pub fn zalgo_compress(string_to_compress: &str) -> Result<String, String> {
     let mut line = 1;
     let mut result: Vec<u8> = vec![b'E'];
-    for c in s.bytes() {
+
+    for c in string_to_compress.bytes() {
         if c == b'\r' {
             return Err("Non-unix line endings detected".into());
         }
@@ -86,7 +96,7 @@ pub fn zalgo_compress(s: &str) -> Result<String, String> {
             line += 1;
         }
 
-        if !is_zalgo_encodable(c) {
+        if !(32..=126).contains(&c) && c != b'\n' {
             return Err(UnknownCharacterError::new(c, line).to_string());
         }
 
@@ -107,7 +117,7 @@ pub fn zalgo_decompress(compressed: &str) -> Result<String, String> {
         .skip(1)
         .step_by(2)
         .zip(compressed.bytes().skip(2).step_by(2))
-        .map(|(h, c)| (((h << 6 & 64 | c & 63) + 22) % 133 + 10))
+        .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
         .collect();
 
     match std::str::from_utf8(&bytes) {
@@ -122,24 +132,26 @@ mod tests {
 
     #[test]
     fn verify() {
-        const TEST_STRING: &str = "the greatest adventure is going to bed";
+        const TEST_STRING_1: &str = "the greatest adventure is going to bed";
         let out_string = std::str::from_utf8(b"E\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
-        assert_eq!(zalgo_compress(TEST_STRING).unwrap(), out_string,)
-    }
+        assert_eq!(zalgo_compress(TEST_STRING_1).unwrap(), out_string);
 
-    #[test]
-    fn lossless() {
-        const TEST_STRING: &str =
+        const TEST_STRING_2: &str =
             "I'll have you know I graduated top of my class in the Navy Seals";
         assert_eq!(
-            zalgo_decompress(&zalgo_compress(TEST_STRING).unwrap()).unwrap(),
-            TEST_STRING
+            zalgo_decompress(&zalgo_compress(TEST_STRING_2).unwrap()).unwrap(),
+            TEST_STRING_2
         );
     }
 
     #[test]
     fn newlines() {
         assert_eq!(&zalgo_compress("\n").unwrap(), "Eͯ",);
+        const TEST_STRING: &str = "The next sentence is true.\nThe previous sentence is false.";
+        assert_eq!(
+            zalgo_decompress(&zalgo_compress(TEST_STRING).unwrap()).unwrap(),
+            TEST_STRING,
+        );
     }
 
     #[test]
