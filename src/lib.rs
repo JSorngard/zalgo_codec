@@ -1,4 +1,4 @@
-use std::{error::Error, fs, path::{Path, PathBuf}};
+use std::{error::Error, fs, path::Path};
 
 /// This is a crate implementing the zalgo encoding and decoding functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
@@ -123,6 +123,13 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
     }
 }
 
+/// Takes in a string containing python code and returns the zalgo-encoded
+/// version of that string wrapped in python code that decodes and executes it.
+pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, String> {
+    let encoded_string = zalgo_encode(string_to_encode)?;
+    Ok(format!(r"b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
+}
+
 /// Takes in a string that was compressed by `zalgo_encode` and decompresses it
 /// to an ASCII string.
 ///
@@ -183,22 +190,7 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
         string_to_encode = string_to_encode.replace("\t", "    ");
     }
 
-    let mut encoded_string = zalgo_encode(&string_to_encode)?;
-
-    match zalgo_decode(&encoded_string) {
-        Ok(s) => {
-            if s != string_to_encode {
-                return Err("unknown error: encoding process corrupted the input string".into());
-            }
-        }
-        Err(e) => return Err(e.into()),
-    }
-
-    let mut tmp = PathBuf::new();
-    tmp.push(out_file);
-    let mut out_file = tmp;
-    out_file.set_extension("py");
-    encoded_string = format!(r"b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))");
+    let encoded_string = zalgo_encode_python(&string_to_encode)?;
 
     fs::File::create(&out_file)?;
     fs::write(out_file, encoded_string)?;
@@ -208,6 +200,7 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     #[test]
     fn verify() {
