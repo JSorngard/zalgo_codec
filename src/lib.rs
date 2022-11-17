@@ -101,7 +101,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
 
     for c in string_to_compress.bytes() {
         if c == b'\r' {
-            return Err("non-unix line endings detected (carriage return \r)".into());
+            return Err(r"non-unix line endings detected (carriage return \r)".into());
         }
 
         if c == b'\n' {
