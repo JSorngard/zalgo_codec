@@ -1,4 +1,4 @@
-use std::{error::Error, fs, path::Path};
+use std::{error::Error, fs, path::{Path, PathBuf}};
 
 /// This is a crate implementing the zalgo encoding and decoding functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
@@ -152,6 +152,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
     if string_to_encode.contains("\t") {
+        eprintln!("found tabs in the file, replacing with four spaces");
         string_to_encode = string_to_encode.replace("\t", "    ");
     }
 
@@ -171,10 +172,42 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     Ok(())
 }
 
+/// Takes in a path to a python file that should be zalgo-encoded and stored in
+/// a file at the path given in the second argument. This file will still work the same
+/// as the original python code.
+pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+    let mut string_to_encode = fs::read_to_string(in_file)?;
+
+    if string_to_encode.contains("\t") {
+        eprintln!("found tabs in the file, replacing with four spaces");
+        string_to_encode = string_to_encode.replace("\t", "    ");
+    }
+
+    let mut encoded_string = zalgo_encode(&string_to_encode)?;
+
+    match zalgo_decode(&encoded_string) {
+        Ok(s) => {
+            if s != string_to_encode {
+                return Err("unknown error: encoding process corrupted the input string".into());
+            }
+        }
+        Err(e) => return Err(e.into()),
+    }
+
+    let mut tmp = PathBuf::new();
+    tmp.push(out_file);
+    let mut out_file = tmp;
+    out_file.set_extension("py");
+    encoded_string = format!(r"b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))");
+
+    fs::File::create(&out_file)?;
+    fs::write(out_file, encoded_string)?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
 
     #[test]
     fn verify() {
@@ -224,6 +257,20 @@ mod tests {
         let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let lorem_text = fs::read_to_string(lorem_path).unwrap();
         assert_eq!(zalgo_decode(&zalgo_text).unwrap(), lorem_text);
+        fs::remove_file(zalgo_path).unwrap();
+    }
+
+    #[test]
+    fn python_encoding() {
+        let mut lorem_path = PathBuf::new();
+        let mut zalgo_path = PathBuf::new();
+        lorem_path.push("tests");
+        lorem_path.push("lorem.py");
+        zalgo_path.push("tests");
+        zalgo_path.push("zalgo.py");
+        encode_python_file(&lorem_path, &zalgo_path).unwrap();
+        let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
+        let _lorem_text = fs::read_to_string(lorem_path).unwrap();
         fs::remove_file(zalgo_path).unwrap();
     }
 }
