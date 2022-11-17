@@ -5,7 +5,7 @@ version = "0.1.2"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/JSorngard/zalgo_codec"
-description = "A crate for converting an ASCII text string or file to a single unicode character. Can also do the same to python code while still letting the code run as before."
+description = "A crate for converting an ASCII text string or file to a single unicode character. Can also do the same to python code while still letting the code run as before by wrapping it in a decoder."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
