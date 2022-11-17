@@ -158,9 +158,11 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     let encoded_string = zalgo_encode(&string_to_encode)?;
 
     match zalgo_decode(&encoded_string) {
-        Ok(s) => if s != string_to_encode {
-            return Err("unknown error: encoding process corrupted the input string".into())
-        },
+        Ok(s) => {
+            if s != string_to_encode {
+                return Err("unknown error: encoding process corrupted the input string".into());
+            }
+        }
         Err(e) => return Err(e.into()),
     }
 
@@ -172,6 +174,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     #[test]
     fn verify() {
@@ -211,10 +214,16 @@ mod tests {
 
     #[test]
     fn file_encoding() {
-        encode_file("src\\romeo.txt", "zalgo.txt").unwrap();
-        let zalgo = fs::read_to_string("zalgo.txt").unwrap();
-        let romeo = fs::read_to_string("src\\romeo.txt").unwrap();
-        assert_eq!(zalgo_decode(&zalgo).unwrap(), romeo);
-        fs::remove_file("zalgo.txt").unwrap();
+        let mut romeo_path = PathBuf::new();
+        let mut zalgo_path = PathBuf::new();
+        romeo_path.push("tests");
+        romeo_path.push("romeo.txt");
+        zalgo_path.push("tests");
+        zalgo_path.push("zalgo.txt");
+        encode_file(&romeo_path, &zalgo_path).unwrap();
+        let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
+        let romeo_text = fs::read_to_string(romeo_path).unwrap();
+        assert_eq!(zalgo_decode(&zalgo_text).unwrap(), romeo_text);
+        fs::remove_file(zalgo_path).unwrap();
     }
 }
