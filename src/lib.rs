@@ -121,8 +121,8 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
     }
 }
 
-/// Takes in a string that was compressed by `zalgo_encode` and decompresses it.
-/// Returns an ASCII string.
+/// Takes in a string that was compressed by `zalgo_encode` and decompresses it
+/// to an ASCII string.
 ///
 /// # Example
 /// ```
