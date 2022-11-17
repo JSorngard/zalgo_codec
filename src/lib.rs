@@ -49,13 +49,10 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
 ];
 
 fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
-    match UNKNOWN_CHAR_MAP
+    UNKNOWN_CHAR_MAP
         .binary_search_by(|(k, _)| k.cmp(&key))
         .map(|x| UNKNOWN_CHAR_MAP[x].1)
-    {
-        Ok(s) => Some(s),
-        Err(_) => None,
-    }
+        .ok()
 }
 
 struct UnknownCharacterError {
