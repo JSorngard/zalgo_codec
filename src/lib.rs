@@ -8,7 +8,7 @@
 //! This lets you do the mother of all refactoring by converting your entire python program into a single line of code.
 //! Can not encode carriage returns, so files written on non-unix operating systems might not work.
 //!
-//! Explanation by them:  
+//! [Explanation by them](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3):  
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
