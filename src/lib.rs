@@ -139,6 +139,12 @@ mod tests {
             zalgo_decompress(&zalgo_compress(TEST_STRING_2).unwrap()).unwrap(),
             TEST_STRING_2
         );
+
+        const ASCII_TABLE: &str = r##"ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz1234567890 !"#$%&'()*+,-./:;<=>?@"##;
+        assert_eq!(
+            zalgo_decompress(&zalgo_compress(ASCII_TABLE).unwrap()).unwrap(),
+            ASCII_TABLE
+        );
     }
 
     #[test]
