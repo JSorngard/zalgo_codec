@@ -214,16 +214,16 @@ mod tests {
 
     #[test]
     fn file_encoding() {
-        let mut romeo_path = PathBuf::new();
+        let mut lorem_path = PathBuf::new();
         let mut zalgo_path = PathBuf::new();
-        romeo_path.push("tests");
-        romeo_path.push("romeo.txt");
+        lorem_path.push("tests");
+        lorem_path.push("lorem.txt");
         zalgo_path.push("tests");
         zalgo_path.push("zalgo.txt");
-        encode_file(&romeo_path, &zalgo_path).unwrap();
+        encode_file(&lorem_path, &zalgo_path).unwrap();
         let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
-        let romeo_text = fs::read_to_string(romeo_path).unwrap();
-        assert_eq!(zalgo_decode(&zalgo_text).unwrap(), romeo_text);
+        let lorem_text = fs::read_to_string(lorem_path).unwrap();
+        assert_eq!(zalgo_decode(&zalgo_text).unwrap(), lorem_text);
         fs::remove_file(zalgo_path).unwrap();
     }
 }
