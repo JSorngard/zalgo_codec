@@ -1,5 +1,5 @@
 //! This is a crate implementing the zalgo encoding and decoding functions
-//! originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
+//! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner.
 //!
 //! Using the functions defined here you can transform an ASCII string into a unicode string that is a single
 //! "character" wide. This string will be larger than the original in terms of bytes,
@@ -9,7 +9,7 @@
 //! Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding
 //! functions will attempt to encode the file by ignoring carriage returns.
 //!
-//! [Explanation by them](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3):  
+//! Explanation:  
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
@@ -21,7 +21,8 @@
 //! which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
-//! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
+//! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
+//! [Original post.](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 
 use std::{
     error::Error,
