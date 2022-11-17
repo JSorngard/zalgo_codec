@@ -96,8 +96,8 @@ impl std::string::ToString for UnknownCharacterError {
 /// using a reversible encoding scheme. The resulting string should
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
-/// It can be decompressed to recover the original string using `zalgo_decode`.
 /// The resulting string will most likely be larger than the original in terms of bytes.
+/// It can be decompressed to recover the original string using `zalgo_decode`.
 /// # Example
 /// ```
 /// # use zalgo_codec::zalgo_encode;
