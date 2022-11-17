@@ -19,7 +19,7 @@
 //! Conveniently, this gives us 112 different characters we can map to,
 //! which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
 //! The only issue is that we can't have new lines in this system, so to fix that,
-//! we can simply map 0x7F (DEL) to 0x0A (LF). 
+//! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
 
 use std::{error::Error, fs, path::Path};
