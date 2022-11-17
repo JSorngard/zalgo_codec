@@ -186,7 +186,10 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 /// Encodes the contents of the given file and stores the result wrapped in
 /// a decoder in another file. This file will still work the same
 /// as the original python code. If the source file contains carriage return characters
-/// this function will print a message and then attempt to encode the file anyway by ignoring them.
+/// this function will print a message and then attempt to encode the file anyway by ignoring them.  
+/// # Notes
+/// The resulting python file may not work correctly on python versions before 3.10,
+/// (see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1)).
 pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
