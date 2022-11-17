@@ -2,7 +2,7 @@
 //! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner.
 //!
 //! Using the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
-//! "character" wide. the encoding is reversible, but this string will be larger than the original in terms of bytes.
+//! "character" wide. The encoding is reversible, but this string will be larger than the original in terms of bytes.
 //! The crate also provides functions to encode python code and wrap the result in a decoder that
 //! decodes and executes the encoded string. This way the file looks very different, but executes the same way as before.
 //! This lets you do the mother of all refactoring by converting your entire python program into a single line of code.
