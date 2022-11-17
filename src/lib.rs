@@ -16,7 +16,7 @@
 /// this can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
-    (0, "Null (\\0)"),
+    (0, r"Null (\0)"),
     (1, "SOH"),
     (2, "STX"),
     (3, "ETX"),
@@ -24,10 +24,10 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (5, "ENQ"),
     (6, "ACK"),
     (7, "BEL"),
-    (8, "Backspace (\\b)"),
-    (9, "Tab (did you mean to indent with spaces?) (\\t)"),
-    (11, "Vertical Tab (\\v)"),
-    (12, "Form Feed (\\f)"),
+    (8, r"Backspace (\b)"),
+    (9, r"Tab (did you mean to indent with spaces?) (\t)"),
+    (11, r"Vertical Tab (\v)"),
+    (12, r"Form Feed (\f)"),
     (14, "SO"),
     (15, "SI"),
     (16, "DLE"),
@@ -99,7 +99,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
 
     for c in string_to_compress.bytes() {
         if c == b'\r' {
-            return Err("non-unix line endings detected".into());
+            return Err("non-unix line endings detected (carriage return \r)".into());
         }
 
         if c == b'\n' {
