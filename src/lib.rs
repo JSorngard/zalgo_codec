@@ -236,6 +236,7 @@ mod tests {
     fn check_errors() {
         assert!(zalgo_encode("We got the Ä Ö Å, you aint got the Ä Ö Å").is_err());
         assert!(zalgo_encode("\t").is_err());
+        assert!(zalgo_encode("\r").is_err());
     }
 
     #[test]
