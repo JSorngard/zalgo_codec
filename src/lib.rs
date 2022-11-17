@@ -251,7 +251,9 @@ impl UnencodableCharacterError {
         self.line
     }
 
-    /// Returns the byte value of the unencodable character.
+    /// Returns the byte value of the unencodable character. Note that this might
+    /// not be the complete representation of the character in unicode, just the first
+    /// byte of it.
     pub fn unencodable_character_value(&self) -> u8 {
         self.character
     }
