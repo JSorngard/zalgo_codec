@@ -1,6 +1,6 @@
 /// This is a crate implementing the zalgo encoding and decoding functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
-/// 
+///
 /// Explanation by them:
 /// Characters U+0300–U+036F are the combining characters for unicode Latin.
 /// The fun thing about combining characters is that you can add as many of these characters
@@ -25,7 +25,7 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (6, "ACK"),
     (7, "BEL"),
     (8, r"Backspace (\b)"),
-    (9, r"Tab (did you mean to indent with spaces?) (\t)"),
+    (9, r"Tab (\t)"),
     (11, r"Vertical Tab (\v)"),
     (12, r"Form Feed (\f)"),
     (14, "SO"),
@@ -123,7 +123,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
 
 /// Takes in a string that was compressed by `zalgo_encode` and decompresses it.
 /// Returns an ASCII string.
-/// 
+///
 /// # Example
 /// ```
 /// # use zalgo_codec::zalgo_decode;
