@@ -4,7 +4,6 @@ authors = ["Johanna Sörngård (jsorngard@gmail.com)"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-documentation = "https://docs.rs/zalgo-codec"
 repository = "https://github.com/JSorngard/zalgo_codec"
 description = "A crate for converting an ASCII text string or file to a single unicode character. Can also do the same to python code while still letting the code run as before."
 
