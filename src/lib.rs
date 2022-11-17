@@ -2,11 +2,12 @@
 //! originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
 //!
 //! Using the functions defined here you can transform an ASCII string into a unicode string that is a single
-//! "character" wide. This string will almost surely be larger than the original in terms of bytes, but the encoding is reversible.
-//! The crate also provides functions to encode python code and wrap the result in a decoder that
+//! "character" wide. This string will be larger than the original in terms of bytes,
+//! but the encoding is reversible. The crate also provides functions to encode python code and wrap the result in a decoder that
 //! decodes and executes the encoded string. This way the file looks very different, but executes the same way as before.
 //! This lets you do the mother of all refactoring by converting your entire python program into a single line of code.
-//! Can not encode carriage returns, so files written on non-unix operating systems might not work.
+//! Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding
+//! functions will attempt to encode the file by ignoring carriage returns.
 //!
 //! [Explanation by them](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3):  
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
@@ -22,7 +23,12 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.
 
-use std::{error::Error, fs, path::Path};
+use std::{
+    error::Error,
+    fmt, fs,
+    path::{Path, PathBuf},
+    str,
+};
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, r"Null (\0)"),
@@ -37,6 +43,7 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (9, r"Tab (\t)"),
     (11, r"Vertical Tab (\v)"),
     (12, r"Form Feed (\f)"),
+    (13, r"Carriage Return (\r)"),
     (14, "SO"),
     (15, "SI"),
     (16, "DLE"),
@@ -67,49 +74,24 @@ fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
         .ok()
 }
 
-struct UnknownCharacterError {
-    descriptor: String,
-}
-
-impl UnknownCharacterError {
-    fn new(character: u8, line: u64) -> Self {
-        UnknownCharacterError {
-            descriptor: if character < 128 {
-                match get_nonprintable_char_repr(character) {
-                    Some(repr) => format!("{line}: cannot encode {repr} character"),
-                    None => format!("{line}: ASCII {character}"),
-                }
-            } else {
-                format!("{line}: attempt to encode UTF8 character sequence (this program only can encode ascii non-control characters and newlines)")
-            },
-        }
-    }
-}
-
-impl std::string::ToString for UnknownCharacterError {
-    fn to_string(&self) -> String {
-        self.descriptor.clone()
-    }
-}
-
 /// Takes in an ASCII string and "compresses" it to zalgo text
 /// using a reversible encoding scheme. The resulting string should
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
-/// The resulting string will most likely be larger than the original in terms of bytes.
-/// It can be decompressed to recover the original string using `zalgo_decode`.
+/// The resulting string will be larger than the original in terms of bytes, but it
+/// can be decompressed to recover the original string using `zalgo_decode`.
 /// # Example
 /// ```
 /// # use zalgo_codec::zalgo_encode;
 /// assert_eq!(zalgo_encode("Zalgo").unwrap(), "É̺͇͌͏");
 /// ```
-pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
+pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableCharacterError> {
     let mut line = 1;
     let mut result: Vec<u8> = vec![b'E'];
 
     for c in string_to_compress.bytes() {
         if c == b'\r' {
-            return Err(r"non-unix line endings detected (carriage return \r)".into());
+            return Err(UnencodableCharacterError::new(c, line));
         }
 
         if c == b'\n' {
@@ -117,23 +99,22 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
         }
 
         if !(32..=126).contains(&c) && c != b'\n' {
-            return Err(UnknownCharacterError::new(c, line).to_string());
+            return Err(UnencodableCharacterError::new(c, line));
         }
 
-        let v: u8 = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
+        let v = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
         result.push((v >> 6) & 1 | 0b11001100);
         result.push((v & 63) | 0b10000000);
     }
 
-    match std::str::from_utf8(&result) {
-        Ok(s) => Ok(s.into()),
-        Err(e) => Err(e.to_string()),
-    }
+    Ok(str::from_utf8(&result)
+        .expect("the encoding process should not produce invalid utf8")
+        .into())
 }
 
 /// zalgo-encodes an ASCII string containing python code and
 /// wraps it in a decoder that decodes and executes it.
-pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, String> {
+pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, UnencodableCharacterError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -146,7 +127,7 @@ pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, String> {
 /// # use zalgo_codec::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
 /// ```
-pub fn zalgo_decode(compressed: &str) -> Result<String, String> {
+pub fn zalgo_decode(compressed: &str) -> Result<String, str::Utf8Error> {
     let bytes: Vec<u8> = compressed
         .bytes()
         .skip(1)
@@ -155,19 +136,28 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, String> {
         .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
         .collect();
 
-    match std::str::from_utf8(&bytes) {
+    match str::from_utf8(&bytes) {
         Ok(s) => Ok(s.into()),
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(e),
     }
 }
 
 /// Encodes the contents of the file and stores the result in another file.
+/// If carriage return characters are found it will print a message and
+/// attempt to encode the file anyway by ignoring them.
 pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
-    if string_to_encode.contains("\t") {
+    if string_to_encode.contains('\t') {
         eprintln!("found tabs in the file, replacing with four spaces");
-        string_to_encode = string_to_encode.replace("\t", "    ");
+        string_to_encode = string_to_encode.replace('\t', "    ");
+    }
+
+    if string_to_encode.contains('\r') {
+        eprintln!(
+            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+        );
+        string_to_encode = string_to_encode.replace('\r', "");
     }
 
     let encoded_string = zalgo_encode(&string_to_encode)?;
@@ -181,6 +171,13 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
         Err(e) => return Err(e.into()),
     }
 
+    let mut out_path = PathBuf::new();
+    out_path.push(&out_file);
+
+    if out_path.exists() {
+        return Err("a file already exists with the output file name".into());
+    }
+
     fs::File::create(&out_file)?;
     fs::write(out_file, encoded_string)?;
     Ok(())
@@ -188,20 +185,70 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 
 /// Encodes the contents of the given file and stores the result wrapped in
 /// a decoder in another file. This file will still work the same
-/// as the original python code.
+/// as the original python code. If the source file contains carriage return characters
+/// this function will print a message and then attempt to encode the file anyway by ignoring them.
 pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
-    if string_to_encode.contains("\t") {
+    if string_to_encode.contains('\t') {
         eprintln!("found tabs in the file, replacing with four spaces");
-        string_to_encode = string_to_encode.replace("\t", "    ");
+        string_to_encode = string_to_encode.replace('\t', "    ");
+    }
+
+    if string_to_encode.contains('\r') {
+        eprintln!(
+            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+        );
+        string_to_encode = string_to_encode.replace('\r', "");
     }
 
     let encoded_string = zalgo_encode_python(&string_to_encode)?;
 
+    let mut out_path = PathBuf::new();
+    out_path.push(&out_file);
+
+    if out_path.exists() {
+        return Err("a file already exists with the output file name".into());
+    }
+
     fs::File::create(&out_file)?;
     fs::write(out_file, encoded_string)?;
     Ok(())
+}
+
+#[derive(Debug)]
+/// The error returned by the encoding functions
+/// if they encounter a character they can not encode.
+/// Contains a string that references which type of character and which line caused the error.
+pub struct UnencodableCharacterError {
+    descriptor: String,
+}
+
+impl UnencodableCharacterError {
+    fn new(character: u8, line: u64) -> Self {
+        UnencodableCharacterError {
+            descriptor: if character < 128 {
+                match get_nonprintable_char_repr(character) {
+                    Some(repr) => format!("line {line}: cannot encode {repr} character"),
+                    None => format!("line {line}: cannot encode ASCII character #{character}"),
+                }
+            } else {
+                format!("line {line}: attempt to encode UTF8 character sequence (this program can only encode non-control ASCII characters and newlines)")
+            },
+        }
+    }
+}
+
+impl fmt::Display for UnencodableCharacterError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.descriptor)
+    }
+}
+
+impl Error for UnencodableCharacterError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -212,7 +259,7 @@ mod tests {
     #[test]
     fn verify() {
         const TEST_STRING_1: &str = "the greatest adventure is going to bed";
-        let out_string = std::str::from_utf8(b"E\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
+        let out_string = str::from_utf8(b"E\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
         assert_eq!(zalgo_encode(TEST_STRING_1).unwrap(), out_string);
 
         const TEST_STRING_2: &str =
@@ -222,7 +269,7 @@ mod tests {
             TEST_STRING_2
         );
 
-        const ASCII_CHAR_TABLE: &str = r##"ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz1234567890 !"#$%&'()*+,-./:;<=>?@"##;
+        const ASCII_CHAR_TABLE: &str = r##"ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz1234567890 !"#$%&'()*+,-\./:;<=>?@"##;
         assert_eq!(
             zalgo_decode(&zalgo_encode(ASCII_CHAR_TABLE).unwrap()).unwrap(),
             ASCII_CHAR_TABLE
@@ -244,6 +291,7 @@ mod tests {
         assert!(zalgo_encode("We got the Ä Ö Å, you aint got the Ä Ö Å").is_err());
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
+        assert!(zalgo_encode("\0").is_err());
     }
 
     #[test]
@@ -255,9 +303,14 @@ mod tests {
         zalgo_path.push("tests");
         zalgo_path.push("zalgo.txt");
         encode_file(&lorem_path, &zalgo_path).unwrap();
+        assert!(encode_file(&lorem_path, &zalgo_path).is_err());
         let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let lorem_text = fs::read_to_string(lorem_path).unwrap();
-        assert_eq!(zalgo_decode(&zalgo_text).unwrap(), lorem_text);
+        assert_eq!(
+            zalgo_decode(&zalgo_text).unwrap(),
+            //remove carriage return on windows
+            lorem_text.replace("\r", "")
+        );
         fs::remove_file(zalgo_path).unwrap();
     }
 
