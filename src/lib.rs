@@ -1,7 +1,7 @@
 /// This is a crate implementing the zalgo encode and decode functions
 /// originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
 
-static UNKNOWN_CHAR_MAP: &[(u8, & str)] = &[
+static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, "Null (\\0)"),
     (1, "SOH"),
     (2, "STX"),
@@ -36,7 +36,10 @@ static UNKNOWN_CHAR_MAP: &[(u8, & str)] = &[
 ];
 
 fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
-    match UNKNOWN_CHAR_MAP.binary_search_by(|(k, _)| k.cmp(&key)).map(|x| UNKNOWN_CHAR_MAP[x].1) {
+    match UNKNOWN_CHAR_MAP
+        .binary_search_by(|(k, _)| k.cmp(&key))
+        .map(|x| UNKNOWN_CHAR_MAP[x].1)
+    {
         Ok(s) => Some(s),
         Err(_) => None,
     }
@@ -52,7 +55,7 @@ struct UnknownCharacterError {
 
 impl UnknownCharacterError {
     fn new(character: u8, line: u64) -> Self {
-        UnknownCharacterError { 
+        UnknownCharacterError {
             descriptor: if character < 128 {
                 match get_nonprintable_char_repr(character) {
                     Some(repr) => format!("{line}: Cannot encode {repr} character"),
@@ -60,7 +63,7 @@ impl UnknownCharacterError {
                 }
             } else {
                 format!("{line}: Attempt to encode UTF8 character sequence (this program only can encode ascii non-control characters and newlines)")
-            }
+            },
         }
     }
 }
@@ -71,7 +74,7 @@ impl std::string::ToString for UnknownCharacterError {
     }
 }
 
-pub fn zalgo_encode(s: &str) -> Result<String, String> {
+pub fn zalgo_compress(s: &str) -> Result<String, String> {
     let mut line = 1;
     let mut result: Vec<u8> = vec![b'E'];
     for c in s.bytes() {
@@ -87,7 +90,7 @@ pub fn zalgo_encode(s: &str) -> Result<String, String> {
             return Err(UnknownCharacterError::new(c, line).to_string());
         }
 
-        let v: u8 = (c - 11) % 133 - 21;
+        let v: u8 = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
         result.push((v >> 6) & 1 | 0b11001100);
         result.push((v & 63) | 0b10000000);
     }
@@ -98,12 +101,12 @@ pub fn zalgo_encode(s: &str) -> Result<String, String> {
     }
 }
 
-pub fn zalgo_decode(b: &str) -> Result<String, String> {
-    let bytes: Vec<u8> = b
+pub fn zalgo_decompress(compressed: &str) -> Result<String, String> {
+    let bytes: Vec<u8> = compressed
         .bytes()
         .skip(1)
         .step_by(2)
-        .zip(b.bytes().skip(2).step_by(2))
+        .zip(compressed.bytes().skip(2).step_by(2))
         .map(|(h, c)| (((h << 6 & 64 | c & 63) + 22) % 133 + 10))
         .collect();
 
@@ -118,11 +121,30 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let test_string = "the greatest adventure is going to bed";
+    fn verify() {
+        const TEST_STRING: &str = "the greatest adventure is going to bed";
+        let out_string = std::str::from_utf8(b"E\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
+        assert_eq!(zalgo_compress(TEST_STRING).unwrap(), out_string,)
+    }
+
+    #[test]
+    fn lossless() {
+        const TEST_STRING: &str =
+            "I'll have you know I graduated top of my class in the Navy Seals";
         assert_eq!(
-            zalgo_decode(&zalgo_encode(test_string).unwrap()).unwrap(),
-            test_string
-        )
+            zalgo_decompress(&zalgo_compress(TEST_STRING).unwrap()).unwrap(),
+            TEST_STRING
+        );
+    }
+
+    #[test]
+    fn newlines() {
+        assert_eq!(&zalgo_compress("\n").unwrap(), "Eͯ",);
+    }
+
+    #[test]
+    fn check_errors() {
+        assert!(zalgo_compress("We got the Ä Ö Å, you aint got the Ä Ö Å").is_err());
+        assert!(zalgo_compress("\t").is_err());
     }
 }
