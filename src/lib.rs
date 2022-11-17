@@ -1,7 +1,13 @@
 //! This is a crate implementing the zalgo encoding and decoding functions
 //! originally written in Python by [Scott Conner](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor).
 //!
-//! Explanation by them:
+//! Using the functions defined here you can transform an ASCII string into a unicode string that is a single
+//! "character" wide. This string will almost surely be larger than the original in terms of bytes.
+//! The crate also provides functions to encode python code and wrap the result in a decoder that
+//! decodes and executes the encoded string. This way the file looks very different, but executes the same way as before.
+//! This lets you do the mother of all refactoring by converting your entire python program into a single line of code.
+//!
+//! Explanation by them:  
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
@@ -90,6 +96,7 @@ impl std::string::ToString for UnknownCharacterError {
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
 /// It can be decompressed to recover the original string using `zalgo_decode`.
+/// The resulting string will most likely be larger than the original in terms of bytes.
 /// # Example
 /// ```
 /// # use zalgo_codec::zalgo_encode;
@@ -123,8 +130,8 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
     }
 }
 
-/// Takes in a string containing python code and returns the zalgo-encoded
-/// version of that string wrapped in python code that decodes and executes it.
+/// zalgo-encodes an ASCII string containing python code and
+/// wraps it in a decoder that decodes and executes it.
 pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, String> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
@@ -153,8 +160,7 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, String> {
     }
 }
 
-/// Encodes the contents of the file at the path in the first argument and stores 
-/// the result as a file at the path given in the second argument.
+/// Encodes the contents of the file and stores the result in another file.
 pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
@@ -179,8 +185,8 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     Ok(())
 }
 
-/// Encodes the contents of the file at the path in the first argument and stores the result
-/// together with a decoder in a file at the path given in the second argument. This file will still work the same
+/// Encodes the contents of the given file and stores the result wrapped in
+/// a decoder in another file. This file will still work the same
 /// as the original python code.
 pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
