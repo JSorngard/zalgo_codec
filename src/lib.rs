@@ -127,7 +127,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, String> {
 /// version of that string wrapped in python code that decodes and executes it.
 pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, String> {
     let encoded_string = zalgo_encode(string_to_encode)?;
-    Ok(format!(r"b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
+    Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
 /// Takes in a string that was compressed by `zalgo_encode` and decompresses it
