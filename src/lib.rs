@@ -137,10 +137,7 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, str::Utf8Error> {
         .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
         .collect();
 
-    match str::from_utf8(&bytes) {
-        Ok(s) => Ok(s.into()),
-        Err(e) => Err(e),
-    }
+    str::from_utf8(&bytes).map(|s| s.to_owned())
 }
 
 /// Encodes the contents of the file and stores the result in another file.
