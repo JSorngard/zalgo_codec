@@ -1,6 +1,6 @@
 [package]
 name = "zalgo-codec-common"
-authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner"]
+authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner", "Alex Keizer (alex@keizer.dev)"]
 version = "0.2.2"
 edition = "2021"
 license = "MIT"
