@@ -188,7 +188,7 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 
     if string_to_decode.contains('\r') {
         eprintln!(
-            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it"
         );
         string_to_decode = string_to_decode.replace('\r', "");
     }
