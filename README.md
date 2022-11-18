@@ -9,8 +9,30 @@ the encoded string. This way the file looks very different, but executes the sam
 This lets you do the mother of all refactoring by converting your entire python program into a single line of code. 
 Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding functions will attempt to encode files anyway by ignoring carriage returns.  
 
-# Example
-The cursed character at the bottom of this text is the standard "Lorem ipsum" encoded with this crate.
+# Examples
+
+We can execute arbitrary obfuscated code with the macro:
+
+```rust
+// This expands to the code
+// `fn add(x: i32, y: i32) -> i32 {x + y}`
+zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+// The `add` function is now available
+assert_eq!(add(10, 20), 30);
+```
+
+as well as evaluate arbitrary expressions:
+
+```rust
+let x = 20;
+let y = -10;
+// This expands to the code 
+// `x + y`
+let z = zalgo_embed!("È͙̋̀͘");
+assert_eq(z, x + y);
+```
+
+The cursed character at the bottom of this text is the standard "Lorem ipsum" encoded with the encoding function in this crate.
 
 \
 \
