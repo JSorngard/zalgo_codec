@@ -1,6 +1,6 @@
 # zalgo codec
 
-This is a crate implementing the zalgo encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them to Rust using a procedural macro.
+This is a crate implementing the zalgo encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro that can run encoded source code.
 
 With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single "character" wide. While the encoding is reversible the encoded string will be larger than the original in terms of bytes.
 
@@ -24,7 +24,7 @@ zalgo_embed!("E͎͉͙͉̞͉͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛͘̚̚͘�
 assert_eq!(add(10, 20), 30);
 ```
 
-as well as evaluate arbitrary expressions:
+as well as evaluate expressions:
 
 ```rust
 let x = 20;
