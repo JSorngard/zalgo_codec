@@ -4,7 +4,7 @@ This is a crate implementing the zalgo encoding and decoding functions [original
 
 With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single "character" wide. While the encoding is reversible the encoded string will be larger than the original in terms of bytes.
 
-The crate also provides the `zalgo_embed!` macro that can be used to decode a string of encoded source code and pass the results on to the compiler, resulting in no runtime penalty. Imagine the code clarity!
+The crate also provides the `zalgo_embed!` macro that can be used to decode a string of encoded source code and pass the results on to the compiler. Imagine the code clarity!
 
 Additionally the crate provides functions to encode python code and wrap the result in a decoder that decodes and executes the encoded string.
 
