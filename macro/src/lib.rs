@@ -8,7 +8,7 @@ use syn::{parse_macro_input, LitStr};
 /// This macro decodes a Unicode string that has been encoded with `zalgo_encode`
 /// and passes the results on to the compiler.
 /// # Examples
-/// We can add arbitrary source code to our program.
+/// We can use a function created in encoded source code:
 /// ```
 /// # use zalgo_codec_common::zalgo_encode;
 /// # use zalgo_codec_macro::zalgo_embed;

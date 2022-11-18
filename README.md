@@ -12,7 +12,7 @@ Can not encode carriage returns, so files written on non-unix operating systems 
 
 # Examples
 
-We can execute arbitrary encoded code with the macro:
+We can execute encoded code with the macro:
 
 ```rust
 // This expands to the code
