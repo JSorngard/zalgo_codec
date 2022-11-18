@@ -10,3 +10,12 @@ description = "A crate for converting an ASCII text string or file to a single u
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+zalgo-codec-common = { path = "./common" }
+zalgo-codec-macro = { path = "./macro" }
+
+[workspace]
+members = [
+    "common",
+    "macro"
+]
+
