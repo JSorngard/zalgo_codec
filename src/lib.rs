@@ -181,6 +181,32 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     Ok(())
 }
 
+/// Decodes the contents of a file that has been encoded with `encode_file`
+/// and stores the result in another file.
+pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+    let mut string_to_decode = fs::read_to_string(in_file)?;
+
+    if string_to_decode.contains('\r') {
+        eprintln!(
+            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+        );
+        string_to_decode = string_to_decode.replace('\r', "");
+    }
+
+    let decoded_string = zalgo_decode(&string_to_decode)?;
+
+    let mut out_path = PathBuf::new();
+    out_path.push(&out_file);
+
+    if out_path.exists() {
+        return Err("a file already exists with the output file name".into());
+    }
+
+    fs::File::create(&out_file)?;
+    fs::write(out_file, decoded_string)?;
+    Ok(())
+}
+
 /// Encodes the contents of the given file and stores the result wrapped in
 /// a decoder in another file. This file will still work the same
 /// as the original python code. If the source file contains carriage return characters
@@ -319,16 +345,31 @@ mod tests {
         lorem_path.push("lorem.txt");
         zalgo_path.push("tests");
         zalgo_path.push("zalgo.txt");
+
         encode_file(&lorem_path, &zalgo_path).unwrap();
         assert!(encode_file(&lorem_path, &zalgo_path).is_err());
+
         let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let lorem_text = fs::read_to_string(lorem_path).unwrap();
+
         assert_eq!(
             zalgo_decode(&zalgo_text).unwrap(),
             //remove carriage return on windows
-            lorem_text.replace("\r", "")
+            lorem_text.replace('\r', "")
         );
+
+        let mut consistency_path = PathBuf::new();
+        consistency_path.push("tests");
+        consistency_path.push("consistency_check.txt");
+
+        decode_file(&zalgo_path, &consistency_path).unwrap();
+        assert!(decode_file(&zalgo_path, &consistency_path).is_err());
+
+        let decoded_text = fs::read_to_string(&consistency_path).unwrap();
+
+        assert_eq!(decoded_text, lorem_text.replace('\r', ""));
         fs::remove_file(zalgo_path).unwrap();
+        fs::remove_file(consistency_path).unwrap();
     }
 
     #[test]
