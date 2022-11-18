@@ -5,6 +5,7 @@ version = "0.2.3"
 edition = "2021"
 license = "MIT"
 description = "A crate for converting an ASCII text string or file to a single unicode character. Can also do the same to python code while still letting the code run as before by wrapping it in a decoder."
+repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
