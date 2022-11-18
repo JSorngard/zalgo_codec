@@ -1,0 +1,10 @@
+[package]
+name = "zalgo-codec-common"
+authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner"]
+version = "0.2.2"
+edition = "2021"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
