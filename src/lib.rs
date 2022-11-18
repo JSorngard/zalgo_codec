@@ -9,13 +9,26 @@
 //! pass the results on to the compiler, resulting in no runtime penalty.
 //! This way arbitrary code can be replaced by a single short line for the ultimate in code obfuscation.
 //!
-//! Additionally the crate provides functions to encode python code and wrap the result in a decoder that
+//! Additionally the crate provides functions to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string.
 //!
 //! Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding
 //! functions will attempt to encode files anyway by ignoring carriage returns, but the string encoding functions will return an error.
 //!
-//! Explanation:  
+//! # Example
+//! We can execute arbitrary encoded code with the macro:
+//! ```
+//! # use zalgo_codec::zalgo_embed;
+//! // This expands to the code
+//! // `fn add(x: i32, y: i32) -> i32 {x + y}`
+//!
+//! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+//!
+//! // The `add` function is now available
+//! assert_eq!(add(10, 20), 30);
+//! ```
+//!   
+//! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
@@ -28,7 +41,11 @@
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
-//! [Original post.](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
+//! 
+//! # Notes
+//! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) 
+//! where the Python code was first presented together with the above explanation.
+
 
 pub use zalgo_codec_common::*;
 pub use zalgo_codec_macro::*;
