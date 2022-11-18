@@ -11,18 +11,17 @@ Can not encode carriage returns, so files written on non-unix operating systems 
 
 # Example
 The cursed character at the bottom of this text is the standard "Lorem ipsum" encoded with this crate.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
 E̬͏͍͉͓͕͍͒̀͐̀̈́ͅ͏͌͏͓͉͔͍͔͒̀̀́̌̀̓ͅ͏͎͓͔͔͕͉͉͓͉͎͇͉͔͓̓͒̀́̈́͐̓̀͌̌̀̈́̀̈́ͅͅͅͅ͏͉͕͓͍̀ͅ͏͔͍̈́̀͐ͅ͏͉͎͉͉͕͎͔͕͔͒̀̓̈́̈́̀̀͌́͂͏͔͒̀̀̈́ͅͅ͏͌͏͍͇͎͉͒̀́́̀́͌ͅ
