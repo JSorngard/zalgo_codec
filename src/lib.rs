@@ -1,6 +1,6 @@
 //! This is a crate implementing the zalgo encoding and decoding functions
 //! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner
-//! and extends them to Rust using a procedural macro.
+//! and extends them for Rust by providing a procedural macro that can run encoded source code.
 //!
 //! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
 //! "character" wide. While the encoding is reversible the encoded string will be larger than the original in terms of bytes.
