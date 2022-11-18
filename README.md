@@ -9,6 +9,7 @@ the encoded string. This way the file looks very different, but executes the sam
 This lets you do the mother of all refactoring by converting your entire python program into a single line of code. 
 Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding functions will attempt to encode files anyway by ignoring carriage returns.  
 
+# Example
 The cursed character at the bottom of this text is the standard "Lorem ipsum" encoded with this crate.
 
 
