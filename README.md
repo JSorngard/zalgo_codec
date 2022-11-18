@@ -32,7 +32,7 @@ let y = -10;
 // This expands to the code 
 // `x + y`
 let z = zalgo_embed!("È͙̋̀͘");
-assert_eq(z, x + y);
+assert_eq!(z, x + y);
 ```
 
 The cursed character at the bottom of this section is the standard "Lorem ipsum" encoded with the encoding function in this crate.
