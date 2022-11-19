@@ -40,7 +40,7 @@ use syn::{parse_macro_input, LitStr};
 /// version of the former will not work.  
 /// 
 /// There are many more limitations, and as I learn about more I will add them here. Feel free to create a 
-/// Pull Request on Github for adding more notes here it you know of more limitations.
+/// Pull Request on [Github](https://github.com/JSorngard/zalgo_codec) for adding more notes here it you know of more limitations.
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
 
