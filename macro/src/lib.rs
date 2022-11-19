@@ -32,6 +32,12 @@ use syn::{parse_macro_input, LitStr};
 /// let z = zalgo_embed!("È͙̋̀͘");
 /// assert_eq!(z, x + y);
 /// ```
+/// 
+/// # Limitations
+/// E.g. due to ambiguity macros can not deal with variable names inside format string literals.
+/// An example of this is that `println!("{variable_name}")` will give a compile error if used in a macro,
+/// but `println!("{}", variable_name)` will work fine. This means that calling `zalgo_embed!` on the encoded 
+/// version of the former will not work.
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
 
