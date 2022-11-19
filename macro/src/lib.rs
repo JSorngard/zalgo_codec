@@ -4,7 +4,6 @@
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, LitStr};
 
-#[proc_macro]
 /// This macro decodes a Unicode string that has been encoded with `zalgo_encode`
 /// and passes the results on to the compiler.
 /// # Examples
@@ -33,14 +32,36 @@ use syn::{parse_macro_input, LitStr};
 /// assert_eq!(z, x + y);
 /// ```
 /// 
-/// # Limitations
-/// Due to ambiguity macros can not deal with variable names inside format string literals.
-/// An example of this is that `println!("{variable_name}")` will give a compile error if used in a macro,
-/// but `println!("{}", variable_name)` will work fine. This means that calling `zalgo_embed!` on the encoded 
-/// version of the former will not work.  
+/// A more complex example is this program which expands to code that reads the
+/// command line input, encodes it, and prints out the result.
+/// ```
+/// use zalgo_codec_common::{zalgo_encode, UnencodableCharacterError};
+/// use zalgo_codec_macro::zalgo_embed;
 /// 
-/// There are many more limitations, and as I learn about more I will add them here. Feel free to create a 
-/// Pull Request on [Github](https://github.com/JSorngard/zalgo_codec) for adding more notes here if you know of more limitations.
+/// fn main() -> Result<(), UnencodableCharacterError> {
+///     // This macro expands to
+///     // let input = std::env::args().collect::<Vec<_>>()[1..].join(" ");
+///     // let output = zalgo_encode(&input)?;
+///     // println!("{}", output);
+///     zalgo_embed!("E͔͉͎͕͔̝͓͔͎͖͇͓͌̀͐̀̀̈́́͒̈̉̎̓̚̚̚̚ͅͅ͏̶͔̜̜̞̞̻͌͌̓̓̿̈̉̑̎̎̽̎͊̚̚ͅͅ͏̛͉͎͔̈̂̀̂̉ͯ͌̀ͅ͏͕͔͕͔̝͚͇͐̀̀́͌͏͎̿̓ͅ͏̛͉͎͕͔̟͉͎͔͎̼͎̼͎̈́̈̆͐̉ͯ͐͒͌́̈̂͛̂̌̀͝ͅ͏̛͕͔͕͔͐̉");
+///     Ok(())
+/// }
+/// ```
+/// 
+/// # Limitations
+/// This is an incomplete list of the limitations of this macro. There are many more,
+/// and as I learn about them I will add them here. Feel free to create a 
+/// Pull Request on [Github](https://github.com/JSorngard/zalgo_codec) for adding more notes here if you 
+/// know of more limitations.
+/// 
+/// - Due to ambiguity macros can not deal with variable names inside format string literals. An example of this is that  
+///   `println!("{variable_name}")`  
+///    will give a compile error if used in a macro,
+///    but  
+///    `println!("{}", variable_name)`  
+///    will work fine. This means that calling `zalgo_embed!` on the encoded 
+///    version of the former will not work.  
+#[proc_macro]
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
 
