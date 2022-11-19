@@ -15,12 +15,10 @@
 //! functions will attempt to encode files anyway by ignoring carriage returns, but the string encoding functions will return an error.
 //!
 //! # Example
-//! We can execute arbitrary encoded code with the macro:
+//! The cursed character is the result of using `zalgo_encode` on the code `fn add(x: i32, y: i32) -> i32 {x + y}`.
 //! ```
 //! # use zalgo_codec::zalgo_embed;
-//! // This expands to the code
-//! // `fn add(x: i32, y: i32) -> i32 {x + y}`
-//!
+//! // We can execute that source code with the macro
 //! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //!
 //! // The `add` function is now available
