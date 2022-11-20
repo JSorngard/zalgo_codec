@@ -58,7 +58,7 @@ fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
 /// The resulting string will be larger than the original in terms of bytes, but it
-/// can be decompressed to recover the original string using `zalgo_decode`.
+/// can be decompressed to recover the original string using [`zalgo_decode`].
 /// # Example
 /// ```
 /// # use zalgo_codec_common::zalgo_encode;
@@ -98,8 +98,8 @@ pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, Unencodable
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
-/// Takes in a string that was compressed by `zalgo_encode` and decompresses it
-/// to an ASCII string.
+/// Takes in a string that was compressed by [`zalgo_encode`]
+/// and decompresses it to an ASCII string.
 ///
 /// # Example
 /// ```
@@ -159,7 +159,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     Ok(())
 }
 
-/// Decodes the contents of a file that has been encoded with `encode_file`
+/// Decodes the contents of a file that has been encoded with [`encode_file`]
 /// and stores the result in another file.
 pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
     let mut string_to_decode = fs::read_to_string(in_file)?;
