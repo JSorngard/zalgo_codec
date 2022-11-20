@@ -5,7 +5,7 @@
 //! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
 //! "character" wide in a reversible way. The encoded string will be larger than the original in terms of bytes.
 //!
-//! The crate also provides the `zalgo_embed!` macro that can be used to embed encoded source code and
+//! The crate also provides the [`zalgo_embed!`] macro that can be used to embed encoded source code and
 //! pass on the decoded code to the compiler. Imagine the code clarity!
 //!
 //! Additionally the crate provides functions to encode Python code and wrap the result in a decoder that
@@ -15,7 +15,7 @@
 //! functions will attempt to encode files anyway by ignoring carriage returns, but the string encoding functions will return an error.
 //!
 //! # Example
-//! The cursed character is the result of using `zalgo_encode` on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
+//! The cursed character is the result of using [`zalgo_encode`] on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
 //! ```
 //! # use zalgo_codec::zalgo_embed;
 //! // We can add that text to our code with the macro
