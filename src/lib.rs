@@ -3,10 +3,10 @@
 //! and extends them for Rust by providing a procedural macro that can run encoded source code.
 //!
 //! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
-//! "character" wide. While the encoding is reversible the encoded string will be larger than the original in terms of bytes.
+//! "character" wide in a reversible way. The encoded string will be larger than the original in terms of bytes.
 //!
 //! The crate also provides the `zalgo_embed!` macro that can be used to embed encoded source code and
-//! pass the results on to the compiler. Imagine the code clarity!
+//! pass on the decoded code to the compiler. Imagine the code clarity!
 //!
 //! Additionally the crate provides functions to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string.
@@ -18,7 +18,7 @@
 //! The cursed character is the result of using `zalgo_encode` on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
 //! ```
 //! # use zalgo_codec::zalgo_embed;
-//! // We can execute that source code with the macro
+//! // We can add that text to our code with the macro
 //! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //!
 //! // The `add` function is now available
