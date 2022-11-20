@@ -1,10 +1,10 @@
 //! This crate provides the macro part of [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/)
-//! by defining the procedural macro `zalgo_embed!`.
+//! by defining the procedural macro [zalgo_embed!].
 
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, LitStr};
 
-/// This macro decodes a Unicode string that has been encoded with `zalgo_encode`
+/// This macro decodes a Unicode string that has been encoded with [`zalgo_encode`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/fn.zalgo_encode.html)
 /// and passes the results on to the compiler.
 /// # Examples
 /// We can use a function created in encoded source code:
