@@ -17,7 +17,6 @@ We can execute encoded code with the macro:
 ```rust
 // This expands to the code
 // `fn add(x: i32, y: i32) -> i32 {x + y}`
-
 zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 
 // The `add` function is now available
