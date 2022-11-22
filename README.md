@@ -57,4 +57,6 @@ Characters U+0300–U+036F are the combining characters for unicode Latin. The f
 
 
 # Links
-The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) where the python code was first presented together with the above explanation.  
+The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) where the python code was first presented together with the above explanation.   
+[docs.rs](https://docs.rs/crate/zalgo-codec/0.3.2).  
+[crates.io](https://crates.io/crates/zalgo-codec).
