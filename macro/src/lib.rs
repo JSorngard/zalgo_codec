@@ -56,6 +56,7 @@ use syn::{parse_macro_input, LitStr};
 /// Pull Request on [Github](https://github.com/JSorngard/zalgo_codec) for adding more notes here if you
 /// know of more limitations.
 ///
+/// - The source code must be able to pass various checks before the macro gets executed.  
 /// - Due to ambiguity macros can not deal with variable names inside format string literals. An example of this is that  
 ///   `println!("{variable_name}")`  
 ///    will give a compile error if used in a macro,
