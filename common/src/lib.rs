@@ -65,6 +65,8 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
 /// # use zalgo_codec_common::zalgo_encode;
 /// assert_eq!(zalgo_encode("Zalgo").unwrap(), "É̺͇͌͏");
 /// ```
+/// # Notes
+/// Can not encode carriage returns, present in e.g. line endings on Windows.
 pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableByteError> {
     let mut line = 1;
     let mut result: Vec<u8> = vec![b'E'];
@@ -122,7 +124,7 @@ pub struct UnencodableByteError {
 
 impl UnencodableByteError {
     fn new(byte: u8, line: usize) -> Self {
-        UnencodableByteError { byte, line }
+        Self { byte, line }
     }
 
     /// Returns the number of the line on which the unencodable byte occured.
