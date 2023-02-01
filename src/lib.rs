@@ -5,8 +5,7 @@
 //! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
 //! "character" wide in a reversible way. The encoded string will be ~2 times larger than the original in terms of bytes.
 //!
-//! The crate also provides the [`zalgo_embed!`] macro that can be used to embed encoded source code and
-//! pass on the decoded code to the compiler. Imagine the code clarity!
+//! The crate also provides the [`zalgo_embed!`] macro that can be used to execute encoded source code. Imagine the code clarity!
 //!
 //! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string, retaining the functionality of the original code.
