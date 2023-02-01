@@ -50,14 +50,13 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (127, "DEL"),
 ];
 
-/// Searches through the static UNKNOWN_CHAR_MAP for the given key
-/// and returns the corresponding character if found.
-fn get_nonprintable_char_repr(key: u8) -> Option<&'static str> {
-    if key < 10 {
-        Some(UNKNOWN_CHAR_MAP[usize::from(key)].1)
-    } else if key < 32 {
-        Some(UNKNOWN_CHAR_MAP[usize::from(key) - 1].1)
-    } else if key == 127 {
+/// Returns the representation of the given non-printable ASCII char if it is one.
+fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
+    if character < 10 {
+        Some(UNKNOWN_CHAR_MAP[usize::from(character)].1)
+    } else if character < 32 {
+        Some(UNKNOWN_CHAR_MAP[usize::from(character) - 1].1)
+    } else if character == 127 {
         Some(UNKNOWN_CHAR_MAP[31].1)
     } else {
         None
