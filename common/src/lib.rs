@@ -238,18 +238,18 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
 
 #[derive(Debug)]
 /// The error returned by the encoding functions
-/// if they encounter a character they can not encode.
+/// if they encounter a byte they can not encode.
 pub struct UnencodableByteError {
-    character: u8,
+    byte: u8,
     line: usize,
 }
 
 impl UnencodableByteError {
-    fn new(character: u8, line: usize) -> Self {
-        UnencodableByteError { character, line }
+    fn new(byte: u8, line: usize) -> Self {
+        UnencodableByteError { byte, line }
     }
 
-    /// Returns the number of the line on which the unencodable character occured.
+    /// Returns the number of the line on which the unencodable byte occured.
     pub fn line_number(&self) -> usize {
         self.line
     }
@@ -258,19 +258,19 @@ impl UnencodableByteError {
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
     pub fn unencodable_character_value(&self) -> u8 {
-        self.character
+        self.byte
     }
 }
 
 impl fmt::Display for UnencodableByteError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.character < 128 {
-            match get_nonprintable_char_repr(self.character) {
+        if self.byte < 128 {
+            match get_nonprintable_char_repr(self.byte) {
                 Some(repr) => write!(f, "line {}: cannot encode {repr} character", self.line),
                 None => write!(
                     f,
                     "line {}: cannot encode ASCII character #{}",
-                    self.line, self.character
+                    self.line, self.byte
                 ),
             }
         } else {
