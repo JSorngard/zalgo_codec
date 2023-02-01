@@ -8,8 +8,6 @@ The crate also provides the [`zalgo_embed!`] macro that can be used to decode a 
 
 Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes the encoded string, retaining the functionality of the original code.
 
-Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding functions will attempt to encode files anyway by ignoring carriage returns, but the string encoding functions will return an error.
-
 # Examples
 
 We can execute encoded code with the macro:
