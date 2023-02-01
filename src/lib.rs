@@ -38,6 +38,9 @@
 //! # Notes
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 //! where the Python code was first presented together with the above explanation.
+//!
+//! # Warning
+//! The file manipulation functions have been removed in this version.
 
 #![forbid(unsafe_code)]
 
