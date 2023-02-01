@@ -51,7 +51,7 @@ pub use zalgo_codec_macro::*;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::{distributions::Alphanumeric, Rng};
+    use rand::distributions::{Alphanumeric, DistString};
     use std::{fs, path::PathBuf, str};
 
     #[test]
@@ -181,11 +181,7 @@ mod tests {
     #[test]
     fn check_zalgo_codec_lossless() {
         for _ in 0..100 {
-            let s: String = rand::thread_rng()
-                .sample_iter(&Alphanumeric)
-                .take(100)
-                .map(char::from)
-                .collect();
+            let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
             assert_eq!(zalgo_decode(&zalgo_encode(&s).unwrap()).unwrap(), s);
         }
     }
