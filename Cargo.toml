@@ -5,13 +5,13 @@ version = "0.4.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/JSorngard/zalgo_codec"
-description = "A crate for converting an ASCII text string or file to a single unicode character. Provides a macro for executing source code that has been encoded in this way. Can do the same to python code while still letting the code run as before by wrapping it in a decoder."
+description = "A crate for converting an ASCII text string to a single unicode grapheme cluster. Provides a macro for executing source code that has been encoded in this way. Also provides a function to encode Python code while still letting it run as before by wrapping it in a decoder that decodes and executes it."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zalgo-codec-common = {path = "./common"} 
-zalgo-codec-macro = {path= "./macro"}
+zalgo-codec-common = {path = "./common"}
+zalgo-codec-macro = {path="./macro"}
 
 [dev-dependencies]
 rand = "0.8"

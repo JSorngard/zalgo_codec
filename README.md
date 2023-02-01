@@ -2,9 +2,9 @@
 
 This is a crate implementing the zalgo encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro that can run encoded source code.
 
-With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single "character" wide. While the encoding is reversible the encoded string will be larger than the original in terms of bytes.
+With the functions defined in this crate you can transform an ASCII string into a unicode string containing a single grapheme cluster and back. The encoded string will be ~2 times larger than the original in terms of bytes.
 
-The crate also provides the [`zalgo_embed!`](https://docs.rs/zalgo-codec/latest/zalgo_codec/macro.zalgo_embed.html) macro that can be used to decode a string of encoded source code and pass the results on to the compiler. Imagine the code clarity!
+The crate also provides the [`zalgo_embed!`] macro that can be used to decode a string of encoded source code and pass the results on to the compiler. Imagine the code clarity!
 
 Additionally the crate provides functions to encode python code and wrap the result in a decoder that decodes and executes the encoded string.
 

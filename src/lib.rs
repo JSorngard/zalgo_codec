@@ -3,16 +3,13 @@
 //! and extends them for Rust by providing a procedural macro that can run encoded source code.
 //!
 //! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
-//! "character" wide in a reversible way. The encoded string will be larger than the original in terms of bytes.
+//! "character" wide in a reversible way. The encoded string will be ~2 times larger than the original in terms of bytes.
 //!
 //! The crate also provides the [`zalgo_embed!`] macro that can be used to embed encoded source code and
 //! pass on the decoded code to the compiler. Imagine the code clarity!
 //!
-//! Additionally the crate provides functions to encode Python code and wrap the result in a decoder that
-//! decodes and executes the encoded string.
-//!
-//! Can not encode carriage returns, so files written on non-unix operating systems might not work. The file encoding
-//! functions will attempt to encode files anyway by ignoring carriage returns, but the string encoding functions will return an error.
+//! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
+//! decodes and executes the encoded string, retaining the functionality of the original code.
 //!
 //! # Example
 //! The cursed character is the result of using [`zalgo_encode`] on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
@@ -48,11 +45,23 @@
 pub use zalgo_codec_common::*;
 pub use zalgo_codec_macro::*;
 
+/// zalgo-encodes an ASCII string containing python code and
+/// wraps it in a decoder that decodes and executes it.
+/// This results in valid python code that should do the same thing
+/// as the input.
+/// # Notes
+/// May not work correctly on python versions before 3.10,
+/// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
+pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableByteError> {
+    let encoded_string = zalgo_encode(string_to_encode)?;
+    Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use rand::distributions::{Alphanumeric, DistString};
-    use std::{fs, path::PathBuf, str};
+    use std::str;
 
     #[test]
     fn test_embed_function() {
@@ -125,54 +134,5 @@ mod tests {
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
-    }
-
-    #[test]
-    fn file_encoding() {
-        let mut lorem_path = PathBuf::new();
-        let mut zalgo_path = PathBuf::new();
-        lorem_path.push("tests");
-        lorem_path.push("lorem.txt");
-        zalgo_path.push("tests");
-        zalgo_path.push("zalgo.txt");
-
-        encode_file(&lorem_path, &zalgo_path).unwrap();
-        assert!(encode_file(&lorem_path, &zalgo_path).is_err());
-
-        let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
-        let lorem_text = fs::read_to_string(lorem_path).unwrap();
-
-        assert_eq!(
-            zalgo_decode(&zalgo_text).unwrap(),
-            //remove carriage return on windows
-            lorem_text.replace('\r', "")
-        );
-
-        let mut consistency_path = PathBuf::new();
-        consistency_path.push("tests");
-        consistency_path.push("consistency_check.txt");
-
-        decode_file(&zalgo_path, &consistency_path).unwrap();
-        assert!(decode_file(&zalgo_path, &consistency_path).is_err());
-
-        let decoded_text = fs::read_to_string(&consistency_path).unwrap();
-
-        assert_eq!(decoded_text, lorem_text.replace('\r', ""));
-        fs::remove_file(zalgo_path).unwrap();
-        fs::remove_file(consistency_path).unwrap();
-    }
-
-    #[test]
-    fn python_encoding() {
-        let mut lorem_path = PathBuf::new();
-        let mut zalgo_path = PathBuf::new();
-        lorem_path.push("tests");
-        lorem_path.push("lorem.py");
-        zalgo_path.push("tests");
-        zalgo_path.push("zalgo.py");
-        encode_python_file(&lorem_path, &zalgo_path).unwrap();
-        let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
-        let _lorem_text = fs::read_to_string(lorem_path).unwrap();
-        fs::remove_file(zalgo_path).unwrap();
     }
 }
