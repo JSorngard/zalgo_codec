@@ -67,8 +67,8 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
 /// using a reversible encoding scheme. The resulting string should
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
-/// The resulting string will be ~2 times larger than the original in terms of bytes, but it
-/// can be decompressed to recover the original string using [`zalgo_decode`].
+/// The resulting string will be ~2 times larger than the original in terms of bytes, and it
+/// can be decoded to recover the original string using [`zalgo_decode`].
 /// # Example
 /// ```
 /// # use zalgo_codec_common::zalgo_encode;
