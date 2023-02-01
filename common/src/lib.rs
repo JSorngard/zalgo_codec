@@ -6,10 +6,12 @@
 
 use std::{
     error::Error,
-    fmt, fs,
+    fmt, fs, io,
     path::{Path, PathBuf},
     str,
 };
+
+use core::str::Utf8Error;
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, r"Null (\0)"),
@@ -123,7 +125,7 @@ pub fn zalgo_decode(compressed: &str) -> Result<String, str::Utf8Error> {
 /// Encodes the contents of the file and stores the result in another file.
 /// If carriage return characters are found it will print a message and
 /// attempt to encode the file anyway by ignoring them.
-pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
     if string_to_encode.contains('\t') {
@@ -143,7 +145,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     match zalgo_decode(&encoded_string) {
         Ok(s) => {
             if s != string_to_encode {
-                return Err("unknown error: encoding process corrupted the input string".into());
+                return Err(InvalidFileError::CorruptedEncoding);
             }
         }
         Err(e) => return Err(e.into()),
@@ -153,7 +155,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err("a file already exists with the output file name".into());
+        return Err(InvalidFileError::FileExists);
     }
 
     fs::File::create(&out_file)?;
@@ -163,7 +165,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 
 /// Decodes the contents of a file that has been encoded with [`encode_file`]
 /// and stores the result in another file.
-pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
     let mut string_to_decode = fs::read_to_string(in_file)?;
 
     if string_to_decode.contains('\r') {
@@ -179,7 +181,7 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err("a file already exists with the output file name".into());
+        return Err(InvalidFileError::FileExists);
     }
 
     fs::File::create(&out_file)?;
@@ -194,7 +196,7 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dy
 /// # Notes
 /// The resulting python file may not work correctly on python versions before 3.10,
 /// (see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1)).
-pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Box<dyn Error>> {
+pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
     if string_to_encode.contains('\t') {
@@ -215,7 +217,7 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err("a file already exists with the output file name".into());
+        return Err(InvalidFileError::FileExists);
     }
 
     fs::File::create(&out_file)?;
@@ -271,5 +273,56 @@ impl fmt::Display for UnencodableCharacterError {
 impl Error for UnencodableCharacterError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
+    }
+}
+
+#[derive(Debug)]
+pub enum InvalidFileError {
+    Io(io::Error),
+    FileExists,
+    UnencodableContent(UnencodableCharacterError),
+    CorruptedEncoding,
+    Utf8(Utf8Error),
+}
+
+impl fmt::Display for InvalidFileError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Io(e) => write!(f, "{e}"),
+            Self::UnencodableContent(e) => write!(f, "{e}"),
+            Self::CorruptedEncoding => write!(f, "unknown error caused corruption of the contents"),
+            Self::Utf8(e) => write!(f, "{e}"),
+            Self::FileExists => write!(f, "a file with the given output name already exists"),
+        }
+    }
+}
+
+impl Error for InvalidFileError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Io(e) => Some(e),
+            Self::UnencodableContent(e) => Some(e),
+            Self::CorruptedEncoding => None,
+            Self::Utf8(e) => Some(e),
+            Self::FileExists => None,
+        }
+    }
+}
+
+impl From<io::Error> for InvalidFileError {
+    fn from(err: io::Error) -> Self {
+        Self::Io(err)
+    }
+}
+
+impl From<UnencodableCharacterError> for InvalidFileError {
+    fn from(err: UnencodableCharacterError) -> Self {
+        Self::UnencodableContent(err)
+    }
+}
+
+impl From<Utf8Error> for InvalidFileError {
+    fn from(err: Utf8Error) -> Self {
+        Self::Utf8(err)
     }
 }
