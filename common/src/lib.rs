@@ -97,7 +97,9 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableChara
 
 /// zalgo-encodes an ASCII string containing python code and
 /// wraps it in a decoder that decodes and executes it.
-pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, UnencodableCharacterError> {
+/// This results in valid python code that should do the same thing
+/// as the input.
+pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableCharacterError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -110,12 +112,12 @@ pub fn zalgo_encode_python(string_to_encode: &str) -> Result<String, Unencodable
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
 /// ```
-pub fn zalgo_decode(compressed: &str) -> Result<String, str::Utf8Error> {
-    let bytes: Vec<u8> = compressed
+pub fn zalgo_decode(encoded: &str) -> Result<String, str::Utf8Error> {
+    let bytes: Vec<u8> = encoded
         .bytes()
         .skip(1)
         .step_by(2)
-        .zip(compressed.bytes().skip(2).step_by(2))
+        .zip(encoded.bytes().skip(2).step_by(2))
         .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
         .collect();
 
@@ -211,7 +213,7 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
         string_to_encode = string_to_encode.replace('\r', "");
     }
 
-    let encoded_string = zalgo_encode_python(&string_to_encode)?;
+    let encoded_string = zalgo_wrap_python(&string_to_encode)?;
 
     let mut out_path = PathBuf::new();
     out_path.push(&out_file);
@@ -228,27 +230,14 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
 #[derive(Debug)]
 /// The error returned by the encoding functions
 /// if they encounter a character they can not encode.
-/// Contains a string that references which type of character and which line caused the error.
 pub struct UnencodableCharacterError {
-    descriptor: String,
     character: u8,
     line: usize,
 }
 
 impl UnencodableCharacterError {
     fn new(character: u8, line: usize) -> Self {
-        UnencodableCharacterError {
-            descriptor: if character < 128 {
-                match get_nonprintable_char_repr(character) {
-                    Some(repr) => format!("line {line}: cannot encode {repr} character"),
-                    None => format!("line {line}: cannot encode ASCII character #{character}"),
-                }
-            } else {
-                format!("line {line}: attempt to encode UTF8 character sequence (this program can only encode non-control ASCII characters and newlines)")
-            },
-            character,
-            line,
-        }
+        UnencodableCharacterError { character, line }
     }
 
     /// Returns the number of the line on which the unencodable character occured.
@@ -265,8 +254,19 @@ impl UnencodableCharacterError {
 }
 
 impl fmt::Display for UnencodableCharacterError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.descriptor)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.character < 128 {
+            match get_nonprintable_char_repr(self.character) {
+                Some(repr) => write!(f, "line {}: cannot encode {repr} character", self.line),
+                None => write!(
+                    f,
+                    "line {}: cannot encode ASCII character #{}",
+                    self.line, self.character
+                ),
+            }
+        } else {
+            write!(f, "line {}: attempt to encode Utf-8 character sequence (this program can only encode non-control ASCII characters and newlines)", self.line)
+        }
     }
 }
 
@@ -276,6 +276,8 @@ impl Error for UnencodableCharacterError {
     }
 }
 
+/// The error returned by the encoding and decoding functions that
+/// interact with the file system.
 #[derive(Debug)]
 pub enum InvalidFileError {
     Io(io::Error),
