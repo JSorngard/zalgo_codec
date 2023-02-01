@@ -51,6 +51,7 @@ pub use zalgo_codec_macro::*;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::{distributions::Alphanumeric, Rng};
     use std::{fs, path::PathBuf, str};
 
     #[test]
@@ -121,6 +122,14 @@ mod tests {
     }
 
     #[test]
+    fn check_successes() {
+        assert!(zalgo_encode("Zalgo").is_ok());
+        assert!(zalgo_encode("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.").is_ok());
+        assert!(zalgo_encode("5^2\nis 25").is_ok());
+        assert!(zalgo_encode("fn sqr(val: i32) -> i32 { val * val }").is_ok());
+    }
+
+    #[test]
     fn file_encoding() {
         let mut lorem_path = PathBuf::new();
         let mut zalgo_path = PathBuf::new();
@@ -167,5 +176,18 @@ mod tests {
         let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let _lorem_text = fs::read_to_string(lorem_path).unwrap();
         fs::remove_file(zalgo_path).unwrap();
+    }
+
+    #[test]
+    fn check_zalgo_codec_lossless() {
+        println!("Checking that 100 randomly generated strings are unchanged by passing through the encoder and decoder. If this test fails when it shouldn't, please let me know");
+        for _ in 0..100 {
+            let s: String = rand::thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(100)
+                .map(char::from)
+                .collect();
+            assert_eq!(zalgo_decode(&zalgo_encode(&s).unwrap()).unwrap(), s);
+        }
     }
 }
