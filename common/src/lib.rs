@@ -6,12 +6,11 @@
 
 use std::{
     error::Error,
-    fmt, fs, io,
+    fs, io,
     path::{Path, PathBuf},
-    str,
 };
 
-use core::str::Utf8Error;
+use core::{fmt, str::{self, Utf8Error}};
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, r"Null (\0)"),
@@ -99,13 +98,16 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableChara
 /// wraps it in a decoder that decodes and executes it.
 /// This results in valid python code that should do the same thing
 /// as the input.
+/// # Notes
+/// May not work correctly on python versions before 3.10,
+/// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
 pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableCharacterError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
-/// Takes in a string that was compressed by [`zalgo_encode`]
-/// and decompresses it to an ASCII string.
+/// Takes in a string that was encoded by [`zalgo_encode`]
+/// and decodes it to an ASCII string.
 ///
 /// # Example
 /// ```
