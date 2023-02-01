@@ -74,13 +74,13 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
 /// # use zalgo_codec_common::zalgo_encode;
 /// assert_eq!(zalgo_encode("Zalgo").unwrap(), "É̺͇͌͏");
 /// ```
-pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableCharacterError> {
+pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableByteError> {
     let mut line = 1;
     let mut result: Vec<u8> = vec![b'E'];
 
     for c in string_to_compress.bytes() {
         if c == b'\r' {
-            return Err(UnencodableCharacterError::new(c, line));
+            return Err(UnencodableByteError::new(c, line));
         }
 
         if c == b'\n' {
@@ -88,7 +88,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableChara
         }
 
         if !(32..=126).contains(&c) && c != b'\n' {
-            return Err(UnencodableCharacterError::new(c, line));
+            return Err(UnencodableByteError::new(c, line));
         }
 
         let v = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
@@ -108,7 +108,7 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableChara
 /// # Notes
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
-pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableCharacterError> {
+pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableByteError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -239,14 +239,14 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
 #[derive(Debug)]
 /// The error returned by the encoding functions
 /// if they encounter a character they can not encode.
-pub struct UnencodableCharacterError {
+pub struct UnencodableByteError {
     character: u8,
     line: usize,
 }
 
-impl UnencodableCharacterError {
+impl UnencodableByteError {
     fn new(character: u8, line: usize) -> Self {
-        UnencodableCharacterError { character, line }
+        UnencodableByteError { character, line }
     }
 
     /// Returns the number of the line on which the unencodable character occured.
@@ -262,7 +262,7 @@ impl UnencodableCharacterError {
     }
 }
 
-impl fmt::Display for UnencodableCharacterError {
+impl fmt::Display for UnencodableByteError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.character < 128 {
             match get_nonprintable_char_repr(self.character) {
@@ -279,7 +279,7 @@ impl fmt::Display for UnencodableCharacterError {
     }
 }
 
-impl Error for UnencodableCharacterError {
+impl Error for UnencodableByteError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
     }
@@ -291,7 +291,7 @@ impl Error for UnencodableCharacterError {
 pub enum InvalidFileError {
     Io(io::Error),
     FileExists,
-    UnencodableContent(UnencodableCharacterError),
+    UnencodableContent(UnencodableByteError),
     CorruptedEncoding,
     Utf8(Utf8Error),
 }
@@ -326,8 +326,8 @@ impl From<io::Error> for InvalidFileError {
     }
 }
 
-impl From<UnencodableCharacterError> for InvalidFileError {
-    fn from(err: UnencodableCharacterError) -> Self {
+impl From<UnencodableByteError> for InvalidFileError {
+    fn from(err: UnencodableByteError) -> Self {
         Self::UnencodableContent(err)
     }
 }

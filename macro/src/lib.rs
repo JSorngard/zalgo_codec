@@ -37,10 +37,10 @@ use syn::{parse_macro_input, LitStr};
 /// A more complex example is this program which expands to code that reads the
 /// command line input, encodes it, and prints out the result.
 /// ```
-/// use zalgo_codec_common::{zalgo_encode, UnencodableCharacterError};
+/// use zalgo_codec_common::{zalgo_encode, UnencodableByteError};
 /// use zalgo_codec_macro::zalgo_embed;
 ///
-/// fn main() -> Result<(), UnencodableCharacterError> {
+/// fn main() -> Result<(), UnencodableByteError> {
 ///     // This macro expands to
 ///     // let input = std::env::args().collect::<Vec<_>>()[1..].join(" ");
 ///     // let output = zalgo_encode(&input)?;
