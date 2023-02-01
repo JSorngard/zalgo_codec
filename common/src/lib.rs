@@ -136,7 +136,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, str::Utf8Error> {
 /// Encodes the contents of the file and stores the result in another file.
 /// If carriage return characters are found it will print a message and
 /// attempt to encode the file anyway by ignoring them.
-pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
+pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UnencodableFileError> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
     if string_to_encode.contains('\t') {
@@ -151,32 +151,21 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Invali
         string_to_encode = string_to_encode.replace('\r', "");
     }
 
-    let encoded_string = zalgo_encode(&string_to_encode)?;
-
-    match zalgo_decode(&encoded_string) {
-        Ok(s) => {
-            if s != string_to_encode {
-                return Err(InvalidFileError::CorruptedEncoding);
-            }
-        }
-        Err(e) => return Err(e.into()),
-    }
-
     let mut out_path = PathBuf::new();
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err(InvalidFileError::FileExists);
+        return Err(UnencodableFileError::OutputFileExists);
     }
 
     fs::File::create(&out_file)?;
-    fs::write(out_file, encoded_string)?;
+    fs::write(out_file, zalgo_encode(&string_to_encode)?)?;
     Ok(())
 }
 
 /// Decodes the contents of a file that has been encoded with [`encode_file`]
 /// and stores the result in another file.
-pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
+pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UndecodableFileError> {
     let mut string_to_decode = fs::read_to_string(in_file)?;
 
     if string_to_decode.contains('\r') {
@@ -192,7 +181,7 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Invali
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err(InvalidFileError::FileExists);
+        return Err(UndecodableFileError::OutputFileExists);
     }
 
     fs::File::create(&out_file)?;
@@ -207,7 +196,10 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Invali
 /// # Notes
 /// The resulting python file may not work correctly on python versions before 3.10,
 /// (see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1)).
-pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), InvalidFileError> {
+pub fn encode_python_file<P: AsRef<Path>>(
+    in_file: P,
+    out_file: P,
+) -> Result<(), UnencodableFileError> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
     if string_to_encode.contains('\t') {
@@ -222,17 +214,15 @@ pub fn encode_python_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(),
         string_to_encode = string_to_encode.replace('\r', "");
     }
 
-    let encoded_string = zalgo_wrap_python(&string_to_encode)?;
-
     let mut out_path = PathBuf::new();
     out_path.push(&out_file);
 
     if out_path.exists() {
-        return Err(InvalidFileError::FileExists);
+        return Err(UnencodableFileError::OutputFileExists);
     }
 
     fs::File::create(&out_file)?;
-    fs::write(out_file, encoded_string)?;
+    fs::write(out_file, zalgo_wrap_python(&string_to_encode)?)?;
     Ok(())
 }
 
@@ -285,56 +275,85 @@ impl Error for UnencodableByteError {
     }
 }
 
-/// The error returned by the encoding and decoding functions that
+/// The error returned by the encoding functions that
 /// interact with the file system.
 #[derive(Debug)]
-pub enum InvalidFileError {
+pub enum UnencodableFileError {
     Io(io::Error),
-    FileExists,
+    OutputFileExists,
     UnencodableContent(UnencodableByteError),
-    CorruptedEncoding,
-    Utf8(Utf8Error),
 }
 
-impl fmt::Display for InvalidFileError {
+impl fmt::Display for UnencodableFileError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Io(e) => write!(f, "{e}"),
             Self::UnencodableContent(e) => write!(f, "{e}"),
-            Self::CorruptedEncoding => write!(f, "unknown error caused corruption of the contents"),
-            Self::Utf8(e) => write!(f, "{e}"),
-            Self::FileExists => write!(f, "a file with the given output name already exists"),
+            Self::OutputFileExists => write!(f, "a file with the given output name already exists"),
         }
     }
 }
 
-impl Error for InvalidFileError {
+impl Error for UnencodableFileError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::Io(e) => Some(e),
             Self::UnencodableContent(e) => Some(e),
-            Self::CorruptedEncoding => None,
-            Self::Utf8(e) => Some(e),
-            Self::FileExists => None,
+            Self::OutputFileExists => None,
         }
     }
 }
 
-impl From<io::Error> for InvalidFileError {
+impl From<io::Error> for UnencodableFileError {
     fn from(err: io::Error) -> Self {
         Self::Io(err)
     }
 }
 
-impl From<UnencodableByteError> for InvalidFileError {
+impl From<UnencodableByteError> for UnencodableFileError {
     fn from(err: UnencodableByteError) -> Self {
         Self::UnencodableContent(err)
     }
 }
 
-impl From<Utf8Error> for InvalidFileError {
+/// The error returned by the decoding functions that
+/// interact with the file system.
+#[derive(Debug)]
+pub enum UndecodableFileError {
+    Io(io::Error),
+    OutputFileExists,
+    DecodesToInvalidUnicode(Utf8Error),
+}
+
+impl fmt::Display for UndecodableFileError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Io(e) => write!(f, "{e}"),
+            Self::DecodesToInvalidUnicode(e) => write!(f, "{e}"),
+            Self::OutputFileExists => write!(f, "a file with the given output name already exists"),
+        }
+    }
+}
+
+impl Error for UndecodableFileError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Io(e) => Some(e),
+            Self::DecodesToInvalidUnicode(e) => Some(e),
+            Self::OutputFileExists => None,
+        }
+    }
+}
+
+impl From<io::Error> for UndecodableFileError {
+    fn from(err: io::Error) -> Self {
+        Self::Io(err)
+    }
+}
+
+impl From<Utf8Error> for UndecodableFileError {
     fn from(err: Utf8Error) -> Self {
-        Self::Utf8(err)
+        Self::DecodesToInvalidUnicode(err)
     }
 }
 
