@@ -54,8 +54,9 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
     }
 }
 
-/// Takes in an ASCII string and "compresses" it to zalgo text
-/// using a reversible encoding scheme. The resulting string should
+/// Takes in an ASCII string without control characters (except newlines)
+/// and "compresses" it to zalgo text using a reversible encoding scheme.
+/// The resulting string is a single unicode grapheme cluster and should
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
 /// The resulting string will be ~2 times larger than the original in terms of bytes, and it
