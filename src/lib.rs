@@ -101,6 +101,12 @@ mod tests {
             zalgo_decode(&zalgo_encode(ASCII_CHAR_TABLE).unwrap()).unwrap(),
             ASCII_CHAR_TABLE
         );
+
+        println!("Checking that randomly generated alphanumeric strings are encoded in a lossless fashion");
+        for _ in 0..100 {
+            let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
+            assert_eq!(zalgo_decode(&zalgo_encode(&s).unwrap()).unwrap(), s);
+        }
     }
 
     #[test]
@@ -119,14 +125,6 @@ mod tests {
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
-    }
-
-    #[test]
-    fn check_successes() {
-        assert!(zalgo_encode("Zalgo").is_ok());
-        assert!(zalgo_encode("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.").is_ok());
-        assert!(zalgo_encode("5^2\nis 25").is_ok());
-        assert!(zalgo_encode("fn sqr(val: i32) -> i32 { val * val }").is_ok());
     }
 
     #[test]
@@ -176,13 +174,5 @@ mod tests {
         let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let _lorem_text = fs::read_to_string(lorem_path).unwrap();
         fs::remove_file(zalgo_path).unwrap();
-    }
-
-    #[test]
-    fn check_zalgo_codec_lossless() {
-        for _ in 0..100 {
-            let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
-            assert_eq!(zalgo_decode(&zalgo_encode(&s).unwrap()).unwrap(), s);
-        }
     }
 }
