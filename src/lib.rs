@@ -180,7 +180,6 @@ mod tests {
 
     #[test]
     fn check_zalgo_codec_lossless() {
-        println!("Checking that 100 randomly generated strings are unchanged by passing through the encoder and decoder. If this test fails when it shouldn't, please let me know");
         for _ in 0..100 {
             let s: String = rand::thread_rng()
                 .sample_iter(&Alphanumeric)
