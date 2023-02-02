@@ -51,11 +51,7 @@ pub use zalgo_codec_macro::*;
 mod tests {
     use super::*;
     use rand::distributions::{Alphanumeric, DistString};
-    use std::{
-        fs, io,
-        path::{Path, PathBuf},
-        str,
-    };
+    use std::{fs, path::PathBuf, str};
 
     #[test]
     fn test_embed_function() {

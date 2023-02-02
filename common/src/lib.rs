@@ -187,10 +187,6 @@ impl Error for UnencodableByteError {
 /// Encodes the contents of the file and stores the result in another file.
 /// If carriage return characters are found it will print a message and
 /// attempt to encode the file anyway by ignoring them.
-#[deprecated(
-    since = "0.4.0",
-    note = "file manipulation functions will be removed in a future version to streamline the crate"
-)]
 pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UnencodableFileError> {
     let mut string_to_encode = fs::read_to_string(in_file)?;
 
@@ -220,10 +216,6 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Unenco
 
 /// Decodes the contents of a file that has been encoded with [`encode_file`]
 /// and stores the result in another file.
-#[deprecated(
-    since = "0.4.0",
-    note = "file manipulation functions will be removed in a future version to streamline the crate"
-)]
 pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UndecodableFileError> {
     let mut string_to_decode = fs::read_to_string(in_file)?;
 
@@ -255,10 +247,6 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Undeco
 /// # Notes
 /// The resulting python file may not work correctly on python versions before 3.10,
 /// (see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1)).
-#[deprecated(
-    since = "0.4.0",
-    note = "file manipulation functions will be removed in a future version to streamline the crate"
-)]
 pub fn encode_python_file<P: AsRef<Path>>(
     in_file: P,
     out_file: P,
