@@ -47,18 +47,6 @@
 pub use zalgo_codec_common::*;
 pub use zalgo_codec_macro::*;
 
-/// zalgo-encodes an ASCII string containing python code and
-/// wraps it in a decoder that decodes and executes it.
-/// This results in valid python code that should do the same thing
-/// as the input.
-/// # Notes
-/// May not work correctly on python versions before 3.10,
-/// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
-pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableByteError> {
-    let encoded_string = zalgo_encode(string_to_encode)?;
-    Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
