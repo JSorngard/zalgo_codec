@@ -35,6 +35,9 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
 //!
+//! # Features
+//! The "files" feature enables the functions [`encode_file`], [`decode_file`] and [`encode_python_file`].
+//! 
 //! # Notes
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 //! where the Python code was first presented together with the above explanation.
