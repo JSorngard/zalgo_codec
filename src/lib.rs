@@ -48,7 +48,7 @@ pub use zalgo_codec_macro::*;
 mod tests {
     use super::*;
     use rand::distributions::{Alphanumeric, DistString};
-    use std::{fs, path::PathBuf, str};
+    use std::str;
 
     #[test]
     fn test_embed_function() {
@@ -123,7 +123,11 @@ mod tests {
         assert!(zalgo_encode("\0").is_err());
     }
 
+    #[cfg(feature = "files")]
+    use std::{fs, path::PathBuf};
+
     #[test]
+    #[cfg(feature = "files")]
     fn file_encoding() {
         let mut lorem_path = PathBuf::new();
         let mut zalgo_path = PathBuf::new();
@@ -159,6 +163,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "files")]
     fn python_encoding() {
         let mut lorem_path = PathBuf::new();
         let mut zalgo_path = PathBuf::new();
