@@ -3,9 +3,8 @@
 
 #![forbid(unsafe_code)]
 
-use std::error::Error;
-
 use core::{fmt, str};
+use std::error::Error;
 
 static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
     (0, r"Null (\0)"),
@@ -54,7 +53,6 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
         None
     }
 }
-
 
 #[cfg(feature = "files")]
 mod files;
