@@ -51,7 +51,11 @@ pub use zalgo_codec_macro::*;
 mod tests {
     use super::*;
     use rand::distributions::{Alphanumeric, DistString};
-    use std::str;
+    use std::{
+        fs, io,
+        path::{Path, PathBuf},
+        str,
+    };
 
     #[test]
     fn test_embed_function() {
@@ -124,5 +128,54 @@ mod tests {
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
+    }
+
+    #[test]
+    fn file_encoding() {
+        let mut lorem_path = PathBuf::new();
+        let mut zalgo_path = PathBuf::new();
+        lorem_path.push("tests");
+        lorem_path.push("lorem.txt");
+        zalgo_path.push("tests");
+        zalgo_path.push("zalgo.txt");
+
+        encode_file(&lorem_path, &zalgo_path).unwrap();
+        assert!(encode_file(&lorem_path, &zalgo_path).is_err());
+
+        let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
+        let lorem_text = fs::read_to_string(lorem_path).unwrap();
+
+        assert_eq!(
+            zalgo_decode(&zalgo_text).unwrap(),
+            //remove carriage return on windows
+            lorem_text.replace('\r', "")
+        );
+
+        let mut consistency_path = PathBuf::new();
+        consistency_path.push("tests");
+        consistency_path.push("consistency_check.txt");
+
+        decode_file(&zalgo_path, &consistency_path).unwrap();
+        assert!(decode_file(&zalgo_path, &consistency_path).is_err());
+
+        let decoded_text = fs::read_to_string(&consistency_path).unwrap();
+
+        assert_eq!(decoded_text, lorem_text.replace('\r', ""));
+        fs::remove_file(zalgo_path).unwrap();
+        fs::remove_file(consistency_path).unwrap();
+    }
+
+    #[test]
+    fn python_encoding() {
+        let mut lorem_path = PathBuf::new();
+        let mut zalgo_path = PathBuf::new();
+        lorem_path.push("tests");
+        lorem_path.push("lorem.py");
+        zalgo_path.push("tests");
+        zalgo_path.push("zalgo.py");
+        encode_python_file(&lorem_path, &zalgo_path).unwrap();
+        let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
+        let _lorem_text = fs::read_to_string(lorem_path).unwrap();
+        fs::remove_file(zalgo_path).unwrap();
     }
 }
