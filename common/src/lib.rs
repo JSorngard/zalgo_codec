@@ -1,6 +1,5 @@
 //! A crate for converting an ASCII text string to a single unicode grapheme cluster and back.
-//! # Warning
-//! The file manipulation functions have been removed in this version, as I want this crate to be only the codec.
+//! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
 
 #![forbid(unsafe_code)]
 
