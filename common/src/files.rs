@@ -12,56 +12,64 @@ use core::str::Utf8Error;
 /// If carriage return characters are found it will print a message and
 /// attempt to encode the file anyway by ignoring them.
 pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UnencodableFileError> {
-    let mut string_to_encode = fs::read_to_string(in_file)?;
+    fn inner(in_file: &Path, out_file: &Path) -> Result<(), UnencodableFileError> {
+        let mut string_to_encode = fs::read_to_string(in_file)?;
 
-    if string_to_encode.contains('\t') {
-        eprintln!("found tabs in the file, replacing with four spaces");
-        string_to_encode = string_to_encode.replace('\t', "    ");
+        if string_to_encode.contains('\t') {
+            eprintln!("found tabs in the file, replacing with four spaces");
+            string_to_encode = string_to_encode.replace('\t', "    ");
+        }
+
+        if string_to_encode.contains('\r') {
+            eprintln!(
+                r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+            );
+            string_to_encode = string_to_encode.replace('\r', "");
+        }
+
+        let mut out_path = PathBuf::new();
+        out_path.push(&out_file);
+
+        if out_path.exists() {
+            return Err(UnencodableFileError::OutputFileExists);
+        }
+
+        fs::File::create(&out_file)?;
+        fs::write(out_file, zalgo_encode(&string_to_encode)?)?;
+        Ok(())
     }
 
-    if string_to_encode.contains('\r') {
-        eprintln!(
-            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
-        );
-        string_to_encode = string_to_encode.replace('\r', "");
-    }
-
-    let mut out_path = PathBuf::new();
-    out_path.push(&out_file);
-
-    if out_path.exists() {
-        return Err(UnencodableFileError::OutputFileExists);
-    }
-
-    fs::File::create(&out_file)?;
-    fs::write(out_file, zalgo_encode(&string_to_encode)?)?;
-    Ok(())
+    inner(in_file.as_ref(), out_file.as_ref())
 }
 
 /// Decodes the contents of a file that has been encoded with [`encode_file`]
 /// and stores the result in another file.
 pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), UndecodableFileError> {
-    let mut string_to_decode = fs::read_to_string(in_file)?;
+    fn inner(in_file: &Path, out_file: &Path) -> Result<(), UndecodableFileError> {
+        let mut string_to_decode = fs::read_to_string(in_file)?;
 
-    if string_to_decode.contains('\r') {
-        eprintln!(
-            r"file contains the carriage return character (\r). Will attempt to decode the file anyway by ignoring it"
-        );
-        string_to_decode = string_to_decode.replace('\r', "");
+        if string_to_decode.contains('\r') {
+            eprintln!(
+                r"file contains the carriage return character (\r). Will attempt to decode the file anyway by ignoring it"
+            );
+            string_to_decode = string_to_decode.replace('\r', "");
+        }
+
+        let decoded_string = zalgo_decode(&string_to_decode)?;
+
+        let mut out_path = PathBuf::new();
+        out_path.push(&out_file);
+
+        if out_path.exists() {
+            return Err(UndecodableFileError::OutputFileExists);
+        }
+
+        fs::File::create(&out_file)?;
+        fs::write(out_file, decoded_string)?;
+        Ok(())
     }
 
-    let decoded_string = zalgo_decode(&string_to_decode)?;
-
-    let mut out_path = PathBuf::new();
-    out_path.push(&out_file);
-
-    if out_path.exists() {
-        return Err(UndecodableFileError::OutputFileExists);
-    }
-
-    fs::File::create(&out_file)?;
-    fs::write(out_file, decoded_string)?;
-    Ok(())
+    inner(in_file.as_ref(), out_file.as_ref())
 }
 
 /// Encodes the contents of the given file and stores the result wrapped in
@@ -75,30 +83,34 @@ pub fn encode_python_file<P: AsRef<Path>>(
     in_file: P,
     out_file: P,
 ) -> Result<(), UnencodableFileError> {
-    let mut string_to_encode = fs::read_to_string(in_file)?;
+    fn inner(in_file: &Path, out_file: &Path) -> Result<(), UnencodableFileError> {
+        let mut string_to_encode = fs::read_to_string(in_file)?;
 
-    if string_to_encode.contains('\t') {
-        eprintln!("found tabs in the file, replacing with four spaces");
-        string_to_encode = string_to_encode.replace('\t', "    ");
+        if string_to_encode.contains('\t') {
+            eprintln!("found tabs in the file, replacing with four spaces");
+            string_to_encode = string_to_encode.replace('\t', "    ");
+        }
+
+        if string_to_encode.contains('\r') {
+            eprintln!(
+                r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+            );
+            string_to_encode = string_to_encode.replace('\r', "");
+        }
+
+        let mut out_path = PathBuf::new();
+        out_path.push(&out_file);
+
+        if out_path.exists() {
+            return Err(UnencodableFileError::OutputFileExists);
+        }
+
+        fs::File::create(&out_file)?;
+        fs::write(out_file, zalgo_wrap_python(&string_to_encode)?)?;
+        Ok(())
     }
 
-    if string_to_encode.contains('\r') {
-        eprintln!(
-            r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
-        );
-        string_to_encode = string_to_encode.replace('\r', "");
-    }
-
-    let mut out_path = PathBuf::new();
-    out_path.push(&out_file);
-
-    if out_path.exists() {
-        return Err(UnencodableFileError::OutputFileExists);
-    }
-
-    fs::File::create(&out_file)?;
-    fs::write(out_file, zalgo_wrap_python(&string_to_encode)?)?;
-    Ok(())
+    inner(in_file.as_ref(), out_file.as_ref())
 }
 
 /// The error returned by the encoding functions that
