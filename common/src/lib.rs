@@ -1,6 +1,6 @@
 //! A crate for converting an ASCII text string to a single unicode grapheme cluster and back.
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
-//! 
+//!
 //! # Features
 //! `files`: enabled by default and provides the functions [`encode_file`], [`decode_file`] and [`wrap_python_file`].
 
@@ -82,16 +82,12 @@ pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableByteE
     let mut result: Vec<u8> = vec![b'E'];
 
     for c in string_to_compress.bytes() {
-        if c == b'\r' {
+        if !(32..=126).contains(&c) && c != b'\n' {
             return Err(UnencodableByteError::new(c, line));
         }
 
         if c == b'\n' {
             line += 1;
-        }
-
-        if !(32..=126).contains(&c) && c != b'\n' {
-            return Err(UnencodableByteError::new(c, line));
         }
 
         let v = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
