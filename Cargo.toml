@@ -11,7 +11,7 @@ description = "A crate for converting an ASCII text string to a single unicode g
 
 [dependencies]
 zalgo-codec-common = "0.5.0"
-zalgo-codec-macro = "0.1.3"
+zalgo-codec-macro = "0.1.4"
 
 [dev-dependencies]
 rand = "0.8"
