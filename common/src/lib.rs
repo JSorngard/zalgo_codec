@@ -54,10 +54,10 @@ fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
     }
 }
 
-#[cfg(feature = "files")]
+#[cfg(any(doc, feature = "files"))]
 mod files;
 
-#[cfg(feature = "files")]
+#[cfg(any(doc, feature = "files"))]
 pub use files::*;
 
 /// Takes in an ASCII string without control characters (except newlines)

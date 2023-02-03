@@ -28,13 +28,13 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Unenco
         }
 
         let mut out_path = PathBuf::new();
-        out_path.push(&out_file);
+        out_path.push(out_file);
 
         if out_path.exists() {
             return Err(UnencodableFileError::OutputFileExists);
         }
 
-        fs::File::create(&out_file)?;
+        fs::File::create(out_file)?;
         fs::write(out_file, zalgo_encode(&string_to_encode)?)?;
         Ok(())
     }
@@ -58,13 +58,13 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Undeco
         let decoded_string = zalgo_decode(&string_to_decode)?;
 
         let mut out_path = PathBuf::new();
-        out_path.push(&out_file);
+        out_path.push(out_file);
 
         if out_path.exists() {
             return Err(UndecodableFileError::OutputFileExists);
         }
 
-        fs::File::create(&out_file)?;
+        fs::File::create(out_file)?;
         fs::write(out_file, decoded_string)?;
         Ok(())
     }
@@ -72,14 +72,14 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Undeco
     inner(in_file.as_ref(), out_file.as_ref())
 }
 
-/// Encodes the contents of the given file and stores the result wrapped in
-/// a decoder in another file. This file will still work the same
-/// as the original python code. If the source file contains carriage return characters
-/// this function will print a message and then attempt to encode the file anyway by ignoring them.
+/// Encodes the contents of the given Python source file and stores the result wrapped in
+/// a decoder in another file. This new file retains the functionality of the original.
+/// If the source file contains carriage return characters this function will print a
+/// message and then attempt to encode it anyway by ignoring them.
 /// # Notes
 /// The resulting python file may not work correctly on python versions before 3.10,
 /// (see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1)).
-pub fn encode_python_file<P: AsRef<Path>>(
+pub fn wrap_python_file<P: AsRef<Path>>(
     in_file: P,
     out_file: P,
 ) -> Result<(), UnencodableFileError> {
@@ -99,13 +99,13 @@ pub fn encode_python_file<P: AsRef<Path>>(
         }
 
         let mut out_path = PathBuf::new();
-        out_path.push(&out_file);
+        out_path.push(out_file);
 
         if out_path.exists() {
             return Err(UnencodableFileError::OutputFileExists);
         }
 
-        fs::File::create(&out_file)?;
+        fs::File::create(out_file)?;
         fs::write(out_file, zalgo_wrap_python(&string_to_encode)?)?;
         Ok(())
     }

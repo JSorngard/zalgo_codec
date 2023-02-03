@@ -17,6 +17,7 @@ zalgo-codec-macro = {path = "./macro"}
 rand = "0.8"
 
 [features]
+default = ["files"]
 files = ["zalgo-codec-common/files"]
 
 [workspace]

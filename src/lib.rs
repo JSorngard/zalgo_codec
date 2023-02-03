@@ -36,7 +36,7 @@
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
 //!
 //! # Features
-//! The "files" feature enables the functions [`encode_file`], [`decode_file`] and [`encode_python_file`].
+//! `files`: Enabled by default, provides the functions [`encode_file`], [`decode_file`] and [`wrap_python_file`].
 //!
 //! # Notes
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
@@ -174,7 +174,7 @@ mod tests {
         lorem_path.push("lorem.py");
         zalgo_path.push("tests");
         zalgo_path.push("zalgo.py");
-        encode_python_file(&lorem_path, &zalgo_path).unwrap();
+        wrap_python_file(&lorem_path, &zalgo_path).unwrap();
         let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let _lorem_text = fs::read_to_string(lorem_path).unwrap();
         fs::remove_file(zalgo_path).unwrap();
