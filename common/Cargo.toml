@@ -1,7 +1,7 @@
 [package]
 name = "zalgo-codec-common"
 authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner"]
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 license = "MIT"
 description = "A crate for converting an ASCII text string to a single unicode grapheme cluster and back."
