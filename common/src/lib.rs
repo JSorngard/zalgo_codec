@@ -48,7 +48,7 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
 fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
     if character < 10 {
         Some(UNKNOWN_CHAR_MAP[usize::from(character)].1)
-    } else if character < 32 {
+    } else if character > 10 && character < 32 {
         Some(UNKNOWN_CHAR_MAP[usize::from(character) - 1].1)
     } else if character == 127 {
         Some(UNKNOWN_CHAR_MAP[31].1)
@@ -192,6 +192,7 @@ mod test {
                 UNKNOWN_CHAR_MAP[usize::from(i)].1
             );
         }
+        assert_eq!(get_nonprintable_char_repr(10), None);
         for i in 11_u8..32 {
             assert_eq!(
                 get_nonprintable_char_repr(i).unwrap(),
