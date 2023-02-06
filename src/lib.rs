@@ -52,6 +52,7 @@ mod tests {
     use super::*;
     use rand::distributions::{Alphanumeric, DistString};
     use std::str;
+    use unicode_segmentation::UnicodeSegmentation;
 
     #[test]
     fn test_embed_function() {
@@ -101,10 +102,15 @@ mod tests {
             ASCII_CHAR_TABLE
         );
 
-        println!("Checking that randomly generated alphanumeric strings are encoded in a lossless fashion");
+        println!("Checking that randomly generated alphanumeric strings are encoded in a lossless fashion, and that they contain a single grapheme cluster");
         for _ in 0..100 {
             let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
-            assert_eq!(zalgo_decode(&zalgo_encode(&s).unwrap()).unwrap(), s);
+            let encoded = zalgo_encode(&s).unwrap();
+            assert_eq!(zalgo_decode(&encoded).unwrap(), s);
+            assert_eq!(
+                UnicodeSegmentation::graphemes(encoded.as_str(), true).count(),
+                1
+            )
         }
     }
 
