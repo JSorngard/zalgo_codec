@@ -107,10 +107,7 @@ mod tests {
             let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
             let encoded = zalgo_encode(&s).unwrap();
             assert_eq!(zalgo_decode(&encoded).unwrap(), s);
-            assert_eq!(
-                UnicodeSegmentation::graphemes(encoded.as_str(), true).count(),
-                1
-            )
+            assert_eq!(encoded.as_str().graphemes(true).count(), 1)
         }
     }
 
