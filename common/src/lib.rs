@@ -48,7 +48,7 @@ static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
 fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
     if character < 10 {
         Some(UNKNOWN_CHAR_MAP[usize::from(character)].1)
-    } else if character > 10 && character < 32 {
+    } else if (11..32).contains(&character) {
         Some(UNKNOWN_CHAR_MAP[usize::from(character) - 1].1)
     } else if character == 127 {
         Some(UNKNOWN_CHAR_MAP[31].1)
@@ -140,19 +140,19 @@ pub struct UnencodableByteError {
 }
 
 impl UnencodableByteError {
-    fn new(byte: u8, line: usize) -> Self {
+    const fn new(byte: u8, line: usize) -> Self {
         Self { byte, line }
     }
 
     /// Returns the number of the line on which the unencodable byte occured.
-    pub fn line_number(&self) -> usize {
+    pub const fn line_number(&self) -> usize {
         self.line
     }
 
     /// Returns the byte value of the unencodable character. Note that this might
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
-    pub fn unencodable_character_value(&self) -> u8 {
+    pub const fn unencodable_character_value(&self) -> u8 {
         self.byte
     }
 }
