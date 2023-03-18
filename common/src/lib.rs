@@ -131,7 +131,7 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableBy
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// The error returned by the encoding functions
 /// if they encounter a byte they can not encode.
 pub struct UnencodableByteError {
