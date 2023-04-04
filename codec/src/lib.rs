@@ -2,7 +2,7 @@
 //! It is based on the encoding and decoding functions
 //! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner
 //! and extends them for Rust by providing a procedural macro that lets you embed an encoded string
-//! and decode it into source code at compile time.
+//! and decode it into source code at compile time.  
 //! This lets you reach new lows in the field of self-documenting code.
 //!
 //! The encoded string will be ~2 times larger than the original in terms of bytes,
