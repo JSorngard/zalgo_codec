@@ -163,6 +163,15 @@ impl UnencodableByteError {
             Self::NonprintableAscii(byte, _, _) | Self::NotAscii(byte, _) => *byte,
         }
     }
+
+    /// Return a representation of the unencodable byte if there is one.
+    /// E.g. this returns `Some("Carriage Return (\r)")` if the byte value is 13.
+    pub const fn repr(&self) -> Option<&'static str> {
+        match self {
+            Self::NonprintableAscii(_, _, repr) => *repr,
+            Self::NotAscii(_, _) => None,
+        }
+    }
 }
 
 impl fmt::Display for UnencodableByteError {
