@@ -22,7 +22,7 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Unenco
 
         if string_to_encode.contains('\r') {
             eprintln!(
-                r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it. This may result in a different file when decoded"
+                r"file contains the carriage return character (\r). Will attempt to encode the file anyway by ignoring it."
             );
             string_to_encode = string_to_encode.replace('\r', "");
         }
