@@ -4,9 +4,8 @@ use std::error::Error;
 use std::{
     fmt, fs, io,
     path::{Path, PathBuf},
+    string::FromUtf8Error,
 };
-
-use core::str::Utf8Error;
 
 /// Encodes the contents of the file and stores the result in another file.
 /// If carriage return characters are found it will print a message and
@@ -162,7 +161,7 @@ impl From<UnencodableByteError> for UnencodableFileError {
 pub enum UndecodableFileError {
     Io(io::Error),
     OutputFileExists,
-    DecodesToInvalidUnicode(Utf8Error),
+    DecodesToInvalidUnicode(FromUtf8Error),
 }
 
 impl fmt::Display for UndecodableFileError {
@@ -193,8 +192,8 @@ impl From<io::Error> for UndecodableFileError {
     }
 }
 
-impl From<Utf8Error> for UndecodableFileError {
-    fn from(err: Utf8Error) -> Self {
+impl From<FromUtf8Error> for UndecodableFileError {
+    fn from(err: FromUtf8Error) -> Self {
         Self::DecodesToInvalidUnicode(err)
     }
 }

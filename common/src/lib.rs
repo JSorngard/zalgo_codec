@@ -109,7 +109,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteErr
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
 /// ```
-pub fn zalgo_decode(encoded: &str) -> Result<String, str::Utf8Error> {
+pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
     let bytes: Vec<u8> = encoded
         .bytes()
         .skip(1)
@@ -118,7 +118,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, str::Utf8Error> {
         .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
         .collect();
 
-    str::from_utf8(&bytes).map(|s| s.to_owned())
+    String::from_utf8(bytes)
 }
 
 /// zalgo-encodes an ASCII string containing Python code and
