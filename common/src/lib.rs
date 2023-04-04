@@ -77,12 +77,12 @@ pub use files::*;
 /// ```
 /// # Notes
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
-pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableByteError> {
+pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteError> {
     let mut line = 1;
-    let mut result = Vec::<u8>::with_capacity(2 * string_to_compress.len() + 1);
+    let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
 
-    for c in string_to_compress.bytes() {
+    for c in string_to_encode.bytes() {
         if !(32..=126).contains(&c) && c != b'\n' {
             return Err(UnencodableByteError::new(c, line));
         }
