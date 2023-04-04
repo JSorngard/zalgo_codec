@@ -134,42 +134,45 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableBy
 #[derive(Debug, Clone)]
 /// The error returned by the encoding functions
 /// if they encounter a byte they can not encode.
-pub struct UnencodableByteError {
-    byte: u8,
-    line: usize,
+pub enum UnencodableByteError {
+    NonprintableAscii(u8, usize, Option<&'static str>),
+    NotAscii(u8, usize),
 }
 
 impl UnencodableByteError {
-    const fn new(byte: u8, line: usize) -> Self {
-        Self { byte, line }
+    fn new(byte: u8, line: usize) -> Self {
+        if byte < 128 {
+            Self::NonprintableAscii(byte, line, get_nonprintable_char_repr(byte))
+        } else {
+            Self::NotAscii(byte, line)
+        }
     }
 
     /// Returns the number of the line on which the unencodable byte occured.
-    pub const fn line_number(&self) -> usize {
-        self.line
+    pub const fn line(&self) -> usize {
+        match self {
+            Self::NonprintableAscii(_, line, _) | Self::NotAscii(_, line) => *line,
+        }
     }
 
     /// Returns the byte value of the unencodable character. Note that this might
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
-    pub const fn unencodable_byte(&self) -> u8 {
-        self.byte
+    pub const fn byte(&self) -> u8 {
+        match self {
+            Self::NonprintableAscii(byte, _, _) | Self::NotAscii(byte, _) => *byte,
+        }
     }
 }
 
 impl fmt::Display for UnencodableByteError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.byte < 128 {
-            match get_nonprintable_char_repr(self.byte) {
-                Some(repr) => write!(f, "line {}: cannot encode {repr} character", self.line),
-                None => write!(
-                    f,
-                    "line {}: cannot encode ASCII character #{}",
-                    self.line, self.byte
-                ),
-            }
-        } else {
-            write!(f, "line {}: attempt to encode Utf-8 character sequence (this program can only encode non-control ASCII characters and newlines)", self.line)
+        match self {
+            Self::NonprintableAscii(byte, line, r) => match r {
+                Some(repr) => write!(f, "line {line}: can not encode ASCII characters with byte value {byte} (aka {repr} characters)"),
+                None => write!(f, "line {line}: could not encode ASCII character with byte value {byte}"),
+            },
+            Self::NotAscii(byte, line) => write!(f, "line {line}: byte value {byte} does not correspond to an ASCII character"),
         }
     }
 }
