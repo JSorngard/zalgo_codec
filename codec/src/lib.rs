@@ -1,9 +1,12 @@
-//! This is a crate implementing the zalgo encoding and decoding functions
+//! This crate lets you convert ASCII strings into single unicode grapheme clusters and back.
+//! It is based on the encoding and decoding functions
 //! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner
-//! and extends them for Rust by providing a procedural macro that can run encoded source code.
+//! and extends them for Rust by providing a procedural macro that lets you embed an encoded string
+//! and decode it into source code at compile time.
 //!
-//! With the functions defined in this crate you can transform an ASCII string into a unicode string that is a single
-//! "character" wide in a reversible way. The encoded string will be ~2 times larger than the original in terms of bytes.
+//! The encoded string will be ~2 times larger than the original in terms of bytes,
+//! but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes))
+//! you should only get one.
 //!
 //! The crate also provides the [`zalgo_embed!`] macro that can be used to execute encoded source code. Imagine the code clarity!
 //!
