@@ -152,7 +152,7 @@ impl UnencodableByteError {
     /// Returns the byte value of the unencodable character. Note that this might
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
-    pub const fn unencodable_character_value(&self) -> u8 {
+    pub const fn unencodable_byte(&self) -> u8 {
         self.byte
     }
 }
