@@ -36,7 +36,8 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteErr
 
     for c in string_to_encode.bytes() {
         if !(32..=126).contains(&c) && c != b'\n' {
-            return Err(UnencodableByteError::new(c, line));
+            return Err(UnencodableByteError::try_new(c, line)
+                .expect("just verified that the byte is in the appropriate ASCII subset and try_new is verified in a unit test"));
         }
 
         if c == b'\n' {
@@ -82,20 +83,23 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableBy
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// The error returned by the encoding functions
 /// if they encounter a byte they can not encode.
 pub enum UnencodableByteError {
-    NonprintableAscii(u8, usize, Option<&'static str>),
+    NonprintableAscii(u8, usize, &'static str),
     NotAscii(u8, usize),
 }
 
 impl UnencodableByteError {
-    const fn new(byte: u8, line: usize) -> Self {
+    const fn try_new(byte: u8, line: usize) -> Option<Self> {
         if byte < 128 {
-            Self::NonprintableAscii(byte, line, get_nonprintable_char_repr(byte))
+            match get_nonprintable_char_repr(byte) {
+                Some(repr) => Some(Self::NonprintableAscii(byte, line, repr)),
+                None => None,
+            }
         } else {
-            Self::NotAscii(byte, line)
+            Some(Self::NotAscii(byte, line))
         }
     }
 
@@ -124,7 +128,7 @@ impl UnencodableByteError {
     /// ```
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
-            Self::NonprintableAscii(_, _, repr) => *repr,
+            Self::NonprintableAscii(_, _, repr) => Some(*repr),
             Self::NotAscii(_, _) => None,
         }
     }
@@ -133,18 +137,10 @@ impl UnencodableByteError {
 impl fmt::Display for UnencodableByteError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::NonprintableAscii(byte, line, r) => match r {
-                Some(repr) => write!(
-                    f,
-                    "line {line}: can not encode ASCII \"{repr}\" characters with byte value {byte}"
-                ),
-                // TODO: find a way to remove this possibillity as all non-printable ASCII characters
-                // have a representation and we can encode all printable ones.
-                None => write!(
-                    f,
-                    "line {line}: could not encode ASCII character with byte value {byte}"
-                ),
-            },
+            Self::NonprintableAscii(byte, line, repr) => write!(
+                f,
+                "line {line}: can not encode ASCII \"{repr}\" characters with byte value {byte}"
+            ),
             Self::NotAscii(byte, line) => write!(
                 f,
                 "line {line}: byte value {byte} does not correspond to an ASCII character"
@@ -206,5 +202,51 @@ const fn get_nonprintable_char_repr(byte: u8) -> Option<&'static str> {
         Some("Delete")
     } else {
         None
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn check_invalid_bytes() {
+        for b in 0..10 {
+            assert_eq!(
+                UnencodableByteError::try_new(b, 0)
+                    .unwrap()
+                    .representation(),
+                get_nonprintable_char_repr(b),
+            )
+        }
+
+        assert!(UnencodableByteError::try_new(10, 0).is_none());
+
+        for b in 11..32 {
+            assert_eq!(
+                UnencodableByteError::try_new(b, 0)
+                    .unwrap()
+                    .representation(),
+                get_nonprintable_char_repr(b),
+            )
+        }
+
+        for b in 32..127 {
+            assert!(UnencodableByteError::try_new(b, 0).is_none());
+        }
+
+        assert_eq!(
+            UnencodableByteError::try_new(127, 0)
+                .unwrap()
+                .representation(),
+            Some("Delete"),
+        );
+
+        for b in 128..=u8::MAX {
+            assert_eq!(
+                UnencodableByteError::try_new(b, 0),
+                Some(UnencodableByteError::NotAscii(b, 0)),
+            );
+        }
     }
 }
