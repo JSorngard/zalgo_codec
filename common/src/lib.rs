@@ -96,9 +96,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteErr
         result.push((v & 63) | 0b10000000);
     }
 
-    Ok(str::from_utf8(&result)
-        .expect("the encoding process should not produce invalid utf8")
-        .into())
+    Ok(String::from_utf8(result).expect("the encoding process should not produce invalid utf8"))
 }
 
 /// Takes in a string that was encoded by [`zalgo_encode`]
