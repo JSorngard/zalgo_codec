@@ -79,7 +79,8 @@ pub use files::*;
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
 pub fn zalgo_encode(string_to_compress: &str) -> Result<String, UnencodableByteError> {
     let mut line = 1;
-    let mut result: Vec<u8> = vec![b'E'];
+    let mut result = Vec::<u8>::with_capacity(2 * string_to_compress.len() + 1);
+    result.push(b'E');
 
     for c in string_to_compress.bytes() {
         if !(32..=126).contains(&c) && c != b'\n' {
