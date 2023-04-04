@@ -138,6 +138,8 @@ impl fmt::Display for UnencodableByteError {
                     f,
                     "line {line}: can not encode ASCII \"{repr}\" characters with byte value {byte}"
                 ),
+                // TODO: find a way to remove this possibillity as all non-printable ASCII characters
+                // have a representation and we can encode all printable ones.
                 None => write!(
                     f,
                     "line {line}: could not encode ASCII character with byte value {byte}"
