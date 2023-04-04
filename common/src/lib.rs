@@ -9,54 +9,6 @@
 use core::{fmt, str};
 use std::error::Error;
 
-static UNKNOWN_CHAR_MAP: &[(u8, &str)] = &[
-    (0, r"Null (\0)"),
-    (1, "SOH"),
-    (2, "STX"),
-    (3, "ETX"),
-    (4, "EOT"),
-    (5, "ENQ"),
-    (6, "ACK"),
-    (7, "BEL"),
-    (8, r"Backspace (\b)"),
-    (9, r"Tab (\t)"),
-    (11, r"Vertical Tab (\v)"),
-    (12, r"Form Feed (\f)"),
-    (13, r"Carriage Return (\r)"),
-    (14, "SO"),
-    (15, "SI"),
-    (16, "DLE"),
-    (17, "DC1"),
-    (18, "DC2"),
-    (19, "DC3"),
-    (20, "DC4"),
-    (21, "NAK"),
-    (22, "SYN"),
-    (23, "ETB"),
-    (24, "CAN"),
-    (25, "EM"),
-    (26, "SUB"),
-    (27, "ESC"),
-    (28, "FS"),
-    (29, "GS"),
-    (30, "RS"),
-    (31, "US"),
-    (127, "DEL"),
-];
-
-/// Returns the representation of the given non-printable ASCII char if it is one.
-fn get_nonprintable_char_repr(character: u8) -> Option<&'static str> {
-    if character < 10 {
-        Some(UNKNOWN_CHAR_MAP[usize::from(character)].1)
-    } else if (11..32).contains(&character) {
-        Some(UNKNOWN_CHAR_MAP[usize::from(character) - 1].1)
-    } else if character == 127 {
-        Some(UNKNOWN_CHAR_MAP[31].1)
-    } else {
-        None
-    }
-}
-
 #[cfg(any(doc, feature = "files"))]
 mod files;
 
@@ -139,7 +91,7 @@ pub enum UnencodableByteError {
 }
 
 impl UnencodableByteError {
-    fn new(byte: u8, line: usize) -> Self {
+    const fn new(byte: u8, line: usize) -> Self {
         if byte < 128 {
             Self::NonprintableAscii(byte, line, get_nonprintable_char_repr(byte))
         } else {
@@ -147,7 +99,7 @@ impl UnencodableByteError {
         }
     }
 
-    /// Returns the number of the line on which the unencodable byte occured.
+    /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
     pub const fn line(&self) -> usize {
         match self {
             Self::NonprintableAscii(_, line, _) | Self::NotAscii(_, line) => *line,
@@ -164,8 +116,13 @@ impl UnencodableByteError {
     }
 
     /// Return a representation of the unencodable byte if there is one.
-    /// E.g. this returns `Some("Carriage Return (\r)")` if the byte value is 13.
-    pub const fn repr(&self) -> Option<&'static str> {
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::zalgo_encode;
+    /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
+    /// assert_eq!(zalgo_encode("❤").err().unwrap().representation(), None);
+    /// ```
+    pub const fn representation(&self) -> Option<&'static str> {
         match self {
             Self::NonprintableAscii(_, _, repr) => *repr,
             Self::NotAscii(_, _) => None,
@@ -177,10 +134,19 @@ impl fmt::Display for UnencodableByteError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::NonprintableAscii(byte, line, r) => match r {
-                Some(repr) => write!(f, "line {line}: can not encode ASCII characters with byte value {byte} (aka {repr} characters)"),
-                None => write!(f, "line {line}: could not encode ASCII character with byte value {byte}"),
+                Some(repr) => write!(
+                    f,
+                    "line {line}: can not encode ASCII \"{repr}\" characters with byte value {byte}"
+                ),
+                None => write!(
+                    f,
+                    "line {line}: could not encode ASCII character with byte value {byte}"
+                ),
             },
-            Self::NotAscii(byte, line) => write!(f, "line {line}: byte value {byte} does not correspond to an ASCII character"),
+            Self::NotAscii(byte, line) => write!(
+                f,
+                "line {line}: byte value {byte} does not correspond to an ASCII character"
+            ),
         }
     }
 }
@@ -191,28 +157,52 @@ impl Error for UnencodableByteError {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn check_unknown_char_map() {
-        for i in 0_u8..10 {
-            assert_eq!(
-                get_nonprintable_char_repr(i).unwrap(),
-                UNKNOWN_CHAR_MAP[usize::from(i)].1
-            );
-        }
-        assert_eq!(get_nonprintable_char_repr(10), None);
-        for i in 11_u8..32 {
-            assert_eq!(
-                get_nonprintable_char_repr(i).unwrap(),
-                UNKNOWN_CHAR_MAP[usize::from(i - 1)].1
-            );
-        }
-        assert_eq!(
-            get_nonprintable_char_repr(127).unwrap(),
-            UNKNOWN_CHAR_MAP[31].1
-        );
+/// Returns the representation of the given ASCII byte if it's not printable.
+const fn get_nonprintable_char_repr(byte: u8) -> Option<&'static str> {
+    if byte < 10 {
+        Some(
+            [
+                "Null",
+                "Start Of Heading",
+                "Start Of Text",
+                "End Of Text",
+                "End Of Transmission",
+                "Enquiry",
+                "Acknowledge",
+                "Bell",
+                "Backspace",
+                "Horizontal Tab",
+            ][byte as usize],
+        )
+    } else if byte >= 11 && byte < 32 {
+        Some(
+            [
+                "Vertical Tab",
+                "Form Feed",
+                "Carriage Return",
+                "Shift Out",
+                "Shift In",
+                "Data Link Escape",
+                "Data Control 1",
+                "Data Control 2",
+                "Data Control 3",
+                "Data Control 4",
+                "Negative Acknowledge",
+                "Synchronous Idle",
+                "End Of Transmission Block",
+                "Cancel",
+                "End Of Medium",
+                "Substitute",
+                "Escape",
+                "File Separator",
+                "Group Separator",
+                "Record Separator",
+                "Unit Separator",
+            ][byte as usize - 11],
+        )
+    } else if byte == 127 {
+        Some("Delete")
+    } else {
+        None
     }
 }
