@@ -52,11 +52,32 @@ pub use zalgo_codec_macro::*;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::distributions::{Alphanumeric, DistString};
+    use rand::{
+        distributions::{DistString, Distribution},
+        seq::SliceRandom,
+        Rng,
+    };
     use std::str;
     use unicode_segmentation::UnicodeSegmentation;
 
     const TEST_DIR: &str = "tests";
+
+    struct PrintableAscii;
+
+    impl Distribution<char> for PrintableAscii {
+        fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> char {
+            *b" ! \"#$%&'()*,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVXYZ[\\]^_`abcdefghijklmnopqrstuvxyz{|}~".choose(rng).unwrap() as char
+        }
+    }
+
+    impl DistString for PrintableAscii {
+        fn append_string<R: Rng + ?Sized>(&self, rng: &mut R, string: &mut String, len: usize) {
+            string.reserve(len);
+            for _ in 0..len {
+                string.push(self.sample(rng));
+            }
+        }
+    }
 
     #[test]
     fn test_embed_function() {
@@ -108,7 +129,7 @@ mod tests {
 
         println!("Checking that randomly generated alphanumeric strings are encoded in a lossless fashion, and that they contain a single grapheme cluster");
         for _ in 0..100 {
-            let s = Alphanumeric.sample_string(&mut rand::thread_rng(), 100);
+            let s = PrintableAscii.sample_string(&mut rand::thread_rng(), 100);
             let encoded = zalgo_encode(&s).unwrap();
             assert_eq!(zalgo_decode(&encoded).unwrap(), s);
             assert_eq!(encoded.as_str().graphemes(true).count(), 1)
@@ -183,7 +204,7 @@ mod tests {
         path3.push("decoded.txt");
 
         for _ in 0..10 {
-            let contents = Alphanumeric.sample_string(&mut rand::thread_rng(), 1000);
+            let contents = PrintableAscii.sample_string(&mut rand::thread_rng(), 1000);
             fs::write(&path1, &contents).unwrap();
             let _ = encode_file(&path1, &path2);
             fs::remove_file(&path1).unwrap();
