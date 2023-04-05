@@ -66,7 +66,7 @@ mod tests {
 
     impl Distribution<char> for PrintableAscii {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> char {
-            *b" ! \"#$%&'()*,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVXYZ[\\]^_`abcdefghijklmnopqrstuvxyz{|}~".choose(rng).unwrap() as char
+            *b" !\"#$%&'()*,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVXYZ[\\]^_`abcdefghijklmnopqrstuvxyz{|}~".choose(rng).unwrap() as char
         }
     }
 
