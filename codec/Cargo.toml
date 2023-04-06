@@ -5,7 +5,7 @@ version = "0.6.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/JSorngard/zalgo_codec"
-description = "A crate for converting an ASCII text string to a single unicode grapheme cluster and back. Provides a macro for executing Rust source code that has been encoded in this way. Additionally provides a function that encodes Python code and wraps it in a decoder so that it retains its functionality."
+description = "A crate for converting an ASCII text string to a single unicode grapheme cluster and back. Provides a macro for embedding Rust source code that has been encoded in this way. Additionally provides a function that encodes Python code and wraps it in a decoder so that it retains its functionality."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
