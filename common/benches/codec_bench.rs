@@ -24,7 +24,7 @@ impl DistString for PrintableAsciiAndNewline {
 }
 
 fn bench_codec(c: &mut Criterion) {
-    let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 10_000);
+    let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 100_000);
 
     let mut group = c.benchmark_group("codec");
     group.bench_function("encode", |b| b.iter(|| zalgo_encode(&string)));
