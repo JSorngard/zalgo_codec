@@ -27,9 +27,9 @@ fn bench_codec(c: &mut Criterion) {
     let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 10_000);
 
     let mut group = c.benchmark_group("codec");
-    group.bench_function("encode".to_owned(), |b| b.iter(|| zalgo_encode(&string)));
+    group.bench_function("encode", |b| b.iter(|| zalgo_encode(&string)));
     let encoded = zalgo_encode(&string).unwrap();
-    group.bench_function("decode".to_owned(), |b| b.iter(|| zalgo_decode(&encoded)));
+    group.bench_function("decode", |b| b.iter(|| zalgo_decode(&encoded)));
 }
 
 criterion_group!(benches, bench_codec);
