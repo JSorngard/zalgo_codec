@@ -1,6 +1,10 @@
 use criterion::{criterion_group, criterion_main, Criterion};
+use rand::{
+    distributions::{DistString, Distribution},
+    seq::SliceRandom,
+    thread_rng, Rng,
+};
 use zalgo_codec_common::{zalgo_decode, zalgo_encode};
-use rand::{thread_rng, distributions::{Distribution, DistString}, seq::SliceRandom, Rng};
 
 struct PrintableAsciiAndNewline;
 
