@@ -14,3 +14,11 @@ default = ["files"]
 files = []
 
 [dependencies]
+
+[dev-dependencies]
+criterion = {version = "0.4", features = ["html_reports"]}
+rand = "0.8.5"
+
+[[bench]]
+name = "codec_bench"
+harness = false
