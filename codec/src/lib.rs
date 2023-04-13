@@ -57,7 +57,11 @@ mod tests {
         seq::SliceRandom,
         Rng,
     };
-    use std::str;
+    use std::{
+        fs,
+        path::PathBuf,
+        str::{self, FromStr},
+    };
     use unicode_segmentation::UnicodeSegmentation;
 
     const TEST_DIR: &str = "tests";
@@ -154,13 +158,7 @@ mod tests {
         assert!(zalgo_encode("\0").is_err());
     }
 
-    #[cfg(feature = "files")]
-    use std::str::FromStr;
-    #[cfg(feature = "files")]
-    use std::{fs, path::PathBuf};
-
     #[test]
-    #[cfg(feature = "files")]
     fn file_encoding() {
         let mut lorem_path = PathBuf::from_str(TEST_DIR).unwrap();
         let mut zalgo_path = PathBuf::from_str(TEST_DIR).unwrap();
@@ -194,7 +192,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "files")]
     fn test_random_files() {
         let mut path1 = PathBuf::from_str(TEST_DIR).unwrap();
         let mut path2 = PathBuf::from_str(TEST_DIR).unwrap();
@@ -217,7 +214,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "files")]
     fn python_encoding() {
         let mut lorem_path = PathBuf::new();
         let mut zalgo_path = PathBuf::new();
