@@ -1,5 +1,6 @@
 use std::{
     fs,
+    hint::black_box,
     path::PathBuf,
     str::FromStr,
     time::{Duration, Instant},
@@ -58,7 +59,7 @@ fn bench_file_codec(c: &mut Criterion) {
             let mut elapsed = Duration::from_secs(0);
             for _ in 0..iters {
                 let start = Instant::now();
-                encode_file(&orig_path, &encoded_path).unwrap();
+                black_box(encode_file(&orig_path, &encoded_path)).unwrap();
                 let duration = start.elapsed();
                 fs::remove_file(&encoded_path).unwrap();
                 elapsed += duration;
@@ -74,7 +75,7 @@ fn bench_file_codec(c: &mut Criterion) {
             let mut elapsed = Duration::from_secs(0);
             for _ in 0..iters {
                 let start = Instant::now();
-                decode_file(&encoded_path, &decoded_path).unwrap();
+                black_box(decode_file(&encoded_path, &decoded_path)).unwrap();
                 let duration = start.elapsed();
                 fs::remove_file(&decoded_path).unwrap();
                 elapsed += duration;
@@ -83,8 +84,9 @@ fn bench_file_codec(c: &mut Criterion) {
         })
     });
     fs::remove_file(orig_path).unwrap();
-    fs::remove_file(encoded_path).unwrap();
-    // fs::remove_file(decoded_path).unwrap();
+    // Depending on the order of the benchmarks, these files could be gone
+    let _ = fs::remove_file(encoded_path).unwrap();
+    let _ = fs::remove_file(decoded_path).unwrap();
 }
 
 criterion_group!(benches, bench_codec, bench_file_codec);
