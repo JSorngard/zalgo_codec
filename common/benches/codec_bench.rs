@@ -35,9 +35,13 @@ fn bench_codec(c: &mut Criterion) {
     let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 100_000);
 
     let mut group = c.benchmark_group("codec");
-    group.bench_function("encode", |b| b.iter(|| zalgo_encode(&string)));
+    group.bench_function("encode", |b| {
+        b.iter(|| black_box(zalgo_encode(&string)).unwrap())
+    });
     let encoded = zalgo_encode(&string).unwrap();
-    group.bench_function("decode", |b| b.iter(|| zalgo_decode(&encoded)));
+    group.bench_function("decode", |b| {
+        b.iter(|| black_box(zalgo_decode(&encoded)).unwrap())
+    });
 }
 
 fn bench_file_codec(c: &mut Criterion) {
