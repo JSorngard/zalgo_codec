@@ -89,8 +89,8 @@ fn bench_file_codec(c: &mut Criterion) {
     });
     fs::remove_file(orig_path).unwrap();
     // Depending on the order of the benchmarks, these files could be gone
-    let _ = fs::remove_file(encoded_path).unwrap();
-    let _ = fs::remove_file(decoded_path).unwrap();
+    let _ = fs::remove_file(encoded_path);
+    let _ = fs::remove_file(decoded_path);
 }
 
 criterion_group!(benches, bench_codec, bench_file_codec);
