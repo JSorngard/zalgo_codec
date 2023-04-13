@@ -40,10 +40,9 @@ fn bench_codec(c: &mut Criterion) {
 }
 
 fn bench_file_codec(c: &mut Criterion) {
-    const TEST_DIR: &str = "benches";
     let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 100_000);
 
-    let mut orig_path = PathBuf::from_str(TEST_DIR).unwrap();
+    let mut orig_path = PathBuf::from_str("benches").unwrap();
     let mut encoded_path = orig_path.clone();
     let mut decoded_path = orig_path.clone();
 
