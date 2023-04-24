@@ -29,10 +29,6 @@ pub fn encode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Unenco
         let mut out_path = PathBuf::new();
         out_path.push(out_file);
 
-        if out_path.exists() {
-            return Err(UnencodableFileError::OutputFileExists);
-        }
-
         fs::File::create(out_file)?;
         fs::write(out_file, zalgo_encode(&string_to_encode)?)?;
         Ok(())
@@ -58,10 +54,6 @@ pub fn decode_file<P: AsRef<Path>>(in_file: P, out_file: P) -> Result<(), Undeco
 
         let mut out_path = PathBuf::new();
         out_path.push(out_file);
-
-        if out_path.exists() {
-            return Err(UndecodableFileError::OutputFileExists);
-        }
 
         fs::File::create(out_file)?;
         fs::write(out_file, decoded_string)?;
@@ -100,10 +92,6 @@ pub fn wrap_python_file<P: AsRef<Path>>(
         let mut out_path = PathBuf::new();
         out_path.push(out_file);
 
-        if out_path.exists() {
-            return Err(UnencodableFileError::OutputFileExists);
-        }
-
         fs::File::create(out_file)?;
         fs::write(out_file, zalgo_wrap_python(&string_to_encode)?)?;
         Ok(())
@@ -117,7 +105,6 @@ pub fn wrap_python_file<P: AsRef<Path>>(
 #[derive(Debug)]
 pub enum UnencodableFileError {
     Io(io::Error),
-    OutputFileExists,
     UnencodableContent(UnencodableByteError),
 }
 
@@ -126,9 +113,6 @@ impl fmt::Display for UnencodableFileError {
         match self {
             Self::Io(e) => write!(f, "{e}"),
             Self::UnencodableContent(e) => write!(f, "{e}"),
-            Self::OutputFileExists => {
-                write!(f, "a file with the given output name already exists")
-            }
         }
     }
 }
@@ -138,7 +122,6 @@ impl Error for UnencodableFileError {
         match self {
             Self::Io(e) => Some(e),
             Self::UnencodableContent(e) => Some(e),
-            Self::OutputFileExists => None,
         }
     }
 }
@@ -160,7 +143,6 @@ impl From<UnencodableByteError> for UnencodableFileError {
 #[derive(Debug)]
 pub enum UndecodableFileError {
     Io(io::Error),
-    OutputFileExists,
     DecodesToInvalidUnicode(FromUtf8Error),
 }
 
@@ -169,9 +151,6 @@ impl fmt::Display for UndecodableFileError {
         match self {
             Self::Io(e) => write!(f, "{e}"),
             Self::DecodesToInvalidUnicode(e) => write!(f, "{e}"),
-            Self::OutputFileExists => {
-                write!(f, "a file with the given output name already exists")
-            }
         }
     }
 }
@@ -181,7 +160,6 @@ impl Error for UndecodableFileError {
         match self {
             Self::Io(e) => Some(e),
             Self::DecodesToInvalidUnicode(e) => Some(e),
-            Self::OutputFileExists => None,
         }
     }
 }
