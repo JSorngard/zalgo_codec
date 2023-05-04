@@ -6,6 +6,8 @@
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, LitStr};
 
+use zalgo_codec_common::zalgo_decode;
+
 /// This macro decodes a Unicode string that has been encoded with [`zalgo_encode`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/fn.zalgo_encode.html)
 /// and passes the results on to the compiler.
 /// # Examples
@@ -51,25 +53,10 @@ use syn::{parse_macro_input, LitStr};
 /// ```
 ///
 /// # Limitations
-/// This is an incomplete list of the limitations of this macro. There are many more,
-/// and as I learn about them I will add them here. Feel free to create a
-/// Pull Request on [Github](https://github.com/JSorngard/zalgo_codec) for adding more notes here if you
-/// know of more limitations.
-///
-/// - The source code must be able to pass various checks before the macro gets executed.  
-/// - Due to ambiguity macros can not deal with variable names inside format string literals. An example of this is that  
-///   `println!("{variable_name}")`  
-///    will give a compile error if used in a macro,
-///    but  
-///    `println!("{}", variable_name)`  
-///    will work fine. This means that calling `zalgo_embed!` on the encoded
-///    version of the former will not work.  
+/// The encoded code must be valid macro output
 #[proc_macro]
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
 
-    zalgo_codec_common::zalgo_decode(&encoded)
-        .unwrap()
-        .parse()
-        .unwrap()
+    zalgo_decode(&encoded).unwrap().parse().unwrap()
 }
