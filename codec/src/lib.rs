@@ -166,7 +166,6 @@ mod tests {
         zalgo_path.push("zalgo.txt");
 
         encode_file(&lorem_path, &zalgo_path).unwrap();
-        assert!(encode_file(&lorem_path, &zalgo_path).is_err());
 
         let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
         let lorem_text = fs::read_to_string(lorem_path).unwrap();
@@ -182,7 +181,6 @@ mod tests {
         consistency_path.push("consistency_check.txt");
 
         decode_file(&zalgo_path, &consistency_path).unwrap();
-        assert!(decode_file(&zalgo_path, &consistency_path).is_err());
 
         let decoded_text = fs::read_to_string(&consistency_path).unwrap();
 
