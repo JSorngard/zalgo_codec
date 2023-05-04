@@ -53,7 +53,7 @@ use zalgo_codec_common::zalgo_decode;
 /// ```
 ///
 /// # Limitations
-/// The encoded code must be valid macro output
+/// The encoded code must be valid macro output.
 #[proc_macro]
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
