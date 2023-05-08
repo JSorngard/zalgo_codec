@@ -33,23 +33,25 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteErr
     let mut line = 1;
     let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
-
-    for c in string_to_encode.bytes() {
-        if !(32..=126).contains(&c) && c != b'\n' {
-            return Err(UnencodableByteError::try_new(c, line)
-                .expect("just verified that the byte is in the appropriate ASCII subset and try_new is verified in a unit test"));
+    for b in string_to_encode.bytes() {
+        match nonprintable_char_repr(b) {
+            Some(repr) => return Err(UnencodableByteError::NonprintableAscii(b, line, repr)),
+            None => {
+                if b == b'\n' {
+                    line += 1;
+                }
+                if b < 127 {
+                    let v = if b == b'\n' { 111 } else { (b - 11) % 133 - 21 };
+                    result.push((v >> 6) & 1 | 0b11001100);
+                    result.push((v & 63) | 0b10000000);
+                } else {
+                    return Err(UnencodableByteError::NotAscii(b, line));
+                }
+            }
         }
-
-        if c == b'\n' {
-            line += 1;
-        }
-
-        let v = if c == b'\n' { 111 } else { (c - 11) % 133 - 21 };
-        result.push((v >> 6) & 1 | 0b11001100);
-        result.push((v & 63) | 0b10000000);
     }
 
-    Ok(String::from_utf8(result).expect("the encoding process should not produce invalid utf8"))
+    Ok(String::from_utf8(result).expect("the encoding process does not produce invalid utf8 given valid ascii text, which is verified before this point"))
 }
 
 /// Takes in a string that was encoded by [`zalgo_encode`]
@@ -92,17 +94,6 @@ pub enum UnencodableByteError {
 }
 
 impl UnencodableByteError {
-    const fn try_new(byte: u8, line: usize) -> Option<Self> {
-        if byte < 128 {
-            match get_nonprintable_char_repr(byte) {
-                Some(repr) => Some(Self::NonprintableAscii(byte, line, repr)),
-                None => None,
-            }
-        } else {
-            Some(Self::NotAscii(byte, line))
-        }
-    }
-
     /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
     pub const fn line(&self) -> usize {
         match self {
@@ -156,7 +147,7 @@ impl Error for UnencodableByteError {
 }
 
 /// Returns the representation of the given ASCII byte if it's not printable.
-const fn get_nonprintable_char_repr(byte: u8) -> Option<&'static str> {
+const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
         Some(
             [
@@ -202,51 +193,5 @@ const fn get_nonprintable_char_repr(byte: u8) -> Option<&'static str> {
         Some("Delete")
     } else {
         None
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn check_invalid_bytes() {
-        for b in 0..10 {
-            assert_eq!(
-                UnencodableByteError::try_new(b, 0)
-                    .unwrap()
-                    .representation(),
-                get_nonprintable_char_repr(b),
-            )
-        }
-
-        assert!(UnencodableByteError::try_new(10, 0).is_none());
-
-        for b in 11..32 {
-            assert_eq!(
-                UnencodableByteError::try_new(b, 0)
-                    .unwrap()
-                    .representation(),
-                get_nonprintable_char_repr(b),
-            )
-        }
-
-        for b in 32..127 {
-            assert!(UnencodableByteError::try_new(b, 0).is_none());
-        }
-
-        assert_eq!(
-            UnencodableByteError::try_new(127, 0)
-                .unwrap()
-                .representation(),
-            Some("Delete"),
-        );
-
-        for b in 128..=u8::MAX {
-            assert_eq!(
-                UnencodableByteError::try_new(b, 0),
-                Some(UnencodableByteError::NotAscii(b, 0)),
-            );
-        }
     }
 }
