@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
-use zalgo_codec_common::{encode_file, zalgo_decode, zalgo_encode};
+use zalgo_codec_common::{decode_file, encode_file, zalgo_decode, zalgo_encode};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
@@ -60,7 +60,6 @@ struct Cli {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Cli::parse();
-    println!("{config:?}");
 
     if let Some(ref destination) = config.out_path {
         if destination.exists() && !config.force {
@@ -98,8 +97,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Source::Text { text } => {
                 if text.len() == 1 {
                     let result = zalgo_decode(&text[0])?;
-                    println!("{result}");
-                    Ok(())
+                    match config.out_path {
+                        Some(dst) => Ok(std::fs::write(dst, result)?),
+                        None => {
+                            println!("{result}");
+                            Ok(())
+                        }
+                    }
                 } else {
                     Err(Box::new(std::io::Error::new(
                         std::io::ErrorKind::InvalidData,
@@ -107,9 +111,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     )))
                 }
             }
-            Source::File { path } => {
-                unimplemented!()
-            }
+            Source::File { path } => match config.out_path {
+                Some(dst) => Ok(decode_file(path, dst)?),
+                None => {
+                    let encoded = std::fs::read_to_string(path)?;
+                    let text = zalgo_decode(&encoded)?;
+                    println!("{text}");
+                    Ok(())
+                }
+            },
         },
     }
 }
