@@ -24,7 +24,7 @@ impl TryInto<String> for Source {
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
-    /// Turn normal (printable ascii + newline) text into zalgo-encoded text
+    /// Turn normal (printable ascii + newline) text into a single grapheme cluster
     Encode {
         #[command(subcommand)]
         source: Source,
