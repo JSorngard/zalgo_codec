@@ -15,6 +15,16 @@ enum Source {
     },
 }
 
+impl TryInto<String> for Source {
+    type Error = std::io::Error;
+    fn try_into(self) -> Result<String, Self::Error> {
+        match self {
+            Source::Stdin {text} => Ok(text.join(" ")),
+            Source::File {path} => std::fs::read_to_string(path),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
     /// Turn normal (printable ascii + newline) text into zalgo-encoded text
@@ -51,6 +61,15 @@ struct Cli {
 }
 
 fn main() {
-    let args = Cli::parse();
-    println!("{args:?}");
+    let config = Cli::parse();
+    println!("{config:?}");
+    match config.mode {
+        Mode::Encode {source} => {
+            
+            println!("encoding {source:?}")
+        }
+        Mode::Decode{source} => {
+            println!("decoding {source:?}")
+        }
+    }
 }
