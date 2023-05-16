@@ -86,7 +86,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Source::File { path } => match config.out_path {
                 Some(dst) => Ok(encode_file(path, dst)?),
                 None => {
-                    let text = std::fs::read_to_string(path)?.replace("\r", "");
+                    let text = std::fs::read_to_string(path)?.replace('\r', "");
                     let result = zalgo_encode(&text)?;
                     println!("{result}");
                     Ok(())
