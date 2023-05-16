@@ -3,5 +3,5 @@ members = [
     "common",
     "macro",
     "codec",
-    "zalgo",
+    "wrapper",
 ]
