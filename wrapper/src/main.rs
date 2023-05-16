@@ -12,16 +12,6 @@ enum Source {
     File { path: PathBuf },
 }
 
-impl TryInto<String> for Source {
-    type Error = std::io::Error;
-    fn try_into(self) -> Result<String, Self::Error> {
-        match self {
-            Source::Text { text } => Ok(text.join(" ")),
-            Source::File { path } => std::fs::read_to_string(path),
-        }
-    }
-}
-
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
     /// Turn normal (printable ascii + newline) text into a single grapheme cluster
