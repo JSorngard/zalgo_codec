@@ -20,7 +20,7 @@ unicode-segmentation = "1.10.1"
 
 [features]
 default = ["files"]
-## Enables the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
+## Provides the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
 files = ["zalgo-codec-common/files"]
 document-features = ["zalgo-codec-common/document-features", "dep:document-features"]
 
