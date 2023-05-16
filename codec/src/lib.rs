@@ -37,8 +37,11 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
 //!
-//! # Features
-#![doc = document_features::document_features!()]
+#![cfg_attr(
+    feature = "document-features",
+    cfg_attr(doc, doc = "# Features"),
+    cfg_attr(doc, doc = ::document_features::document_features!())
+)]
 //!
 //! # Links
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
