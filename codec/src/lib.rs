@@ -38,7 +38,7 @@
 //! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
 //!
 //! # Features
-//! `files`: enabled by default, provides the functions [`encode_file`], [`decode_file`] and [`wrap_python_file`].
+#![doc = document_features::document_features!()]
 //!
 //! # Links
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)

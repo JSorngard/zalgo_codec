@@ -10,6 +10,7 @@ description = "A crate for converting an ASCII text string to a single unicode g
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+document-features = "0.2.7"
 zalgo-codec-common = {path = "../common"}
 zalgo-codec-macro = {path = "../macro"}
 
@@ -19,4 +20,5 @@ unicode-segmentation = "1.10.1"
 
 [features]
 default = ["files"]
+## Enables the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
 files = ["zalgo-codec-common/files"]

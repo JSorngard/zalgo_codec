@@ -11,9 +11,11 @@ repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 
 [features]
 default = ["files"]
+## Enables the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
 files = []
 
 [dependencies]
+document-features = "0.2.7"
 
 [dev-dependencies]
 criterion = {version = "0.4", features = ["html_reports"]}

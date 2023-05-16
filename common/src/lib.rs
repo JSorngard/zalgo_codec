@@ -2,7 +2,7 @@
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
 //!
 //! # Features
-//! `files`: enabled by default and provides the functions [`encode_file`], [`decode_file`] and [`wrap_python_file`].
+#![doc = document_features::document_features!()]
 
 #![forbid(unsafe_code)]
 
