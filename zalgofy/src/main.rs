@@ -1,26 +1,22 @@
-use zalgo_codec_common::{zalgo_encode};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
+use zalgo_codec_common::{encode_file, zalgo_encode};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
     /// Operate on all text after the command
-    Stdin {
-        text: Vec<String>,
-    },
+    Stdin { text: Vec<String> },
 
     /// Operate on the contents of the file at the path given after the command
-    File {
-        path: PathBuf,
-    },
+    File { path: PathBuf },
 }
 
 impl TryInto<String> for Source {
     type Error = std::io::Error;
     fn try_into(self) -> Result<String, Self::Error> {
         match self {
-            Source::Stdin {text} => Ok(text.join(" ")),
-            Source::File {path} => std::fs::read_to_string(path),
+            Source::Stdin { text } => Ok(text.join(" ")),
+            Source::File { path } => std::fs::read_to_string(path),
         }
     }
 }
@@ -37,7 +33,7 @@ enum Mode {
     Decode {
         #[command(subcommand)]
         source: Source,
-    }
+    },
 }
 
 #[derive(Debug, Clone, Parser)]
@@ -55,21 +51,49 @@ struct Cli {
     out_path: Option<PathBuf>,
 
     #[arg(short, long, required = false, requires = "out_path")]
-    /// Overwrite the output file if it already exists. 
+    /// Overwrite the output file if it already exists.
     /// Only valid if OUT_PATH is also provided
     force: bool,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Cli::parse();
     println!("{config:?}");
-    match config.mode {
-        Mode::Encode {source} => {
-            
-            println!("encoding {source:?}")
+
+    if let Some(ref destination) = config.out_path {
+        if destination.exists() && !config.force {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::AlreadyExists,
+                "to overwrite the contents you can supply -f/--force",
+            )));
         }
-        Mode::Decode{source} => {
-            println!("decoding {source:?}")
+    }
+
+    match config.mode {
+        Mode::Encode { source } => match source {
+            Source::Stdin { text } => {
+                let text = text.join(" ");
+                let result = zalgo_encode(&text)?;
+                match config.out_path {
+                    Some(dst) => Ok(std::fs::write(dst, result)?),
+                    None => {
+                        println!("{result}");
+                        Ok(())
+                    }
+                }
+            }
+            Source::File { path } => match config.out_path {
+                Some(dst) => Ok(encode_file(path, dst)?),
+                None => {
+                    let text = std::fs::read_to_string(path)?;
+                    let result = zalgo_encode(&text)?;
+                    println!("{result}");
+                    Ok(())
+                }
+            },
+        },
+        Mode::Decode { source } => {
+            unimplemented!()
         }
     }
 }
