@@ -1,6 +1,6 @@
 # zalgo codec
 
-This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. It is based on the encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro lets you embed an encoded string and decode it into source code at compile time.  
+This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. It is based on the encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro that lets you embed an encoded string and decode it into source code at compile time.  
 This lets you reach new lows in the field of self-documenting code.
 
 The encoded string will be ~2 times larger than the original in terms of bytes, but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes)) you should only get one.
