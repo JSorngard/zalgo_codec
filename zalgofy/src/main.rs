@@ -4,9 +4,12 @@ use std::path::PathBuf;
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
+    /// Operate on all text after the command
     Stdin {
         text: Vec<String>,
     },
+
+    /// Operate on the contents of the file at the path given after the command
     File {
         path: PathBuf,
     },
@@ -14,11 +17,13 @@ enum Source {
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
+    /// Turn normal (printable ascii + newline) text into zalgo-encoded text
     Encode {
         #[command(subcommand)]
         source: Source,
     },
-    
+
+    /// Turn text that has been encoded back into its normal form
     Decode {
         #[command(subcommand)]
         source: Source,
