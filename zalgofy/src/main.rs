@@ -5,9 +5,10 @@ use zalgo_codec_common::{encode_file, zalgo_encode};
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
     /// Operate on all text after the command
-    Stdin { text: Vec<String> },
+    Text { text: Vec<String> },
 
-    /// Operate on the contents of the file at the path given after the command
+    /// Operate on the contents of the file at the path given after the command.
+    /// Ignores carriage return characters
     File { path: PathBuf },
 }
 
@@ -15,7 +16,7 @@ impl TryInto<String> for Source {
     type Error = std::io::Error;
     fn try_into(self) -> Result<String, Self::Error> {
         match self {
-            Source::Stdin { text } => Ok(text.join(" ")),
+            Source::Text { text } => Ok(text.join(" ")),
             Source::File { path } => std::fs::read_to_string(path),
         }
     }
@@ -71,7 +72,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match config.mode {
         Mode::Encode { source } => match source {
-            Source::Stdin { text } => {
+            Source::Text { text } => {
                 let text = text.join(" ");
                 let result = zalgo_encode(&text)?;
                 match config.out_path {
@@ -85,7 +86,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Source::File { path } => match config.out_path {
                 Some(dst) => Ok(encode_file(path, dst)?),
                 None => {
-                    let text = std::fs::read_to_string(path)?;
+                    let text = std::fs::read_to_string(path)?.replace("\r", "");
                     let result = zalgo_encode(&text)?;
                     println!("{result}");
                     Ok(())
