@@ -114,7 +114,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Source::File { path } => match config.out_path {
                 Some(dst) => Ok(decode_file(path, dst)?),
                 None => {
-                    let encoded = std::fs::read_to_string(path)?;
+                    let encoded = std::fs::read_to_string(path)?.replace('\r', "");
                     let text = zalgo_decode(&encoded)?;
                     println!("{text}");
                     Ok(())
