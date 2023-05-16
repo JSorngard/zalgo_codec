@@ -2,43 +2,27 @@ use zalgo_codec_common::{zalgo_encode};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Subcommand)]
 enum Source {
-    Stdin,
-    File
-}
-
-#[derive(Debug, Clone)]
-enum Action {
-    Encode,
-    Decode,
+    Stdin {
+        text: Vec<String>,
+    },
+    File {
+        path: PathBuf,
+    },
 }
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
-    /// Encode text read from stdin and print it to stdout
-    EncodeStdin {
-        /// The text to encode
-        text: Vec<String>,
+    Encode {
+        #[command(subcommand)]
+        source: Source,
     },
     
-    /// Encode the contents of a file
-    EncodeFile {
-        /// The path to the file to be encoded
-        in_path: PathBuf,
-    },
-    
-    /// Decode text from stdin and print it to stdout
-    DecodeStdin {
-        /// The text to decode
-        text: Vec<String>,
-    },
-    
-    /// Decode the contents of a file
-    DecodeFile {
-        /// The path to the encoded file
-        in_path: PathBuf,
-    },
+    Decode {
+        #[command(subcommand)]
+        source: Source,
+    }
 }
 
 #[derive(Debug, Clone, Parser)]
@@ -47,11 +31,18 @@ struct Cli {
     #[command(subcommand)]
     mode: Mode,
 
+    #[arg(short, long)]
     /// An optional path to a location where the result should be saved.
     /// If this is left unspecified the result is printed to stdout.
     /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
-    /// you might want to use this option instead of an OS pipe in order to avoid broken text
+    /// you might want to use this option instead of an OS pipe to save to a file
+    /// in order to avoid broken text. If this option is used it must occur before any commands
     out_path: Option<PathBuf>,
+
+    #[arg(short, long, required = false, requires = "out_path")]
+    /// Overwrite the output file if it already exists. 
+    /// Only valid if OUT_PATH is also provided
+    force: bool,
 }
 
 fn main() {

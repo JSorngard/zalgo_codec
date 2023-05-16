@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/JSorngard/zalgo_codec"
-description = "A thin wrapper program around the codec that zalgo encodes some input, either a file or text on the command line"
+description = "A thin wrapper program around the codec that can encode and decode text from either stdin or a file into either stdout or a file"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
