@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
-use zalgo_codec_common::{encode_file, zalgo_encode};
+use zalgo_codec_common::{encode_file, zalgo_decode, zalgo_encode};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
@@ -45,7 +45,8 @@ struct Cli {
 
     #[arg(short, long)]
     /// An optional path to a location where the result should be saved.
-    /// If this is left unspecified the result is printed to stdout.
+    /// If this is left unspecified the result is printed to stdout
+    /// (not everything might appear visually, but it's still there).
     /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
     /// you might want to use this option instead of an OS pipe to save to a file
     /// in order to avoid broken text. If this option is used it must occur before any commands
@@ -93,8 +94,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             },
         },
-        Mode::Decode { source } => {
-            unimplemented!()
-        }
+        Mode::Decode { source } => match source {
+            Source::Text { text } => {
+                if text.len() == 1 {
+                    let result = zalgo_decode(&text[0])?;
+                    println!("{result}");
+                    Ok(())
+                } else {
+                    Err(Box::new(std::io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        "can only decode one grapheme cluster at a time",
+                    )))
+                }
+            }
+            Source::File { path } => {
+                unimplemented!()
+            }
+        },
     }
 }
