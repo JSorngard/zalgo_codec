@@ -103,6 +103,11 @@ impl UnencodableByteError {
     /// Returns the byte value of the unencodable character. Note that this might
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
+    /// ```
+    /// # use zalgo_codec_common::{UnencodableByteError, zalgo_encode};
+    /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
+    /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(),  226);
+    /// ```
     pub const fn byte(&self) -> u8 {
         match self {
             Self::NonprintableAscii(byte, _, _) | Self::NotAscii(byte, _) => *byte,
@@ -114,7 +119,7 @@ impl UnencodableByteError {
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
-    /// assert_eq!(zalgo_encode("❤").err().unwrap().representation(), None);
+    /// assert_eq!(zalgo_encode("❤️").err().unwrap().representation(), None);
     /// ```
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
