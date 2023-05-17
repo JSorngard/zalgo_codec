@@ -7,6 +7,7 @@
     cfg_attr(doc, doc = ::document_features::document_features!())
 )]
 #![forbid(unsafe_code)]
+#![cfg_attr(feature = "document-features", feature(doc_cfg))]
 
 use core::{fmt, str};
 use std::error::Error;
@@ -15,6 +16,7 @@ use std::error::Error;
 mod files;
 
 #[cfg(any(doc, feature = "files"))]
+#[cfg_attr(feature = "document-features", doc(cfg(feature = "files")))]
 pub use files::*;
 
 /// Takes in an ASCII string without control characters (except newlines)

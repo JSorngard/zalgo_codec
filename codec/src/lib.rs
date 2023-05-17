@@ -47,10 +47,15 @@
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 //! where the Python code was first presented together with the above explanation.
 
+#![cfg_attr(feature = "document-features", feature(doc_cfg))]
 #![forbid(unsafe_code)]
 
-pub use zalgo_codec_common::*;
-pub use zalgo_codec_macro::*;
+pub use zalgo_codec_common::{zalgo_encode, zalgo_decode, zalgo_wrap_python, UnencodableByteError};
+pub use zalgo_codec_macro::zalgo_embed;
+
+#[cfg(any(doc, test, feature = "files"))]
+#[cfg_attr(feature = "document-features", doc(cfg(feature = "files")))]
+pub use zalgo_codec_common::{encode_file, decode_file, wrap_python_file, UnencodableFileError, UndecodableFileError};
 
 #[cfg(test)]
 mod tests {
