@@ -47,7 +47,7 @@
 pub use zalgo_codec_common::{zalgo_encode, zalgo_decode, zalgo_wrap_python, UnencodableByteError};
 pub use zalgo_codec_macro::zalgo_embed;
 
-#[cfg(any(test, feature = "files"))]
+#[cfg(any(doc, test, feature = "files"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "files")))]
 pub use zalgo_codec_common::{encode_file, decode_file, wrap_python_file, UnencodableFileError, UndecodableFileError};
 
