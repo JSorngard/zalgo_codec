@@ -12,13 +12,11 @@ repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 [features]
 ## Provides the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
 files = []
-document-features = ["dep:document-features"]
 
 [dependencies]
-document-features = {version = "0.2.7", optional = true}
 
 [package.metadata.docs.rs]
-all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dev-dependencies]
 criterion = {version = "0.4", features = ["html_reports"]}

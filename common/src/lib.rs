@@ -1,22 +1,17 @@
 //! A crate for converting an ASCII text string to a single unicode grapheme cluster and back.
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
-//!
-#![cfg_attr(
-    feature = "document-features",
-    cfg_attr(doc, doc = "# Features"),
-    cfg_attr(doc, doc = ::document_features::document_features!())
-)]
+
 #![forbid(unsafe_code)]
-#![cfg_attr(feature = "document-features", feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 use core::{fmt, str};
 use std::error::Error;
 
-#[cfg(any(doc, feature = "files"))]
+#[cfg(feature = "files")]
 mod files;
 
-#[cfg(any(doc, feature = "files"))]
-#[cfg_attr(feature = "document-features", doc(cfg(feature = "files")))]
+#[cfg(feature = "files")]
+#[cfg_attr(docsrs, doc(cfg(feature = "files")))]
 pub use files::*;
 
 /// Takes in an ASCII string without control characters (except newlines)
