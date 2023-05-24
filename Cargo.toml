@@ -3,5 +3,4 @@ members = [
     "common",
     "macro",
     "codec",
-    "wrapper",
 ]

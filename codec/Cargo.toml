@@ -12,6 +12,7 @@ description = "A crate for converting an ASCII text string to a single unicode g
 [dependencies]
 zalgo-codec-common = {path = "../common"}
 zalgo-codec-macro = {path = "../macro"}
+clap = {version = "4.3", features = ["derive"], optional = true}
 
 [dev-dependencies]
 rand = "0.8"
@@ -20,6 +21,17 @@ unicode-segmentation = "1.10.1"
 [features]
 ## Provides the functions [`encode_file`], [`decode_file`], and [`wrap_python_file`]
 files = ["zalgo-codec-common/files"]
+## Builds a binary that can be used to test out the codec
+binary = ["dep:clap", "files"]
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]
+
+[[bin]]
+name = "zalgo_codec"
+path = "src/main.rs"
+required-features = ["binary"]
+
+[lib]
+name = "zalgo_codec"
+path = "src/lib.rs"
