@@ -44,12 +44,14 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![forbid(unsafe_code)]
 
-pub use zalgo_codec_common::{zalgo_encode, zalgo_decode, zalgo_wrap_python, UnencodableByteError};
+pub use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python, UnencodableByteError};
 pub use zalgo_codec_macro::zalgo_embed;
 
 #[cfg(any(doc, test, feature = "files"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "files")))]
-pub use zalgo_codec_common::{encode_file, decode_file, wrap_python_file, UnencodableFileError, UndecodableFileError};
+pub use zalgo_codec_common::{
+    decode_file, encode_file, wrap_python_file, UndecodableFileError, UnencodableFileError,
+};
 
 #[cfg(test)]
 mod tests {
