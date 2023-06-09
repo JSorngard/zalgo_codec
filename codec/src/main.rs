@@ -39,7 +39,7 @@ struct Cli {
     /// (not everything might appear visually, but it's still there).
     /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
     /// you might want to use this option instead of an OS pipe to save to a file
-    /// in order to avoid broken text. If this option is used it must occur before any commands
+    /// in order to avoid broken text. NOTE: If this option is used it must occur before any commands
     out_path: Option<PathBuf>,
 
     #[arg(short, long, required = false, requires = "out_path")]
