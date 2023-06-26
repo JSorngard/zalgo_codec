@@ -20,13 +20,13 @@ use std::error::Error;
 /// ```
 /// # Notes
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
-pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteError> {
+pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
     let mut line = 1;
     let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for b in string_to_encode.bytes() {
         match nonprintable_char_repr(b) {
-            Some(repr) => return Err(UnencodableByteError::NonprintableAscii(b, line, repr)),
+            Some(repr) => return Err(ZalgoError::NonprintableAscii(b, line, repr)),
             None => {
                 if b == b'\n' {
                     line += 1;
@@ -36,7 +36,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, UnencodableByteErr
                     result.push((v >> 6) & 1 | 0b11001100);
                     result.push((v & 63) | 0b10000000);
                 } else {
-                    return Err(UnencodableByteError::NotAscii(b, line));
+                    return Err(ZalgoError::NotAscii(b, line));
                 }
             }
         }
@@ -71,7 +71,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error>
 /// # Notes
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
-pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableByteError> {
+pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -79,12 +79,12 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, UnencodableBy
 #[derive(Debug, Clone, PartialEq)]
 /// The error returned by the encoding functions
 /// if they encounter a byte they can not encode.
-pub enum UnencodableByteError {
+pub enum ZalgoError {
     NonprintableAscii(u8, usize, &'static str),
     NotAscii(u8, usize),
 }
 
-impl UnencodableByteError {
+impl ZalgoError {
     /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
     pub const fn line(&self) -> usize {
         match self {
@@ -96,7 +96,7 @@ impl UnencodableByteError {
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
     /// ```
-    /// # use zalgo_codec_common::{UnencodableByteError, zalgo_encode};
+    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(),  226);
     /// ```
@@ -121,7 +121,7 @@ impl UnencodableByteError {
     }
 }
 
-impl fmt::Display for UnencodableByteError {
+impl fmt::Display for ZalgoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::NonprintableAscii(byte, line, repr) => write!(
@@ -136,7 +136,7 @@ impl fmt::Display for UnencodableByteError {
     }
 }
 
-impl Error for UnencodableByteError {
+impl Error for ZalgoError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         None
     }

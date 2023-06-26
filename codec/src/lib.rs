@@ -43,7 +43,7 @@
 
 #![forbid(unsafe_code)]
 
-pub use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python, UnencodableByteError};
+pub use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python, ZalgoError};
 pub use zalgo_codec_macro::zalgo_embed;
 
 #[cfg(test)]
