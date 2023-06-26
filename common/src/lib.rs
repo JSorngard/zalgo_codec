@@ -1,10 +1,122 @@
 //! A crate for converting an ASCII text string to a single unicode grapheme cluster and back.
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
-
-#![forbid(unsafe_code)]
-
+//! 
 use core::{fmt, str};
 use std::error::Error;
+
+pub use zalgo_string::ZalgoString;
+mod zalgo_string {
+    use super::{fmt, zalgo_encode, ZalgoError};
+    use core::convert;
+    #[cfg(feature = "serde_support")]
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Clone, PartialEq, Hash)]
+    #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+    pub struct ZalgoString(String);
+
+    impl ZalgoString {
+        /// Encodes the given string as a new `ZalgoString`
+        #[must_use = "the function returns a new `ZalgoString` and the input is dropped"]
+        pub fn encode(s: String) -> Result<Self, ZalgoError> {
+            zalgo_encode(&s).map(Self)
+        }
+
+        /// Decodes `self` into a normal `String` in-place. This method has no effect on the allocated capacity.
+        #[must_use = "`self` will be dropped if the result is not used"]
+        pub fn decode(self) -> String {
+            let mut w = 0;
+            let mut bytes = self.into_bytes();
+            for r in (1..bytes.len()).step_by(2) {
+                bytes[w] = ((bytes[r] << 6 & 64 | bytes[r + 1] & 63) + 22) % 133 + 10;
+                w += 1;
+            }
+            bytes.truncate(w);
+            // Safety: we know that the starting string was encoded from valid ASCII to begin with
+            unsafe {
+                String::from_utf8_unchecked(bytes)
+            }
+        }
+
+        /// Extracts a string slice containing the entire `ZalgoString`.
+        #[inline]
+        #[must_use]
+        pub fn as_str(&self) -> &str {
+            &self.0
+        }
+
+        /// Returns the contents of the `ZalgoString` as a byte slice.
+        #[inline]
+        #[must_use]
+        pub fn as_bytes(&self) -> &[u8] {
+            self.0.as_bytes()
+        }
+
+        /// Returns the length of the `ZalgoString` in bytes.
+        #[inline]
+        #[must_use]
+        pub fn len(&self) -> usize {
+            self.0.len()
+        }
+
+        /// Returns an iterator over the bytes of the ZalgoString. See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
+        #[inline]
+        pub fn bytes(&self) -> core::str::Bytes<'_> {
+            self.0.bytes()
+        }
+
+        /// Returns an iterator over the characters of the ZalgoString. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
+        /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+        #[inline]
+        pub fn chars(&self) -> core::str::Chars<'_> {
+            self.0.chars()
+        }
+
+        /// Converts a `ZalgoString` into a byte vector.
+        /// This consumes the `ZalgoString`, so we do not need to copy its contents.
+        #[inline]
+        #[must_use = "`self` will be dropped if the result is not used"]
+        pub fn into_bytes(self) -> Vec<u8> {
+            self.0.into_bytes()
+        }
+    }
+
+    impl convert::From<ZalgoString> for String {
+        /// Converts the `ZalgoString` into a `String` *without decoding it*.
+        #[inline]
+        fn from(zs: ZalgoString) -> Self {
+            zs.0
+        }
+    }
+
+    impl<'a> convert::From<&'a ZalgoString> for &'a str {
+        /// Converts a `&ZalgoString` to a `&str` *without any decoding*.
+        #[inline]
+        fn from(zs: &'a ZalgoString) -> Self {
+            &zs.0
+        }
+    }
+
+    macro_rules! impl_partial_eq {
+        ($($rhs:ty),+) => {
+            $(
+                impl<'a> PartialEq<$rhs> for ZalgoString {
+                    #[inline]
+                    fn eq(&self, other: &$rhs) -> bool {
+                        &self.0 == other
+                    }
+                }
+            )+
+        };
+    }
+    impl_partial_eq! {String, str, std::borrow::Cow<'a, str>}
+
+    impl fmt::Display for ZalgoString {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{}", self.0)
+        }
+    }
+}
 
 /// Takes in an ASCII string without control characters (except newlines)
 /// and "compresses" it to zalgo text using a reversible encoding scheme.
@@ -46,7 +158,8 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
 }
 
 /// Takes in a string that was encoded by [`zalgo_encode`]
-/// and decodes it back into an ASCII string.
+/// and decodes it back into an ASCII string. Can fail if
+/// the given a string that was not encoded by [`zalgo_encode`].
 ///
 /// # Example
 /// ```

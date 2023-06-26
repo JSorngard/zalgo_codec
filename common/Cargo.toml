@@ -10,10 +10,14 @@ repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = {version = "1.0", default_features = false, features = ["derive"], optional = true}
 
 [dev-dependencies]
 criterion = {version = "0.4", features = ["html_reports"]}
 rand = "0.8.5"
+
+[features]
+serde_support = ["dep:serde"]
 
 [[bench]]
 name = "codec_bench"
