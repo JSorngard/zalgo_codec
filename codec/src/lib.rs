@@ -41,17 +41,10 @@
 //! The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 //! where the Python code was first presented together with the above explanation.
 
-#![cfg_attr(docsrs, feature(doc_cfg))]
 #![forbid(unsafe_code)]
 
 pub use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python, UnencodableByteError};
 pub use zalgo_codec_macro::zalgo_embed;
-
-#[cfg(any(doc, test, feature = "files"))]
-#[cfg_attr(docsrs, doc(cfg(feature = "files")))]
-pub use zalgo_codec_common::{
-    decode_file, encode_file, wrap_python_file, UndecodableFileError, UnencodableFileError,
-};
 
 #[cfg(test)]
 mod tests {
@@ -61,14 +54,8 @@ mod tests {
         seq::SliceRandom,
         Rng,
     };
-    use std::{
-        fs,
-        path::PathBuf,
-        str::{self, FromStr},
-    };
+    use std::str;
     use unicode_segmentation::UnicodeSegmentation;
-
-    const TEST_DIR: &str = "tests";
 
     struct PrintableAsciiAndNewline;
 
@@ -160,72 +147,5 @@ mod tests {
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
-    }
-
-    #[test]
-    fn file_encoding() {
-        let mut lorem_path = PathBuf::from_str(TEST_DIR).unwrap();
-        let mut zalgo_path = PathBuf::from_str(TEST_DIR).unwrap();
-        lorem_path.push("lorem.txt");
-        zalgo_path.push("zalgo.txt");
-
-        encode_file(&lorem_path, &zalgo_path).unwrap();
-
-        let zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
-        let lorem_text = fs::read_to_string(lorem_path).unwrap();
-
-        assert_eq!(
-            zalgo_decode(&zalgo_text).unwrap(),
-            //remove carriage return on windows
-            lorem_text.replace('\r', "")
-        );
-
-        let mut consistency_path = PathBuf::new();
-        consistency_path.push(TEST_DIR);
-        consistency_path.push("consistency_check.txt");
-
-        decode_file(&zalgo_path, &consistency_path).unwrap();
-
-        let decoded_text = fs::read_to_string(&consistency_path).unwrap();
-
-        assert_eq!(decoded_text, lorem_text.replace('\r', ""));
-        fs::remove_file(zalgo_path).unwrap();
-        fs::remove_file(consistency_path).unwrap();
-    }
-
-    #[test]
-    fn test_random_files() {
-        let mut path1 = PathBuf::from_str(TEST_DIR).unwrap();
-        let mut path2 = PathBuf::from_str(TEST_DIR).unwrap();
-        let mut path3 = PathBuf::from_str(TEST_DIR).unwrap();
-        path1.push("original.txt");
-        path2.push("encoded.txt");
-        path3.push("decoded.txt");
-
-        for _ in 0..10 {
-            let contents = PrintableAsciiAndNewline.sample_string(&mut rand::thread_rng(), 1000);
-            fs::write(&path1, &contents).unwrap();
-            let _ = encode_file(&path1, &path2);
-            fs::remove_file(&path1).unwrap();
-            let _ = decode_file(&path2, &path3);
-            fs::remove_file(&path2).unwrap();
-            let transcoded = fs::read_to_string(&path3);
-            fs::remove_file(&path3).unwrap();
-            assert_eq!(contents, transcoded.unwrap());
-        }
-    }
-
-    #[test]
-    fn python_encoding() {
-        let mut lorem_path = PathBuf::new();
-        let mut zalgo_path = PathBuf::new();
-        lorem_path.push(TEST_DIR);
-        lorem_path.push("lorem.py");
-        zalgo_path.push(TEST_DIR);
-        zalgo_path.push("zalgo.py");
-        wrap_python_file(&lorem_path, &zalgo_path).unwrap();
-        let _zalgo_text = fs::read_to_string(&zalgo_path).unwrap();
-        let _lorem_text = fs::read_to_string(lorem_path).unwrap();
-        fs::remove_file(zalgo_path).unwrap();
     }
 }

@@ -2,17 +2,9 @@
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
 
 #![forbid(unsafe_code)]
-#![cfg_attr(docsrs, feature(doc_cfg))]
 
 use core::{fmt, str};
 use std::error::Error;
-
-#[cfg(feature = "files")]
-mod files;
-
-#[cfg(feature = "files")]
-#[cfg_attr(docsrs, doc(cfg(feature = "files")))]
-pub use files::*;
 
 /// Takes in an ASCII string without control characters (except newlines)
 /// and "compresses" it to zalgo text using a reversible encoding scheme.

@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
-use zalgo_codec_common::{decode_file, encode_file, zalgo_decode, zalgo_encode};
+use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
@@ -74,7 +74,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             Source::File { path } => match config.out_path {
-                Some(dst) => Ok(encode_file(path, dst)?),
+                Some(dst) => {
+                    let text = std::fs::read_to_string(path)?.replace('\r', "");
+                    let result = zalgo_encode(&text)?;
+                    Ok(std::fs::write(dst, result)?)
+                }
                 None => {
                     let text = std::fs::read_to_string(path)?.replace('\r', "");
                     let result = zalgo_encode(&text)?;
@@ -102,7 +106,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             Source::File { path } => match config.out_path {
-                Some(dst) => Ok(decode_file(path, dst)?),
+                Some(dst) => {
+                    let encoded = std::fs::read_to_string(path)?.replace('\r', "");
+                    let text = zalgo_decode(&encoded)?;
+                    Ok(std::fs::write(dst, text)?)
+                }
                 None => {
                     let encoded = std::fs::read_to_string(path)?.replace('\r', "");
                     let text = zalgo_decode(&encoded)?;
