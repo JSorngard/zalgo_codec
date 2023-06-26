@@ -1,6 +1,6 @@
 //! A crate for converting an ASCII text string to a single unicode grapheme cluster and back.
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
-//! 
+//!
 use core::{fmt, str};
 use std::error::Error;
 
@@ -33,9 +33,7 @@ mod zalgo_string {
             }
             bytes.truncate(w);
             // Safety: we know that the starting string was encoded from valid ASCII to begin with
-            unsafe {
-                String::from_utf8_unchecked(bytes)
-            }
+            unsafe { String::from_utf8_unchecked(bytes) }
         }
 
         /// Extracts a string slice containing the entire `ZalgoString`.
@@ -65,11 +63,28 @@ mod zalgo_string {
             self.0.bytes()
         }
 
-        /// Returns an iterator over the characters of the ZalgoString. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
+        /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
         /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
         #[inline]
         pub fn chars(&self) -> core::str::Chars<'_> {
             self.0.chars()
+        }
+
+        /// Returns an iterator over the decoded characters of the `ZalgoString`.
+        #[inline]
+        pub fn decoded_chars(&self) -> DecodedChars<'_> {
+            DecodedChars {
+                dcb: self.decoded_bytes(),
+            }
+        }
+
+        /// Returns an iterator over the decoded bytes of the `ZalgoString`.
+        #[inline]
+        pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
+            DecodedBytes {
+                zs: self.as_bytes(),
+                index: 1,
+            }
         }
 
         /// Converts a `ZalgoString` into a byte vector.
@@ -78,6 +93,38 @@ mod zalgo_string {
         #[must_use = "`self` will be dropped if the result is not used"]
         pub fn into_bytes(self) -> Vec<u8> {
             self.0.into_bytes()
+        }
+    }
+
+    pub struct DecodedBytes<'a> {
+        zs: &'a [u8],
+        index: usize,
+    }
+
+    impl<'a> Iterator for DecodedBytes<'a> {
+        type Item = u8;
+        fn next(&mut self) -> Option<Self::Item> {
+            if self.index < self.zs.len() {
+                let t = Some(
+                    ((self.zs[self.index] << 6 & 64 | self.zs[self.index + 1] & 63) + 22) % 133
+                        + 10,
+                );
+                self.index += 2;
+                t
+            } else {
+                None
+            }
+        }
+    }
+
+    pub struct DecodedChars<'a> {
+        dcb: DecodedBytes<'a>,
+    }
+
+    impl<'a> Iterator for DecodedChars<'a> {
+        type Item = char;
+        fn next(&mut self) -> Option<Self::Item> {
+            self.dcb.next().map(char::from)
         }
     }
 
