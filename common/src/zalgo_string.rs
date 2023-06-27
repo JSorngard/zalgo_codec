@@ -34,8 +34,6 @@ impl ZalgoString {
     /// assert!(ZalgoString::try_new("\r").is_err());
     /// ```
     pub fn try_new<S: Borrow<str>>(s: S) -> Result<Self, ZalgoError> {
-        // TODO: Make this take in a `String` and reuse the allocation
-        // by resizing it and encoding from the back
         zalgo_encode(s.borrow()).map(Self)
     }
 
