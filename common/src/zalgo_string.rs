@@ -1,5 +1,5 @@
-use crate::{decode_byte_pair, fmt, zalgo_decode, zalgo_encode, ZalgoError};
-use core::{borrow::Borrow, convert, iter::FusedIterator};
+use crate::{decode_byte_pair, fmt, zalgo_encode, ZalgoError};
+use core::{borrow::Borrow, iter::FusedIterator};
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
 
@@ -42,11 +42,26 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::try_new("Zalgo").unwrap();
-    /// assert_eq!("Zalgo", zs.into_decoded());
+    /// assert_eq!("Zalgo", zs.into_decoded_string());
     /// // println!("{zs}"); // Error: value used after move
     /// ```
     #[must_use = "`self` will be dropped if the result is not used"]
-    pub fn into_decoded(self) -> String {
+    pub fn into_decoded_string(self) -> String {
+        // Safety: we know that the starting string was encoded from valid ASCII to begin with
+        // so every decoded byte is a valid utf-8 character.
+        // This invariant can be broken by improper use of the function `ZalgoString::as_bytes_mut`.
+        unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
+    }
+
+    /// Decodes `self` into a `Vec<u8>` in-place. This method has no effect on the allocated capacity.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// assert_eq!(b"Zalgo".to_vec(), zs.into_decoded_bytes());
+    /// // println!("{zs}"); // Error: value used after move
+    /// ```
+    pub fn into_decoded_bytes(self) -> Vec<u8> {
         let mut w = 0;
         let mut bytes = self.into_bytes();
         for r in (1..bytes.len()).step_by(2) {
@@ -54,23 +69,7 @@ impl ZalgoString {
             w += 1;
         }
         bytes.truncate(w);
-        // Safety: we know that the starting string was encoded from valid ASCII to begin with
-        // so every decoded byte is a valid utf-8 character.
-        // This invariant can be broken by improper use of the function `ZalgoString::as_bytes_mut`.
-        unsafe { String::from_utf8_unchecked(bytes) }
-    }
-
-    /// Decode the contents of `self` into a new `String`.
-    /// # Example
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
-    /// assert_eq!(zs.decoded(), "Zalgo");
-    /// // We can still use the ZalgoString
-    /// println!("{zs}");
-    /// ```
-    pub fn decoded(&self) -> String {
-        zalgo_decode(&self.0).expect("we know that the original string is valid ASCII")
+        bytes
     }
 
     /// Returns the contents of `self` as a string slice.
@@ -181,16 +180,24 @@ impl ZalgoString {
     }
 
     /// Converts `self` into a byte vector.
-    /// This simply returns the underlying buffer without any cloning.
+    /// This simply returns the underlying buffer without any cloning or decoding.
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
         self.0.into_bytes()
     }
+
+    /// Converts `self` into a `String`.  
+    /// This simply returns the underlying `String` without any cloning or decoding.
+    #[inline]
+    #[must_use = "`self` will be dropped if the result is not used"]
+    pub fn into_string(self) -> String {
+        self.0
+    }
 }
 
 /// An iterator over the decoded bytes of a [`ZalgoString`].
-/// 
+///
 /// This struct is obtained by calling the [`decoded_bytes`](ZalgoString::decoded_bytes) method on a [`ZalgoString`].
 /// See its documentation for more.
 pub struct DecodedBytes<'a> {
@@ -238,7 +245,7 @@ impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
 impl<'a> FusedIterator for DecodedBytes<'a> {}
 
 /// An iterator over the decoded characters of a [`ZalgoString`].
-/// 
+///
 /// This struct is obtained by calling the [`decoded_chars`](ZalgoString::decoded_chars) method on a [`ZalgoString`].
 /// See it's documentation for more.
 pub struct DecodedChars<'a> {
@@ -263,22 +270,6 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 }
 
 impl<'a> FusedIterator for DecodedChars<'a> {}
-
-impl convert::From<ZalgoString> for String {
-    /// Converts the `ZalgoString` into a `String` *without decoding it*.
-    #[inline]
-    fn from(zs: ZalgoString) -> Self {
-        zs.0
-    }
-}
-
-impl<'a> convert::From<&'a ZalgoString> for &'a str {
-    /// Converts a `&ZalgoString` to a `&str` *without any decoding*.
-    #[inline]
-    fn from(zs: &'a ZalgoString) -> Self {
-        &zs.0
-    }
-}
 
 macro_rules! impl_partial_eq {
     ($($rhs:ty),+) => {
