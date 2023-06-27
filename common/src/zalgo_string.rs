@@ -131,7 +131,8 @@ impl ZalgoString {
     /// let zs = ZalgoString::try_new("Zalgo").unwrap();
     /// let mut decoded_bytes = zs.decoded_bytes();
     /// assert_eq!(decoded_bytes.next(), Some(90));
-    /// assert_eq!(decoded_bytes.collect::<Vec<u8>>(), vec![97, 108, 103, 111]);
+    /// assert_eq!(decoded_bytes.next_back(), Some(111));
+    /// assert_eq!(decoded_bytes.collect::<Vec<u8>>(), vec![97, 108, 103]);
     #[inline]
     pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
         DecodedBytes {
@@ -188,6 +189,10 @@ impl ZalgoString {
     }
 }
 
+/// An iterator over the decoded bytes of a [`ZalgoString`].
+/// 
+/// This struct is obtained by calling the [`decoded_bytes`](ZalgoString::decoded_bytes) method on a [`ZalgoString`].
+/// See its documentation for more.
 pub struct DecodedBytes<'a> {
     zs: &'a [u8],
     index: usize,
@@ -232,6 +237,10 @@ impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
 
 impl<'a> FusedIterator for DecodedBytes<'a> {}
 
+/// An iterator over the decoded characters of a [`ZalgoString`].
+/// 
+/// This struct is obtained by calling the [`decoded_chars`](ZalgoString::decoded_chars) method on a [`ZalgoString`].
+/// See it's documentation for more.
 pub struct DecodedChars<'a> {
     dcb: DecodedBytes<'a>,
 }

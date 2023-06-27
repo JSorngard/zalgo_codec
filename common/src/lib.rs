@@ -4,7 +4,7 @@
 use core::{fmt, str};
 use std::error::Error;
 
-mod zalgo_string;
+pub mod zalgo_string;
 pub use zalgo_string::ZalgoString;
 
 /// Takes in an ASCII string without control characters (except newlines)
