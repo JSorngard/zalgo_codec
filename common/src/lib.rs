@@ -8,7 +8,7 @@ pub mod zalgo_string;
 pub use zalgo_string::ZalgoString;
 
 /// Takes in an ASCII string without control characters (except newlines)
-/// and "compresses" it to zalgo text using a reversible encoding scheme.
+/// and encodes it to zalgo text using a reversible encoding scheme.
 /// The resulting string is a single unicode grapheme cluster and should
 /// only take up a single character space horizontally when displayed
 /// (though this can vary between platforms depending on how they deal with unicode).
@@ -46,9 +46,10 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
     Ok(String::from_utf8(result).expect("the encoding process does not produce invalid utf8 given valid ascii text, which is verified before this point"))
 }
 
-/// Takes in a string that was encoded by [`zalgo_encode`]
-/// and decodes it back into an ASCII string. Can fail if
-/// the given a string that was not encoded by [`zalgo_encode`].
+/// Takes in a string that was encoded by [`zalgo_encode`] and decodes it back into an ASCII string.
+/// Returns an error if the decoded string is not valid UTF-8.
+/// This can happen if the input is a string that was not encoded by [`zalgo_encode`],
+/// since the byte manipulations that this functions does could result in invalid unicode in that case.
 ///
 /// # Example
 /// ```

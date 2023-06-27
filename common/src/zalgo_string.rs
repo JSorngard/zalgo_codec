@@ -4,7 +4,7 @@ use core::{borrow::Borrow, iter::FusedIterator};
 use serde::{Deserialize, Serialize};
 
 /// A thin wrapper around a [`String`] that's been encoded with [`zalgo_encode`]. The main benefit of using this type is that
-/// decoding can safely be done in-place since it is known how it was encoded. If the `serde_support` feature is enabled this struct derives the
+/// decoding can safely be done in-place without a validity check since it is known how it was encoded. If the `serde_support` feature is enabled this struct derives the
 /// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
@@ -49,7 +49,6 @@ impl ZalgoString {
     pub fn into_decoded_string(self) -> String {
         // Safety: we know that the starting string was encoded from valid ASCII to begin with
         // so every decoded byte is a valid utf-8 character.
-        // This invariant can be broken by improper use of the function `ZalgoString::as_bytes_mut`.
         unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
     }
 
@@ -84,19 +83,6 @@ impl ZalgoString {
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
-    }
-
-    /// Returns the contents of `self` as a mutable byte slice.
-    /// # Safety
-    /// This function has the same safety invariants as [`str::as_bytes_mut`] in addition to requiring
-    /// that the result of decoding the string after the borrow ends also results in
-    /// valid UTF-8.
-    ///
-    /// Use of a `ZalgoString`, `String`, or `str` whose contents is not valid UFT-8 is undefined behaviour.
-    #[inline]
-    #[must_use]
-    pub unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-        self.0.as_bytes_mut()
     }
 
     /// Returns the length of `self` in bytes. The allocated capacity is the same.

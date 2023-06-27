@@ -21,6 +21,7 @@ unicode-segmentation = "1.10.1"
 [features]
 ## Builds a binary that can be used to test out the codec
 binary = ["dep:clap"]
+serde_support = ["zalgo-codec-common/serde_support"]
 
 [[bin]]
 name = "zalgo_codec"
