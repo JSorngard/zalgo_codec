@@ -6,34 +6,75 @@ use std::error::Error;
 
 pub use zalgo_string::ZalgoString;
 mod zalgo_string {
-    use super::{fmt, zalgo_encode, ZalgoError};
-    use core::convert;
+    use super::{decode_byte_pair, fmt, zalgo_decode, zalgo_encode, ZalgoError};
+    use core::{borrow::Borrow, convert, iter::FusedIterator};
     #[cfg(feature = "serde_support")]
     use serde::{Deserialize, Serialize};
 
+    /// A thin wrapper around a [`String`] that's been encoded with [`zalgo_encode`]. The main benefit of using this type is that
+    /// decoding can safely be done in-place since it is known how it was encoded.
     #[derive(Debug, Clone, PartialEq, Hash)]
     #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
     pub struct ZalgoString(String);
 
     impl ZalgoString {
-        /// Encodes the given string as a new `ZalgoString`
-        #[must_use = "the function returns a new `ZalgoString` and the input is dropped"]
-        pub fn encode(s: String) -> Result<Self, ZalgoError> {
-            zalgo_encode(&s).map(Self)
+        /// Encodes the given string with [`zalgo_encode`] and stores the result in a new allocation.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// assert_eq!(ZalgoString::try_encode_new("Zalgo").unwrap(), "É̺͇͌͏");
+        /// ```
+        /// A `ZalgoString` created from a `String` is the same as one created from a `&str`:
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// assert_eq!(
+        ///     ZalgoString::try_encode_new(String::from("Zalgo\nHe comes")).unwrap(),
+        ///     ZalgoString::try_encode_new("Zalgo\nHe comes").unwrap(),
+        /// );
+        /// ```
+        /// Can only encode printable ASCII and newlines:
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// assert!(ZalgoString::try_encode_new("❤️").is_err());
+        /// assert!(ZalgoString::try_encode_new("\r").is_err());
+        /// ```
+        pub fn try_encode_new<S: Borrow<str>>(s: S) -> Result<Self, ZalgoError> {
+            zalgo_encode(s.borrow()).map(Self)
         }
 
         /// Decodes `self` into a normal `String` in-place. This method has no effect on the allocated capacity.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// let zs = ZalgoString::try_encode_new("Zalgo").unwrap();
+        /// assert_eq!("Zalgo", zs.into_decoded());
+        /// // println!("{zs}"); // Error: value borrowed here after move
+        /// ```
         #[must_use = "`self` will be dropped if the result is not used"]
-        pub fn decode(self) -> String {
+        pub fn into_decoded(self) -> String {
             let mut w = 0;
             let mut bytes = self.into_bytes();
             for r in (1..bytes.len()).step_by(2) {
-                bytes[w] = ((bytes[r] << 6 & 64 | bytes[r + 1] & 63) + 22) % 133 + 10;
+                bytes[w] = decode_byte_pair(bytes[r], bytes[r + 1]);
                 w += 1;
             }
             bytes.truncate(w);
             // Safety: we know that the starting string was encoded from valid ASCII to begin with
+            // so every decoded byte is a valid utf-8 character.
             unsafe { String::from_utf8_unchecked(bytes) }
+        }
+
+        /// Decode the contents of `self` into a new `String`.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// let zs = ZalgoString::try_encode_new("Zalgo").unwrap();
+        /// assert_eq!(zs.decoded(), "Zalgo");
+        /// // We can still use the ZalgoString
+        /// println!("{zs}");
+        /// ```
+        pub fn decoded(&self) -> String {
+            zalgo_decode(&self.0).expect("we know that the original string is valid ASCII")
         }
 
         /// Extracts a string slice containing the entire `ZalgoString`.
@@ -43,34 +84,69 @@ mod zalgo_string {
             &self.0
         }
 
-        /// Returns the contents of the `ZalgoString` as a byte slice.
+        /// Returns the contents of `self` as a byte slice.
         #[inline]
         #[must_use]
         pub fn as_bytes(&self) -> &[u8] {
             self.0.as_bytes()
         }
 
-        /// Returns the length of the `ZalgoString` in bytes.
+        /// Returns the length of `self` in bytes. The allocated capacity is the same.
         #[inline]
         #[must_use]
         pub fn len(&self) -> usize {
             self.0.len()
         }
 
-        /// Returns an iterator over the bytes of the ZalgoString. See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
+        /// Returns an iterator over the bytes of the `ZalgoString`. See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
         #[inline]
         pub fn bytes(&self) -> core::str::Bytes<'_> {
             self.0.bytes()
         }
 
+        /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// let zs = ZalgoString::try_encode_new("Zalgo").unwrap();
+        /// let mut decoded_bytes = zs.decoded_bytes();
+        /// assert_eq!(decoded_bytes.next().unwrap(), 90);
+        /// assert_eq!(decoded_bytes.collect::<Vec<u8>>(), vec![97, 108, 103, 111]);
+        #[inline]
+        pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
+            DecodedBytes {
+                zs: self.as_bytes(),
+                index: 1,
+                back_index: self.as_bytes().len(),
+            }
+        }
+
         /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
         /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// let zs = ZalgoString::try_encode_new("Zalgo").unwrap();
+        /// let mut chars = zs.chars();
+        /// // A ZalgoString always begin with an 'E'
+        /// assert_eq!(chars.next().unwrap(), 'E');
+        /// // After that it gets weird
+        /// assert_eq!(chars.next().unwrap(), '\u{33a}');
+        /// ```
         #[inline]
         pub fn chars(&self) -> core::str::Chars<'_> {
             self.0.chars()
         }
 
-        /// Returns an iterator over the decoded characters of the `ZalgoString`.
+        /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
+        /// # Example
+        /// ```
+        /// # use zalgo_codec_common::ZalgoString;
+        /// let zs = ZalgoString::try_encode_new("Zalgo").unwrap();
+        /// let mut decoded_chars = zs.decoded_chars();
+        /// assert_eq!(decoded_chars.next().unwrap(), 'Z');
+        /// assert_eq!(decoded_chars.collect::<String>(), "algo");
+        /// ```
         #[inline]
         pub fn decoded_chars(&self) -> DecodedChars<'_> {
             DecodedChars {
@@ -78,16 +154,7 @@ mod zalgo_string {
             }
         }
 
-        /// Returns an iterator over the decoded bytes of the `ZalgoString`.
-        #[inline]
-        pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
-            DecodedBytes {
-                zs: self.as_bytes(),
-                index: 1,
-            }
-        }
-
-        /// Converts a `ZalgoString` into a byte vector.
+        /// Converts `self` into a byte vector.
         /// This consumes the `ZalgoString`, so we do not need to copy its contents.
         #[inline]
         #[must_use = "`self` will be dropped if the result is not used"]
@@ -99,23 +166,46 @@ mod zalgo_string {
     pub struct DecodedBytes<'a> {
         zs: &'a [u8],
         index: usize,
+        back_index: usize,
     }
 
     impl<'a> Iterator for DecodedBytes<'a> {
         type Item = u8;
         fn next(&mut self) -> Option<Self::Item> {
-            if self.index < self.zs.len() {
-                let t = Some(
-                    ((self.zs[self.index] << 6 & 64 | self.zs[self.index + 1] & 63) + 22) % 133
-                        + 10,
-                );
+            if self.index < self.back_index {
+                let t = Some(decode_byte_pair(
+                    self.zs[self.index],
+                    self.zs[self.index + 1],
+                ));
                 self.index += 2;
                 t
             } else {
                 None
             }
         }
+
+        fn size_hint(&self) -> (usize, Option<usize>) {
+            let left = (self.back_index.saturating_sub(self.index)) / 2;
+            (left, Some(left))
+        }
     }
+
+    impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
+        fn next_back(&mut self) -> Option<Self::Item> {
+            if self.back_index > self.index {
+                let t = Some(decode_byte_pair(
+                    self.zs[self.back_index - 2],
+                    self.zs[self.back_index - 1],
+                ));
+                self.back_index -= 2;
+                t
+            } else {
+                None
+            }
+        }
+    }
+
+    impl<'a> FusedIterator for DecodedBytes<'a> {}
 
     pub struct DecodedChars<'a> {
         dcb: DecodedBytes<'a>,
@@ -126,7 +216,19 @@ mod zalgo_string {
         fn next(&mut self) -> Option<Self::Item> {
             self.dcb.next().map(char::from)
         }
+
+        fn size_hint(&self) -> (usize, Option<usize>) {
+            self.dcb.size_hint()
+        }
     }
+
+    impl<'a> DoubleEndedIterator for DecodedChars<'a> {
+        fn next_back(&mut self) -> Option<Self::Item> {
+            self.dcb.next_back().map(char::from)
+        }
+    }
+
+    impl<'a> FusedIterator for DecodedChars<'a> {}
 
     impl convert::From<ZalgoString> for String {
         /// Converts the `ZalgoString` into a `String` *without decoding it*.
@@ -156,7 +258,7 @@ mod zalgo_string {
             )+
         };
     }
-    impl_partial_eq! {String, str, std::borrow::Cow<'a, str>}
+    impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 
     impl fmt::Display for ZalgoString {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -219,10 +321,16 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error>
         .skip(1)
         .step_by(2)
         .zip(encoded.bytes().skip(2).step_by(2))
-        .map(|(odds, evens)| (((odds << 6 & 64 | evens & 63) + 22) % 133 + 10))
+        .map(|(odd, even)| decode_byte_pair(odd, even))
         .collect();
 
     String::from_utf8(bytes)
+}
+
+#[must_use]
+#[inline]
+fn decode_byte_pair(odd: u8, even: u8) -> u8 {
+    ((odd << 6 & 64 | even & 63) + 22) % 133 + 10
 }
 
 /// zalgo-encodes an ASCII string containing Python code and
