@@ -37,7 +37,7 @@ impl ZalgoString {
     pub fn try_new<S: Borrow<str>>(s: S) -> Result<Self, ZalgoError> {
         zalgo_encode(s.borrow()).map(Self)
     }
-    
+
     /// Returns the contents of `self` as a string slice.
     /// # Example
     /// ```
@@ -53,7 +53,7 @@ impl ZalgoString {
 
     /// Converts `self` into a `String`.
     /// This simply returns the underlying `String` without any cloning or decoding.
-    /// 
+    ///
     /// If you want to clone the contents of `self` into a new `String`
     /// you can use the [`to_string`](std::string::ToString) method since `ZalgoString` implements [`Display`](core::fmt::Display).
     /// # Example
