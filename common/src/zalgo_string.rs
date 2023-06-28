@@ -70,18 +70,6 @@ impl ZalgoString {
         self.0
     }
 
-    /// Decodes `self` and returns it as a new `String`.
-    /// # Example
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
-    /// assert_eq!(zs.to_decoded_string(), "Zalgo");
-    /// ```
-    #[must_use = "the method returns a new value and does not modify the original"]
-    pub fn to_decoded_string(&self) -> String {
-        self.decoded_chars().collect()
-    }
-
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
     /// # Example
     /// ```
@@ -113,24 +101,12 @@ impl ZalgoString {
         self.0.as_bytes()
     }
 
-    /// Returns the contents of `self` in a new byte vector.
-    #[must_use = "this method returns a new value and does not modify `self`"]
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.as_bytes().to_vec()
-    }
-
     /// Converts `self` into a byte vector.
     /// This simply returns the underlying buffer without any cloning or decoding.
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
         self.0.into_bytes()
-    }
-
-    /// Decodes `self` into a new byte vector.
-    #[must_use = "this method returns a new value and does not modify `self`"]
-    pub fn to_decoded_bytes(&self) -> Vec<u8> {
-        self.decoded_bytes().collect()
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
