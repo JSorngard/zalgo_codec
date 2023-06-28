@@ -43,6 +43,44 @@ impl ZalgoString {
         &self.0
     }
 
+    /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
+    /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut chars = zs.chars();
+    /// // A ZalgoString always begins with an 'E'
+    /// assert_eq!(chars.next(), Some('E'));
+    /// // After that it gets weird
+    /// assert_eq!(chars.next(), Some('\u{33a}'));
+    /// ```
+    #[inline]
+    pub fn chars(&self) -> core::str::Chars<'_> {
+        self.0.chars()
+    }
+
+    /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zlgoa").unwrap();
+    /// let mut decoded_chars = zs.decoded_chars();
+    /// assert_eq!(decoded_chars.next(), Some('Z'));
+    /// assert_eq!(decoded_chars.next_back(), Some('a'));
+    /// assert_eq!(decoded_chars.next(), Some('l'));
+    /// assert_eq!(decoded_chars.next(), Some('g'));
+    /// assert_eq!(decoded_chars.next_back(), Some('o'));
+    /// assert_eq!(decoded_chars.next(), None);
+    /// assert_eq!(decoded_chars.next_back(), None);
+    /// ```
+    #[inline]
+    pub fn decoded_chars(&self) -> DecodedChars<'_> {
+        DecodedChars {
+            dcb: self.decoded_bytes(),
+        }
+    }
+
     /// Converts `self` into a `String`.
     /// This simply returns the underlying `String` without any cloning or decoding.
     /// # Basic Usage
@@ -90,6 +128,32 @@ impl ZalgoString {
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
+    }
+
+    /// Returns an iterator over the bytes of the `ZalgoString`.
+    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes)
+    /// for more information.
+    #[inline]
+    pub fn bytes(&self) -> core::str::Bytes<'_> {
+        self.0.bytes()
+    }
+
+    /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut decoded_bytes = zs.decoded_bytes();
+    /// assert_eq!(decoded_bytes.next(), Some(90));
+    /// assert_eq!(decoded_bytes.next_back(), Some(111));
+    /// assert_eq!(decoded_bytes.collect::<Vec<u8>>(), vec![97, 108, 103]);
+    #[inline]
+    pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
+        DecodedBytes {
+            zs: self.as_bytes(),
+            index: 1,
+            back_index: self.as_bytes().len(),
+        }
     }
 
     /// Converts `self` into a byte vector.
@@ -153,70 +217,6 @@ impl ZalgoString {
     #[must_use]
     pub fn decoded_len(&self) -> usize {
         (self.len().get() - 1) / 2
-    }
-
-    /// Returns an iterator over the bytes of the `ZalgoString`.
-    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes)
-    /// for more information.
-    #[inline]
-    pub fn bytes(&self) -> core::str::Bytes<'_> {
-        self.0.bytes()
-    }
-
-    /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
-    /// # Example
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::new("Zalgo").unwrap();
-    /// let mut decoded_bytes = zs.decoded_bytes();
-    /// assert_eq!(decoded_bytes.next(), Some(90));
-    /// assert_eq!(decoded_bytes.next_back(), Some(111));
-    /// assert_eq!(decoded_bytes.collect::<Vec<u8>>(), vec![97, 108, 103]);
-    #[inline]
-    pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
-        DecodedBytes {
-            zs: self.as_bytes(),
-            index: 1,
-            back_index: self.as_bytes().len(),
-        }
-    }
-
-    /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
-    /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
-    /// # Example
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::new("Zalgo").unwrap();
-    /// let mut chars = zs.chars();
-    /// // A ZalgoString always begins with an 'E'
-    /// assert_eq!(chars.next(), Some('E'));
-    /// // After that it gets weird
-    /// assert_eq!(chars.next(), Some('\u{33a}'));
-    /// ```
-    #[inline]
-    pub fn chars(&self) -> core::str::Chars<'_> {
-        self.0.chars()
-    }
-
-    /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
-    /// # Example
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::new("Zlgoa").unwrap();
-    /// let mut decoded_chars = zs.decoded_chars();
-    /// assert_eq!(decoded_chars.next(), Some('Z'));
-    /// assert_eq!(decoded_chars.next_back(), Some('a'));
-    /// assert_eq!(decoded_chars.next(), Some('l'));
-    /// assert_eq!(decoded_chars.next(), Some('g'));
-    /// assert_eq!(decoded_chars.next_back(), Some('o'));
-    /// assert_eq!(decoded_chars.next(), None);
-    /// assert_eq!(decoded_chars.next_back(), None);
-    /// ```
-    #[inline]
-    pub fn decoded_chars(&self) -> DecodedChars<'_> {
-        DecodedChars {
-            dcb: self.decoded_bytes(),
-        }
     }
 }
 
