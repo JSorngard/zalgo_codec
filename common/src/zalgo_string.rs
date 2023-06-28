@@ -17,16 +17,16 @@ impl ZalgoString {
     /// # Examples
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// assert_eq!(ZalgoString::try_new("Zalgo").unwrap(), "É̺͇͌͏");
+    /// assert_eq!(ZalgoString::new("Zalgo").unwrap(), "É̺͇͌͏");
     /// ```
     /// Can only encode printable ASCII and newlines:
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// assert!(ZalgoString::try_new("❤️").is_err());
-    /// assert!(ZalgoString::try_new("\r").is_err());
+    /// assert!(ZalgoString::new("❤️").is_err());
+    /// assert!(ZalgoString::new("\r").is_err());
     /// ```
     #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
-    pub fn try_new(s: &str) -> Result<Self, ZalgoError> {
+    pub fn new(s: &str) -> Result<Self, ZalgoError> {
         zalgo_encode(s).map(Self)
     }
 
@@ -34,7 +34,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Oh boy!").unwrap();
+    /// let zs = ZalgoString::new("Oh boy!").unwrap();
     /// assert_eq!(zs.as_str(), "È̯͈͂͏͙́");
     /// ```
     #[inline]
@@ -48,7 +48,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
+    /// let zs = ZalgoString::new("Zalgo\n He comes!").unwrap();
     /// let es = "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ";
     /// assert_eq!(zs.to_string(), es);
     /// assert_eq!(zs.into_string(), es);
@@ -65,7 +65,7 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let s = "Zalgo";
-    /// let zs = ZalgoString::try_new(s).unwrap();
+    /// let zs = ZalgoString::new(s).unwrap();
     /// assert_eq!(s, zs.into_decoded_string());
     /// // println!("{zs}"); // Error: value used after move
     /// ```
@@ -81,7 +81,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// let mut bytes = zs.as_bytes();
     /// assert_eq!(bytes[0], 69);
     /// assert_eq!(&bytes[1..5], &[204, 186, 205, 129]);
@@ -97,7 +97,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// assert_eq!(zs.into_bytes(), vec![69, 204, 186, 205, 129, 205, 140, 205, 135, 205, 143]);
     /// ```
     #[inline]
@@ -110,7 +110,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// assert_eq!(b"Zalgo".to_vec(), zs.into_decoded_bytes());
     /// // println!("{zs}"); // Error: value used after move
     /// ```
@@ -131,7 +131,7 @@ impl ZalgoString {
     /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Z").unwrap();
+    /// let zs = ZalgoString::new("Z").unwrap();
     /// assert_eq!(zs.len().get(), 3);
     /// ```
     #[inline]
@@ -147,7 +147,7 @@ impl ZalgoString {
     /// This is computed without any decoding.
     /// # Basic Usage
     /// let s = "Zalgo, He comes!";
-    /// let zs = ZalgoString::try_new(s);
+    /// let zs = ZalgoString::new(s);
     /// assert_eq!(s.len(), zs.decoded_len());
     #[inline]
     #[must_use]
@@ -167,7 +167,7 @@ impl ZalgoString {
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// let mut decoded_bytes = zs.decoded_bytes();
     /// assert_eq!(decoded_bytes.next(), Some(90));
     /// assert_eq!(decoded_bytes.next_back(), Some(111));
@@ -186,7 +186,7 @@ impl ZalgoString {
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// let mut chars = zs.chars();
     /// // A ZalgoString always begins with an 'E'
     /// assert_eq!(chars.next(), Some('E'));
@@ -202,7 +202,7 @@ impl ZalgoString {
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zlgoa").unwrap();
+    /// let zs = ZalgoString::new("Zlgoa").unwrap();
     /// let mut decoded_chars = zs.decoded_chars();
     /// assert_eq!(decoded_chars.next(), Some('Z'));
     /// assert_eq!(decoded_chars.next_back(), Some('a'));
@@ -322,20 +322,20 @@ mod test {
     #[test]
     fn check_into_decoded_string() {
         let s = "Zalgo\n He comes!";
-        let zs: ZalgoString = ZalgoString::try_new(s).unwrap();
+        let zs: ZalgoString = ZalgoString::new(s).unwrap();
         assert_eq!(zs.into_decoded_string(), s);
 
-        let zs = ZalgoString::try_new("").unwrap();
+        let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_decoded_string(), "");
     }
 
     #[test]
     fn check_string_from_zalgo_string() {
-        let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
+        let zs = ZalgoString::new("Zalgo\n He comes!").unwrap();
         assert_eq!(zs.to_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
         assert_eq!(zs.into_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
 
-        let zs = ZalgoString::try_new("").unwrap();
+        let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_string(), "E");
     }
 }
