@@ -3,8 +3,10 @@ use core::iter::FusedIterator;
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
 
-/// A thin wrapper around a [`String`] that's been encoded with [`zalgo_encode`]. The main benefit of using this type is that
-/// decoding can safely be done in-place without a validity check since it is known how it was encoded. If the `serde_support` feature is enabled this struct derives the
+/// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`]. 
+/// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
+/// encoded and decoded form.
+/// If the `serde_support` feature is enabled this struct derives the
 /// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
@@ -45,6 +47,7 @@ impl ZalgoString {
 
     /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
     /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+    /// The first character is 'E' and the characters after that are in the unicode range U+0300–U+036F.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
