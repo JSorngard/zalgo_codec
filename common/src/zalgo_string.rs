@@ -33,11 +33,56 @@ impl ZalgoString {
     /// assert!(ZalgoString::try_new("❤️").is_err());
     /// assert!(ZalgoString::try_new("\r").is_err());
     /// ```
+    #[must_use = "this function returns a new `ZalgoString`, it does not modify the input beyond dropping it if it's not a reference"]
     pub fn try_new<S: Borrow<str>>(s: S) -> Result<Self, ZalgoError> {
         zalgo_encode(s.borrow()).map(Self)
     }
+    
+    /// Returns the contents of `self` as a string slice.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Oh boy!").unwrap();
+    /// assert_eq!(zs.as_str(), "È̯͈͂͏͙́");
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 
-    /// Decodes `self` into a normal `String` in-place. This method has no effect on the allocated capacity.
+    /// Converts `self` into a `String`.
+    /// This simply returns the underlying `String` without any cloning or decoding.
+    /// 
+    /// If you want to clone the contents of `self` into a new `String`
+    /// you can use the [`to_string`](std::string::ToString) method since `ZalgoString` implements [`Display`](core::fmt::Display).
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
+    /// assert_eq!(zs.to_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
+    /// assert_eq!(zs.into_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
+    /// // println!("{zs}"); // Error: value used after move
+    /// ```
+    #[inline]
+    #[must_use = "`self` will be dropped if the result is not used"]
+    pub fn into_string(self) -> String {
+        self.0
+    }
+
+    /// Decodes `self` and returns it as a new `String`.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// assert_eq!(zs.to_decoded_string(), "Zalgo");
+    /// ```
+    #[must_use = "the method returns a new value and does not modify the original"]
+    pub fn to_decoded_string(&self) -> String {
+        self.decoded_chars().collect()
+    }
+
+    /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
@@ -52,7 +97,43 @@ impl ZalgoString {
         unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
     }
 
-    /// Decodes `self` into a `Vec<u8>` in-place. This method has no effect on the allocated capacity.
+    /// Returns the contents of `self` as a byte slice.
+    /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// let mut bytes = zs.as_bytes();
+    /// assert_eq!(bytes[0], 69);
+    /// assert_eq!(&bytes[1..5], &[204, 186, 205, 129]);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+
+    /// Returns the contents of `self` in a new byte vector.
+    #[must_use = "this method returns a new value and does not modify `self`"]
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.as_bytes().to_vec()
+    }
+
+    /// Converts `self` into a byte vector.
+    /// This simply returns the underlying buffer without any cloning or decoding.
+    #[inline]
+    #[must_use = "`self` will be dropped if the result is not used"]
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.0.into_bytes()
+    }
+
+    /// Decodes `self` into a new byte vector.
+    #[must_use = "this method returns a new value and does not modify `self`"]
+    pub fn to_decoded_bytes(&self) -> Vec<u8> {
+        self.decoded_bytes().collect()
+    }
+
+    /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
@@ -60,6 +141,7 @@ impl ZalgoString {
     /// assert_eq!(b"Zalgo".to_vec(), zs.into_decoded_bytes());
     /// // println!("{zs}"); // Error: value used after move
     /// ```
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_decoded_bytes(self) -> Vec<u8> {
         let mut w = 0;
         let mut bytes = self.into_bytes();
@@ -69,20 +151,6 @@ impl ZalgoString {
         }
         bytes.truncate(w);
         bytes
-    }
-
-    /// Returns the contents of `self` as a string slice.
-    #[inline]
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-
-    /// Returns the contents of `self` as a byte slice.
-    #[inline]
-    #[must_use]
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
     }
 
     /// Returns the length of `self` in bytes. The allocated capacity is the same.
@@ -103,7 +171,8 @@ impl ZalgoString {
         (self.len().get() - 1) / 2
     }
 
-    /// Returns an iterator over the bytes of the `ZalgoString`. See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
+    /// Returns an iterator over the bytes of the `ZalgoString`.
+    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
     #[inline]
     pub fn bytes(&self) -> core::str::Bytes<'_> {
         self.0.bytes()
@@ -163,22 +232,6 @@ impl ZalgoString {
         DecodedChars {
             dcb: self.decoded_bytes(),
         }
-    }
-
-    /// Converts `self` into a byte vector.
-    /// This simply returns the underlying buffer without any cloning or decoding.
-    #[inline]
-    #[must_use = "`self` will be dropped if the result is not used"]
-    pub fn into_bytes(self) -> Vec<u8> {
-        self.0.into_bytes()
-    }
-
-    /// Converts `self` into a `String`.  
-    /// This simply returns the underlying `String` without any cloning or decoding.
-    #[inline]
-    #[must_use = "`self` will be dropped if the result is not used"]
-    pub fn into_string(self) -> String {
-        self.0
     }
 }
 
@@ -274,5 +327,29 @@ impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::ZalgoString;
+
+    #[test]
+    fn check_into_decoded_string() {
+        let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
+        assert_eq!(zs.into_decoded_string(), "Zalgo\n He comes!");
+
+        let zs = ZalgoString::try_new("").unwrap();
+        assert_eq!(zs.into_decoded_string(), "");
+    }
+
+    #[test]
+    fn check_string_from_zalgo_string() {
+        let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
+        assert_eq!(zs.to_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
+        assert_eq!(zs.into_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
+
+        let zs = ZalgoString::try_new("").unwrap();
+        assert_eq!(zs.into_string(), "E");
     }
 }
