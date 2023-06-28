@@ -72,31 +72,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    match config.mode {
+    let output = match config.mode {
         Mode::Encode { source } => {
             let text = match source {
                 Source::Text { text } => text.join(" "),
                 Source::File { path } => std::fs::read_to_string(path)?,
             };
-            let encoded = zalgo_encode(&text)?;
-            match config.out_path {
-                Some(dst) => Ok(std::fs::write(dst, encoded)?),
-                None => {
-                    println!("{encoded}");
-                    Ok(())
-                }
-            }
+            zalgo_encode(&text)?
         }
         Mode::Wrap { path } => {
             let text = std::fs::read_to_string(path)?.replace('\r', "");
-            let wrapped = zalgo_wrap_python(&text)?;
-            match config.out_path {
-                Some(dst) => Ok(std::fs::write(dst, wrapped)?),
-                None => {
-                    println!("{wrapped}");
-                    Ok(())
-                }
-            }
+            zalgo_wrap_python(&text)?
         }
         Mode::Decode { source } => {
             let encoded = match source {
@@ -113,15 +99,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
             };
 
-            let decoded = zalgo_decode(&encoded)?;
-
-            match config.out_path {
-                Some(dst) => Ok(std::fs::write(dst, decoded)?),
-                None => {
-                    println!("{decoded}");
-                    Ok(())
-                }
-            }
+            zalgo_decode(&encoded)?
         }
         Mode::Unwrap { path } => {
             let contents = std::fs::read_to_string(path)?;
@@ -133,15 +111,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 chars.next_back();
             }
             let encoded: String = chars.collect();
-            let decoded = zalgo_decode(&encoded)?;
+            zalgo_decode(&encoded)?
+        }
+    };
 
-            match config.out_path {
-                Some(dst) => Ok(std::fs::write(dst, decoded)?),
-                None => {
-                    println!("{decoded}");
-                    Ok(())
-                }
-            }
+    match config.out_path {
+        Some(dst) => Ok(std::fs::write(dst, output)?),
+        None => {
+            println!("{output}");
+            Ok(())
         }
     }
 }
