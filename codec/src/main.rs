@@ -20,16 +20,22 @@ enum Mode {
         source: Source,
     },
 
-    /// Turn python code into a decoder wrapped around encoded source code.
+    /// Turn python code into a decoder wrapped around encoded source code
     Wrap {
-        /// The path to the file that is to be encoded. Ignores carriage return characters.
-        file: PathBuf,
+        /// The path to the file that is to be encoded. Ignores carriage return characters
+        path: PathBuf,
     },
 
     /// Turn text that has been encoded back into its normal form
     Decode {
         #[command(subcommand)]
         source: Source,
+    },
+
+    /// Unwrap and decode a wrapped python file
+    Unwrap {
+        /// The path to the file to unwrap and decode
+        path: PathBuf,
     },
 }
 
@@ -81,8 +87,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        Mode::Wrap { file } => {
-            let text = std::fs::read_to_string(file)?.replace("\r", "");
+        Mode::Wrap { path } => {
+            let text = std::fs::read_to_string(path)?.replace('\r', "");
             let wrapped = zalgo_wrap_python(&text)?;
             match config.out_path {
                 Some(dst) => Ok(std::fs::write(dst, wrapped)?),
@@ -107,6 +113,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
             };
 
+            let decoded = zalgo_decode(&encoded)?;
+
+            match config.out_path {
+                Some(dst) => Ok(std::fs::write(dst, decoded)?),
+                None => {
+                    println!("{decoded}");
+                    Ok(())
+                }
+            }
+        }
+        Mode::Unwrap { path } => {
+            let contents = std::fs::read_to_string(path)?;
+            let mut chars = contents.chars();
+            for _ in 0..3 {
+                chars.next();
+            }
+            for _ in 0..89 {
+                chars.next_back();
+            }
+            let encoded: String = chars.collect();
             let decoded = zalgo_decode(&encoded)?;
 
             match config.out_path {
