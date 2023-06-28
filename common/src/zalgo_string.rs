@@ -1,5 +1,5 @@
 use crate::{decode_byte_pair, fmt, zalgo_encode, ZalgoError};
-use core::{borrow::Borrow, iter::FusedIterator};
+use core::iter::FusedIterator;
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 pub struct ZalgoString(String);
 
 impl ZalgoString {
-    /// Encodes the given string with [`zalgo_encode`] and stores the result in a new allocation.
+    /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
     /// Returns an error if the input string contains bytes that don't correspond to printable
     /// ASCII characters or newlines.
     /// # Examples
@@ -19,27 +19,19 @@ impl ZalgoString {
     /// # use zalgo_codec_common::ZalgoString;
     /// assert_eq!(ZalgoString::try_new("Zalgo").unwrap(), "É̺͇͌͏");
     /// ```
-    /// A `ZalgoString` created from a `String` is the same as one created from a `&str`:
-    /// ```
-    /// # use zalgo_codec_common::ZalgoString;
-    /// assert_eq!(
-    ///     ZalgoString::try_new(String::from("Zalgo\nHe comes")).unwrap(),
-    ///     ZalgoString::try_new("Zalgo\nHe comes").unwrap(),
-    /// );
-    /// ```
     /// Can only encode printable ASCII and newlines:
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// assert!(ZalgoString::try_new("❤️").is_err());
     /// assert!(ZalgoString::try_new("\r").is_err());
     /// ```
-    #[must_use = "this function returns a new `ZalgoString`, it does not modify the input beyond dropping it if it's not a reference"]
-    pub fn try_new<S: Borrow<str>>(s: S) -> Result<Self, ZalgoError> {
-        zalgo_encode(s.borrow()).map(Self)
+    #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
+    pub fn try_new(s: &str) -> Result<Self, ZalgoError> {
+        zalgo_encode(s).map(Self)
     }
 
     /// Returns the contents of `self` as a string slice.
-    /// # Example
+    /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::try_new("Oh boy!").unwrap();
@@ -53,15 +45,13 @@ impl ZalgoString {
 
     /// Converts `self` into a `String`.
     /// This simply returns the underlying `String` without any cloning or decoding.
-    ///
-    /// If you want to clone the contents of `self` into a new `String`
-    /// you can use the [`to_string`](std::string::ToString) method since `ZalgoString` implements [`Display`](core::fmt::Display).
-    /// # Example
+    /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
-    /// assert_eq!(zs.to_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
-    /// assert_eq!(zs.into_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
+    /// let es = "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ";
+    /// assert_eq!(zs.to_string(), es);
+    /// assert_eq!(zs.into_string(), es);
     /// // println!("{zs}"); // Error: value used after move
     /// ```
     #[inline]
@@ -71,11 +61,12 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
-    /// # Example
+    /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
-    /// assert_eq!("Zalgo", zs.into_decoded_string());
+    /// let s = "Zalgo";
+    /// let zs = ZalgoString::try_new(s).unwrap();
+    /// assert_eq!(s, zs.into_decoded_string());
     /// // println!("{zs}"); // Error: value used after move
     /// ```
     #[must_use = "`self` will be dropped if the result is not used"]
@@ -87,7 +78,7 @@ impl ZalgoString {
 
     /// Returns the contents of `self` as a byte slice.
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
-    /// # Example
+    /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::try_new("Zalgo").unwrap();
@@ -103,6 +94,12 @@ impl ZalgoString {
 
     /// Converts `self` into a byte vector.
     /// This simply returns the underlying buffer without any cloning or decoding.
+    /// # Basic Usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Zalgo").unwrap();
+    /// assert_eq!(zs.into_bytes(), vec![69, 204, 186, 205, 129, 205, 140, 205, 135, 205, 143]);
+    /// ```
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
@@ -110,7 +107,7 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
-    /// # Example
+    /// # Basic Usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::try_new("Zalgo").unwrap();
@@ -130,6 +127,13 @@ impl ZalgoString {
     }
 
     /// Returns the length of `self` in bytes. The allocated capacity is the same.
+    /// This length is twice the length of the original `String` plus one.
+    /// # Basic Usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::try_new("Z").unwrap();
+    /// assert_eq!(zs.len().get(), 3);
+    /// ```
     #[inline]
     #[must_use]
     pub fn len(&self) -> core::num::NonZeroUsize {
@@ -141,6 +145,10 @@ impl ZalgoString {
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
     /// This is computed without any decoding.
+    /// # Basic Usage
+    /// let s = "Zalgo, He comes!";
+    /// let zs = ZalgoString::try_new(s);
+    /// assert_eq!(s.len(), zs.decoded_len());
     #[inline]
     #[must_use]
     pub fn decoded_len(&self) -> usize {
@@ -148,7 +156,8 @@ impl ZalgoString {
     }
 
     /// Returns an iterator over the bytes of the `ZalgoString`.
-    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes) for more information.
+    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes)
+    /// for more information.
     #[inline]
     pub fn bytes(&self) -> core::str::Bytes<'_> {
         self.0.bytes()
@@ -312,8 +321,9 @@ mod test {
 
     #[test]
     fn check_into_decoded_string() {
-        let zs = ZalgoString::try_new("Zalgo\n He comes!").unwrap();
-        assert_eq!(zs.into_decoded_string(), "Zalgo\n He comes!");
+        let s = "Zalgo\n He comes!";
+        let zs: ZalgoString = ZalgoString::try_new(s).unwrap();
+        assert_eq!(zs.into_decoded_string(), s);
 
         let zs = ZalgoString::try_new("").unwrap();
         assert_eq!(zs.into_decoded_string(), "");
