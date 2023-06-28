@@ -3,7 +3,7 @@ use core::iter::FusedIterator;
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
 
-/// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`]. 
+/// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// encoded and decoded form.
 /// If the `serde_support` feature is enabled this struct derives the

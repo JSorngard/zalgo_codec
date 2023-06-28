@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
-use zalgo_codec_common::{zalgo_decode, zalgo_encode};
+use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
@@ -18,6 +18,12 @@ enum Mode {
     Encode {
         #[command(subcommand)]
         source: Source,
+    },
+
+    /// Turn python code into a decoder wrapped around encoded source code.
+    Wrap {
+        /// The path to the file that is to be encoded. Ignores carriage return characters.
+        file: PathBuf,
     },
 
     /// Turn text that has been encoded back into its normal form
@@ -61,63 +67,55 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     match config.mode {
-        Mode::Encode { source } => match source {
-            Source::Text { text } => {
-                let text = text.join(" ");
-                let result = zalgo_encode(&text)?;
-                match config.out_path {
-                    Some(dst) => Ok(std::fs::write(dst, result)?),
-                    None => {
-                        println!("{result}");
-                        Ok(())
-                    }
-                }
-            }
-            Source::File { path } => match config.out_path {
-                Some(dst) => {
-                    let text = std::fs::read_to_string(path)?.replace('\r', "");
-                    let result = zalgo_encode(&text)?;
-                    Ok(std::fs::write(dst, result)?)
-                }
+        Mode::Encode { source } => {
+            let text = match source {
+                Source::Text { text } => text.join(" "),
+                Source::File { path } => std::fs::read_to_string(path)?,
+            };
+            let encoded = zalgo_encode(&text)?;
+            match config.out_path {
+                Some(dst) => Ok(std::fs::write(dst, encoded)?),
                 None => {
-                    let text = std::fs::read_to_string(path)?.replace('\r', "");
-                    let result = zalgo_encode(&text)?;
-                    println!("{result}");
+                    println!("{encoded}");
                     Ok(())
                 }
-            },
-        },
-        Mode::Decode { source } => match source {
-            Source::Text { text } => {
-                if text.len() == 1 {
-                    let result = zalgo_decode(&text[0])?;
-                    match config.out_path {
-                        Some(dst) => Ok(std::fs::write(dst, result)?),
-                        None => {
-                            println!("{result}");
-                            Ok(())
-                        }
-                    }
-                } else {
-                    Err(Box::new(std::io::Error::new(
-                        std::io::ErrorKind::InvalidData,
-                        "can only decode one grapheme cluster at a time",
-                    )))
-                }
             }
-            Source::File { path } => match config.out_path {
-                Some(dst) => {
-                    let encoded = std::fs::read_to_string(path)?.replace('\r', "");
-                    let text = zalgo_decode(&encoded)?;
-                    Ok(std::fs::write(dst, text)?)
-                }
+        }
+        Mode::Wrap { file } => {
+            let text = std::fs::read_to_string(file)?.replace("\r", "");
+            let wrapped = zalgo_wrap_python(&text)?;
+            match config.out_path {
+                Some(dst) => Ok(std::fs::write(dst, wrapped)?),
                 None => {
-                    let encoded = std::fs::read_to_string(path)?.replace('\r', "");
-                    let text = zalgo_decode(&encoded)?;
-                    println!("{text}");
+                    println!("{wrapped}");
                     Ok(())
                 }
-            },
-        },
+            }
+        }
+        Mode::Decode { source } => {
+            let encoded = match source {
+                Source::Text { mut text } => {
+                    if text.len() == 1 {
+                        text.swap_remove(0)
+                    } else {
+                        return Err(Box::new(std::io::Error::new(
+                            std::io::ErrorKind::InvalidData,
+                            "can only decode one grapheme cluster at a time",
+                        )));
+                    }
+                }
+                Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
+            };
+
+            let decoded = zalgo_decode(&encoded)?;
+
+            match config.out_path {
+                Some(dst) => Ok(std::fs::write(dst, decoded)?),
+                None => {
+                    println!("{decoded}");
+                    Ok(())
+                }
+            }
+        }
     }
 }
