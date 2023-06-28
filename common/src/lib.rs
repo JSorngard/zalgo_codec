@@ -86,7 +86,7 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-/// The error returned by [`zalgo_encode`], [`ZalgoString::try_new`], and [`zalgo_wrap_python`]
+/// The error returned by [`zalgo_encode`], [`ZalgoString::new`], and [`zalgo_wrap_python`]
 /// if they encounter a byte they can not encode.
 pub enum ZalgoError {
     NonprintableAscii(u8, usize, &'static str),
