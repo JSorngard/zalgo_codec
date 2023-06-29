@@ -33,7 +33,7 @@ impl ZalgoString {
     }
 
     /// Returns the contents of `self` as a string slice.
-    /// # Basic Usage
+    /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Oh boy!").unwrap();
@@ -108,7 +108,8 @@ impl ZalgoString {
 
     /// Converts `self` into a `String`.
     /// This simply returns the underlying `String` without any cloning or decoding.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo\n He comes!").unwrap();
@@ -124,7 +125,8 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let s = "Zalgo";
@@ -141,7 +143,8 @@ impl ZalgoString {
 
     /// Returns the contents of `self` as a byte slice.
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo").unwrap();
@@ -183,7 +186,8 @@ impl ZalgoString {
 
     /// Converts `self` into a byte vector.
     /// This simply returns the underlying buffer without any cloning or decoding.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo").unwrap();
@@ -196,7 +200,8 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo").unwrap();
@@ -217,7 +222,8 @@ impl ZalgoString {
 
     /// Returns the length of `self` in bytes. The allocated capacity is the same.
     /// This length is twice the length of the original `String` plus one.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Z").unwrap();
@@ -234,7 +240,8 @@ impl ZalgoString {
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
     /// This is computed without any decoding.
-    /// # Basic Usage
+    /// # Example
+    /// Basic usage
     /// let s = "Zalgo, He comes!";
     /// let zs = ZalgoString::new(s);
     /// assert_eq!(s.len(), zs.decoded_len());
