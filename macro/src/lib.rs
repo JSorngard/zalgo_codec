@@ -51,7 +51,12 @@ use zalgo_codec_common::zalgo_decode;
 ///     Ok(())
 /// }
 /// ```
-///
+/// Do the opposite of [`obfstr`](https://crates.io/crates/obfstr): obfuscate a string while coding and deobfuscate it during compile time
+/// ```
+/// # use zalgo_codec_macro::zalgo_embed;
+/// let secret_string = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
+/// assert_eq!(secret_string, "Don't read this mom!");
+/// ```
 /// # Limitations
 /// The encoded code must be valid macro output.
 #[proc_macro]
