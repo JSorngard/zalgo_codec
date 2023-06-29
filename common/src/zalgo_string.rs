@@ -45,9 +45,9 @@ impl ZalgoString {
         &self.0
     }
 
-    /// Returns an iterator over the characters of the `ZalgoString`. For a `ZalgoString` the characters are the different accents and zero-width joiners that make it up.
+    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`. For a `ZalgoString` these are the different Unicode combining characters that make it up.
     /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
-    /// The first character is 'E' and the characters after that are in the unicode range U+0300–U+036F.
+    /// The first character is 'E' and the characters after that are in the unicode range U+0300 to U+036F.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
@@ -61,6 +61,28 @@ impl ZalgoString {
     #[inline]
     pub fn chars(&self) -> core::str::Chars<'_> {
         self.0.chars()
+    }
+
+    /// Returns an iterator of the [`char`](prim@char)s of a `ZalgoString`, and their positions.
+    /// See [`str::char_indices`] and [`ZalgoString::chars`] for more information.
+    /// # Examples
+    /// Combining characters lie deep in the dark depths of Unicode,
+    /// and may not match with your intuition of what a character is.
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut ci = zs.char_indices();
+    /// assert_eq!(ci.next(), Some((0, 'E')));
+    /// assert_eq!(ci.next(), Some((1,'\u{33a}')));
+    /// // Note the 3 here, the combining characters can take up multiple bytes.
+    /// assert_eq!(ci.next(), Some((3, '\u{341}')));
+    /// // The final character begins at position 9
+    /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
+    /// // even though the length in bytes is
+    /// assert_eq!(zs.len().get(), 11);
+    /// ```
+    pub fn char_indices(&self) -> core::str::CharIndices<'_> {
+        self.0.char_indices()
     }
 
     /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
@@ -228,6 +250,7 @@ impl ZalgoString {
 /// This struct is obtained by calling the [`decoded_bytes`](ZalgoString::decoded_bytes) method on a [`ZalgoString`].
 /// See its documentation for more.
 #[derive(Debug, Clone)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct DecodedBytes<'a> {
     zs: &'a [u8],
     index: usize,
@@ -275,6 +298,7 @@ impl<'a> ExactSizeIterator for DecodedBytes<'a> {}
 /// This struct is obtained by calling the [`decoded_chars`](ZalgoString::decoded_chars) method on a [`ZalgoString`].
 /// See it's documentation for more.
 #[derive(Debug, Clone)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct DecodedChars<'a> {
     dcb: DecodedBytes<'a>,
 }
