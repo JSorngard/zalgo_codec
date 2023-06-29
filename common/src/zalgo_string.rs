@@ -49,6 +49,7 @@ impl ZalgoString {
     /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
     /// The first character is 'E' and the characters after that are in the unicode range U+0300 to U+036F.
     /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo").unwrap();
