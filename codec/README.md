@@ -34,7 +34,9 @@ assert_eq!(z, x + y);
 We can also do the opposite of [obfstr](https://crates.io/crates/obfstr): obfuscate a string while coding and deobfuscate it during compile time
 ```rust
 # use zalgo_codec_macro::zalgo_embed;
+
 let secret_string = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
+
 assert_eq!(secret_string, "Don't read this mom!");
 ```
 
