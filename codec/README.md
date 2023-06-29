@@ -5,6 +5,10 @@ This lets you reach new lows in the field of self-documenting code.
 
 The encoded string will be ~2 times larger than the original in terms of bytes, but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes)) you should only get one.
 
+The crate also contains a small program that lets you test the codec by encoding/decoding text and files.  
+If you have cloned the repository you can build it with `cargo build --release --features binary`, and if you want to install it from crates.io
+you can do so with `cargo isntall zalgo-codec --features binary`.
+
 Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes the encoded string, retaining the functionality of the original code.
 
 # Examples
