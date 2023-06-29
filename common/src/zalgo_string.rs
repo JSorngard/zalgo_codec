@@ -78,7 +78,7 @@ impl ZalgoString {
     /// assert_eq!(ci.next(), Some((3, '\u{341}')));
     /// // The final character begins at position 9
     /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
-    /// // even though the length in bytes is
+    /// // even though the length in bytes is 11
     /// assert_eq!(zs.len().get(), 11);
     /// ```
     pub fn char_indices(&self) -> core::str::CharIndices<'_> {
