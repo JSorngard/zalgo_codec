@@ -34,6 +34,7 @@ impl ZalgoString {
 
     /// Returns the contents of `self` as a string slice.
     /// # Example
+    /// Basic usage
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Oh boy!").unwrap();
