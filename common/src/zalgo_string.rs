@@ -1,5 +1,5 @@
 use crate::{decode_byte_pair, fmt, zalgo_encode, ZalgoError};
-use core::iter::FusedIterator;
+use core::iter::{ExactSizeIterator, FusedIterator};
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
 
@@ -227,6 +227,7 @@ impl ZalgoString {
 ///
 /// This struct is obtained by calling the [`decoded_bytes`](ZalgoString::decoded_bytes) method on a [`ZalgoString`].
 /// See its documentation for more.
+#[derive(Debug, Clone)]
 pub struct DecodedBytes<'a> {
     zs: &'a [u8],
     index: usize,
@@ -267,11 +268,13 @@ impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
 }
 
 impl<'a> FusedIterator for DecodedBytes<'a> {}
+impl<'a> ExactSizeIterator for DecodedBytes<'a> {}
 
 /// An iterator over the decoded characters of a [`ZalgoString`].
 ///
 /// This struct is obtained by calling the [`decoded_chars`](ZalgoString::decoded_chars) method on a [`ZalgoString`].
 /// See it's documentation for more.
+#[derive(Debug, Clone)]
 pub struct DecodedChars<'a> {
     dcb: DecodedBytes<'a>,
 }
@@ -294,6 +297,7 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 }
 
 impl<'a> FusedIterator for DecodedChars<'a> {}
+impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 
 macro_rules! impl_partial_eq {
     ($($rhs:ty),+) => {
