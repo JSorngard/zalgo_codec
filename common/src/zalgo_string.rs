@@ -237,12 +237,9 @@ impl<'a> Iterator for DecodedBytes<'a> {
     type Item = u8;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.back_index {
-            let t = Some(decode_byte_pair(
-                self.zs[self.index],
-                self.zs[self.index + 1],
-            ));
+            let t = decode_byte_pair(self.zs[self.index], self.zs[self.index + 1]);
             self.index += 2;
-            t
+            Some(t)
         } else {
             None
         }
