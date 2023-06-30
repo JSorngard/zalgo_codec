@@ -84,7 +84,7 @@ impl ZalgoString {
     /// // The final character begins at position 9
     /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
     /// // even though the length in bytes is 11
-    /// assert_eq!(zs.len().get(), 11);
+    /// assert_eq!(zs.len(), 11);
     /// ```
     pub fn char_indices(&self) -> core::str::CharIndices<'_> {
         self.string.char_indices()
@@ -231,15 +231,12 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Z").unwrap();
-    /// assert_eq!(zs.len().get(), 3);
+    /// assert_eq!(zs.len(), 3);
     /// ```
     #[inline]
     #[must_use]
-    pub fn len(&self) -> core::num::NonZeroUsize {
-        self.string
-            .len()
-            .try_into()
-            .expect("the length is always at least 1 due to the initial 'E' in encoded strings")
+    pub fn len(&self) -> usize {
+        self.string.len()
     }
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
@@ -252,7 +249,7 @@ impl ZalgoString {
     #[inline]
     #[must_use]
     pub fn decoded_len(&self) -> usize {
-        (self.len().get() - 1) / 2
+        (self.len() - 1) / 2
     }
 }
 
