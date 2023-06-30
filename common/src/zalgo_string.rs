@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
-pub struct ZalgoString(String);
+pub struct ZalgoString{string: String}
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
@@ -29,7 +29,7 @@ impl ZalgoString {
     /// ```
     #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
     pub fn new(s: &str) -> Result<Self, ZalgoError> {
-        zalgo_encode(s).map(Self)
+        zalgo_encode(s).map(|string| Self { string })
     }
 
     /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
@@ -68,7 +68,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_string(self) -> String {
-        self.0
+        self.string
     }
 
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
@@ -118,7 +118,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
-        self.0.into_bytes()
+        self.string.into_bytes()
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
@@ -160,7 +160,7 @@ impl core::ops::Deref for ZalgoString {
     type Target = str;
     #[inline]
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.string
     }
 }
 
@@ -248,7 +248,7 @@ macro_rules! impl_partial_eq {
             impl<'a> PartialEq<$rhs> for ZalgoString {
                 #[inline]
                 fn eq(&self, other: &$rhs) -> bool {
-                    &self.0 == other
+                    &self.string == other
                 }
             }
         )+
@@ -258,7 +258,7 @@ impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self.string)
     }
 }
 
