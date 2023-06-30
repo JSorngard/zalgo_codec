@@ -10,7 +10,7 @@
 //! you should only get one.
 //!
 //! A small program in included in the source repository and can be installed with
-//! `cargo install zalgo-codec --features binary`. This program lets you encode and decode text and files.
+//! `cargo install zalgo-codec --features binary`. This program lets you use the functions in the crate on text and files.
 //!
 //! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string, retaining the functionality of the original code.
