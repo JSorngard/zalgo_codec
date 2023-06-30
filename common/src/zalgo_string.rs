@@ -63,7 +63,7 @@ impl ZalgoString {
     /// // Note the 3 here, the combining characters can take up multiple bytes.
     /// assert_eq!(ci.next(), Some((3, '\u{341}')));
     /// // The final character begins at position 9
-    /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
+    /// assert_eq!(ci.next_back(), Some((9, '\u{34f}')));
     /// // even though the length in bytes is 11
     /// assert_eq!(zs.len(), 11);
     /// ```
