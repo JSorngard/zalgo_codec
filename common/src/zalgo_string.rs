@@ -10,7 +10,9 @@ use serde::{Deserialize, Serialize};
 /// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
-pub struct ZalgoString(String);
+pub struct ZalgoString {
+    string: String,
+}
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
@@ -29,7 +31,7 @@ impl ZalgoString {
     /// ```
     #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
     pub fn new(s: &str) -> Result<Self, ZalgoError> {
-        zalgo_encode(s).map(Self)
+        zalgo_encode(s).map(|string| Self { string })
     }
 
     /// Returns the contents of `self` as a string slice.
@@ -43,10 +45,10 @@ impl ZalgoString {
     #[inline]
     #[must_use]
     pub fn as_str(&self) -> &str {
-        &self.0
+        &self.string
     }
 
-    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`. 
+    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`.
     /// For a `ZalgoString` these are the different Unicode combining characters that make it up.
     /// See [`str::chars`] for more information.
     /// The first character is 'E' and the characters after that are in the unicode range U+0300 to U+036F.
@@ -63,7 +65,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn chars(&self) -> core::str::Chars<'_> {
-        self.0.chars()
+        self.string.chars()
     }
 
     /// Returns an iterator of the [`char`](prim@char)s of a `ZalgoString`, and their positions.
@@ -85,7 +87,7 @@ impl ZalgoString {
     /// assert_eq!(zs.len().get(), 11);
     /// ```
     pub fn char_indices(&self) -> core::str::CharIndices<'_> {
-        self.0.char_indices()
+        self.string.char_indices()
     }
 
     /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
@@ -124,7 +126,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_string(self) -> String {
-        self.0
+        self.string
     }
 
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
@@ -158,14 +160,14 @@ impl ZalgoString {
     #[inline]
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
+        self.string.as_bytes()
     }
 
     /// Returns an iterator over the bytes of the `ZalgoString`.
     /// See [`str::bytes`] for more information.
     #[inline]
     pub fn bytes(&self) -> core::str::Bytes<'_> {
-        self.0.bytes()
+        self.string.bytes()
     }
 
     /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
@@ -198,7 +200,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
-        self.0.into_bytes()
+        self.string.into_bytes()
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
@@ -234,7 +236,7 @@ impl ZalgoString {
     #[inline]
     #[must_use]
     pub fn len(&self) -> core::num::NonZeroUsize {
-        self.0
+        self.string
             .len()
             .try_into()
             .expect("the length is always at least 1 due to the initial 'E' in encoded strings")
@@ -338,7 +340,7 @@ macro_rules! impl_partial_eq {
             impl<'a> PartialEq<$rhs> for ZalgoString {
                 #[inline]
                 fn eq(&self, other: &$rhs) -> bool {
-                    &self.0 == other
+                    &self.string == other
                 }
             }
         )+
@@ -348,7 +350,7 @@ impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self.string)
     }
 }
 
