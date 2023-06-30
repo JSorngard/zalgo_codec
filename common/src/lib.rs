@@ -23,24 +23,28 @@ pub use zalgo_string::ZalgoString;
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
     let mut line = 1;
+    let mut col = 1;
     let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for b in string_to_encode.bytes() {
         match nonprintable_char_repr(b) {
-            Some(repr) => return Err(ZalgoError::NonprintableAscii(b, line, repr)),
+            Some(repr) => return Err(ZalgoError::NonprintableAscii(b, line, col, repr)),
             None => {
                 if b == b'\n' {
                     line += 1;
+                    // Still 1-indexed since the newline will be counted at the end of the loop iteration.
+                    col = 0;
                 }
                 if b < 127 {
                     let v = if b == b'\n' { 111 } else { (b - 11) % 133 - 21 };
                     result.push((v >> 6) & 1 | 0b11001100);
                     result.push((v & 63) | 0b10000000);
                 } else {
-                    return Err(ZalgoError::NotAscii(b, line));
+                    return Err(ZalgoError::NotAscii(b, line, col));
                 }
             }
         }
+        col += 1;
     }
 
     Ok(String::from_utf8(result).expect("the encoding process does not produce invalid utf8 given valid ascii text, which is verified before this point"))
@@ -92,13 +96,13 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
 /// if they encounter a byte they can not encode.
 pub enum ZalgoError {
     /// Represents a valid ASCII character that is outside of the encodable set.
-    NonprintableAscii(u8, usize, &'static str),
+    NonprintableAscii(u8, usize, usize, &'static str),
     /// Represents some other unicode character.
-    NotAscii(u8, usize),
+    NotAscii(u8, usize, usize),
 }
 
 impl ZalgoError {
-    /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
+    /// Returns the 1-indexed line number of the line on which the unencodable byte occured.
     /// # Examples
     /// ```
     /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
@@ -108,7 +112,21 @@ impl ZalgoError {
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
-            Self::NonprintableAscii(_, line, _) | Self::NotAscii(_, line) => *line,
+            Self::NonprintableAscii(_, line, _, _) | Self::NotAscii(_, line, _) => *line,
+        }
+    }
+
+    /// Returns the 1-indexed column where the unencodable byte occured.
+    /// Columns are counted from left to right and the count resets for each new line.
+    /// # Example
+    /// ```
+    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().unwrap().column(), 3);
+    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().unwrap().column(), 1);
+    /// ```
+    pub const fn column(&self) -> usize {
+        match self {
+            Self::NonprintableAscii(_, _, column, _) | Self::NotAscii(_, _, column) => *column,
         }
     }
 
@@ -129,7 +147,7 @@ impl ZalgoError {
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn byte(&self) -> u8 {
         match self {
-            Self::NonprintableAscii(byte, _, _) | Self::NotAscii(byte, _) => *byte,
+            Self::NonprintableAscii(byte, _, _, _) | Self::NotAscii(byte, _, _) => *byte,
         }
     }
 
@@ -146,8 +164,8 @@ impl ZalgoError {
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
-            Self::NonprintableAscii(_, _, repr) => Some(*repr),
-            Self::NotAscii(_, _) => None,
+            Self::NonprintableAscii(_, _, _, repr) => Some(*repr),
+            Self::NotAscii(_, _, _) => None,
         }
     }
 }
@@ -155,13 +173,13 @@ impl ZalgoError {
 impl fmt::Display for ZalgoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::NonprintableAscii(byte, line, repr) => write!(
+            Self::NonprintableAscii(byte, line, column, repr) => write!(
                 f,
-                "line {line}: can not encode ASCII \"{repr}\" characters with byte value {byte}"
+                "line {line} at column {column}: can not encode ASCII \"{repr}\" character with byte value {byte}"
             ),
-            Self::NotAscii(byte, line) => write!(
+            Self::NotAscii(byte, line, column) => write!(
                 f,
-                "line {line}: byte value {byte} does not correspond to an ASCII character"
+                "line {line} at column {column}: byte value {byte} does not correspond to an ASCII character"
             ),
         }
     }
