@@ -73,7 +73,8 @@ impl ZalgoString {
         &self.string
     }
 
-    /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
+    /// Returns an iterator over the decoded characters of the `ZalgoString`.
+    /// These characters are guaranteed to be valid ASCII.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
@@ -146,7 +147,8 @@ impl ZalgoString {
         self.string.as_bytes()
     }
 
-    /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
+    /// Returns an iterator over the decoded bytes of the `ZalgoString`.
+    /// These bytes are guaranteed to represent valid ASCII.
     /// # Example
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
