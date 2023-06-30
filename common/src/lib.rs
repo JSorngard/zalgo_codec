@@ -24,7 +24,7 @@ pub use zalgo_string::ZalgoString;
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
     let mut line = 1;
     let mut column = 1;
-    let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
+    let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for byte in string_to_encode.bytes() {
         match nonprintable_char_repr(byte) {
