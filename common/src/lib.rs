@@ -23,28 +23,32 @@ pub use zalgo_string::ZalgoString;
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
     let mut line = 1;
-    let mut col = 1;
+    let mut column = 1;
     let mut result = Vec::<u8>::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
-    for b in string_to_encode.bytes() {
-        match nonprintable_char_repr(b) {
-            Some(repr) => return Err(ZalgoError::NonprintableAscii(b, line, col, repr)),
+    for byte in string_to_encode.bytes() {
+        match nonprintable_char_repr(byte) {
+            Some(repr) => return Err(ZalgoError::NonprintableAscii(byte, line, column, repr)),
             None => {
-                if b == b'\n' {
+                if byte == b'\n' {
                     line += 1;
                     // Still 1-indexed since the newline will be counted at the end of the loop iteration.
-                    col = 0;
+                    column = 0;
                 }
-                if b < 127 {
-                    let v = if b == b'\n' { 111 } else { (b - 11) % 133 - 21 };
+                if byte < 127 {
+                    let v = if byte == b'\n' {
+                        111
+                    } else {
+                        (byte - 11) % 133 - 21
+                    };
                     result.push((v >> 6) & 1 | 0b11001100);
                     result.push((v & 63) | 0b10000000);
                 } else {
-                    return Err(ZalgoError::NotAscii(b, line, col));
+                    return Err(ZalgoError::NotAscii(byte, line, column));
                 }
             }
         }
-        col += 1;
+        column += 1;
     }
 
     Ok(String::from_utf8(result).expect("the encoding process does not produce invalid utf8 given valid ascii text, which is verified before this point"))
