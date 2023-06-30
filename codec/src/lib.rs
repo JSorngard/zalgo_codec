@@ -15,10 +15,10 @@
 //! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string, retaining the functionality of the original code.
 //!
-//! There are two ways of interacting with the codec. 
+//! There are two ways of interacting with the codec.
 //! The first one is to call the encoding and decoding functions directly,
 //! and the second one is to use the [`ZalgoString`] wrapper type.
-//! 
+//!
 //! # Example
 //! The cursed character is the result of using [`zalgo_encode`] on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
 //! ```
