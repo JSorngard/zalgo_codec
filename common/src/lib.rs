@@ -160,49 +160,64 @@ impl Error for ZalgoError {
 #[must_use = "the function returns a new value and does not modify the input"]
 const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
-        Some(
-            [
-                "Null",
-                "Start Of Heading",
-                "Start Of Text",
-                "End Of Text",
-                "End Of Transmission",
-                "Enquiry",
-                "Acknowledge",
-                "Bell",
-                "Backspace",
-                "Horizontal Tab",
-            ][byte as usize],
-        )
+        first_ten(byte as usize)
     } else if byte >= 11 && byte < 32 {
-        Some(
-            [
-                "Vertical Tab",
-                "Form Feed",
-                "Carriage Return",
-                "Shift Out",
-                "Shift In",
-                "Data Link Escape",
-                "Data Control 1",
-                "Data Control 2",
-                "Data Control 3",
-                "Data Control 4",
-                "Negative Acknowledge",
-                "Synchronous Idle",
-                "End Of Transmission Block",
-                "Cancel",
-                "End Of Medium",
-                "Substitute",
-                "Escape",
-                "File Separator",
-                "Group Separator",
-                "Record Separator",
-                "Unit Separator",
-            ][byte as usize - 11],
-        )
+        other_21(byte as usize)
     } else if byte == 127 {
-        Some("Delete")
+        last_one()
     } else {
         None
     }
+}
+
+#[cold]
+const fn first_ten(index: usize) -> Option<&'static str> {
+    Some(
+        [
+            "Null",
+            "Start Of Heading",
+            "Start Of Text",
+            "End Of Text",
+            "End Of Transmission",
+            "Enquiry",
+            "Acknowledge",
+            "Bell",
+            "Backspace",
+            "Horizontal Tab",
+        ][index],
+    )
+}
+
+#[cold]
+const fn other_21(index: usize) -> Option<&'static str> {
+    Some(
+        [
+            "Vertical Tab",
+            "Form Feed",
+            "Carriage Return",
+            "Shift Out",
+            "Shift In",
+            "Data Link Escape",
+            "Data Control 1",
+            "Data Control 2",
+            "Data Control 3",
+            "Data Control 4",
+            "Negative Acknowledge",
+            "Synchronous Idle",
+            "End Of Transmission Block",
+            "Cancel",
+            "End Of Medium",
+            "Substitute",
+            "Escape",
+            "File Separator",
+            "Group Separator",
+            "Record Separator",
+            "Unit Separator",
+        ][index - 11],
+    )
+}
+
+#[cold]
+const fn last_one() -> Option<&'static str> {
+    Some("Delete")
 }
