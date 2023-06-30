@@ -45,27 +45,27 @@ impl ZalgoString {
     /// Iterate through the encoded [`char`](prim@char)s
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// # let zs = ZalgoString::new("Oh boy!").unwrap();
+    /// let zs = ZalgoString::new("42").unwrap();
     /// let mut chars = zs.as_str().chars();
     /// // A ZalgoString always begins with an 'E'
     /// assert_eq!(chars.next(), Some('E'));
     /// // After that it gets weird
-    /// assert_eq!(chars.next(), Some('\u{32f}'));
+    /// assert_eq!(chars.next(), Some('\u{314}'));
     /// ```
     /// Combining characters lie deep in the dark depths of Unicode,
     /// and may not match with your intuition of what a character is.
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
-    /// # let zs = ZalgoString::new("Oh boy!").unwrap();
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
     /// let mut ci = zs.as_str().char_indices();
     /// assert_eq!(ci.next(), Some((0, 'E')));
-    /// assert_eq!(ci.next(), Some((1,'\u{32f}')));
+    /// assert_eq!(ci.next(), Some((1,'\u{33a}')));
     /// // Note the 3 here, the combining characters can take up multiple bytes.
-    /// assert_eq!(ci.next(), Some((3, '\u{348}')));
-    /// // The final character begins at position 13
-    /// assert_eq!(ci.last(), Some((13, '\u{301}')));
-    /// // even though the length in bytes is 15
-    /// assert_eq!(zs.len(), 15);
+    /// assert_eq!(ci.next(), Some((3, '\u{341}')));
+    /// // The final character begins at position 9
+    /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
+    /// // even though the length in bytes is 11
+    /// assert_eq!(zs.len(), 11);
     /// ```
     #[inline]
     #[must_use]
