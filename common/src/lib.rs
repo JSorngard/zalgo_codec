@@ -56,6 +56,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
 /// ```
+#[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
     let bytes: Vec<u8> = encoded
         .bytes()
@@ -68,7 +69,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error>
     String::from_utf8(bytes)
 }
 
-#[must_use]
+#[must_use = "the function returns a new value and does not modify its inputs"]
 #[inline]
 fn decode_byte_pair(odd: u8, even: u8) -> u8 {
     ((odd << 6 & 64 | even & 63) + 22) % 133 + 10
@@ -80,6 +81,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// # Notes
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
+#[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
@@ -95,6 +97,7 @@ pub enum ZalgoError {
 
 impl ZalgoError {
     /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
+    #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
             Self::NonprintableAscii(_, line, _) | Self::NotAscii(_, line) => *line,
@@ -109,6 +112,7 @@ impl ZalgoError {
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(),  226);
     /// ```
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn byte(&self) -> u8 {
         match self {
             Self::NonprintableAscii(byte, _, _) | Self::NotAscii(byte, _) => *byte,
@@ -122,6 +126,7 @@ impl ZalgoError {
     /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().representation(), None);
     /// ```
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
             Self::NonprintableAscii(_, _, repr) => Some(*repr),
@@ -152,6 +157,7 @@ impl Error for ZalgoError {
 }
 
 /// Returns the representation of the given ASCII byte if it's not printable.
+#[must_use = "the function returns a new value and does not modify the input"]
 const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
         Some(
