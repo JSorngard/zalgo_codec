@@ -5,9 +5,12 @@ use serde::{Deserialize, Serialize};
 
 /// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
-/// encoded and decoded form.
+/// encoded and decoded form.  
 /// If the `serde_support` feature is enabled this struct derives the
-/// [`Serialize`] and [`Deserialize`] traits.
+/// [`Serialize`] and [`Deserialize`] traits.  
+/// # Using unsafe functions inherited from [`str`] via [`Deref`](core::ops::Deref)
+/// If you use e.g. [`as_bytes_mut`](str::as_bytes_mut) to directly modify the contents of a `ZalgoString`
+/// you must uphold the additional invariant that the decoded contents are also valid UTF-8.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
 pub struct ZalgoString{string: String}
