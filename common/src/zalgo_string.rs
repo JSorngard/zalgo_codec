@@ -34,7 +34,7 @@ impl ZalgoString {
         zalgo_encode(s).map(|string| Self { string })
     }
 
-    /// Returns the contents of `self` as a string slice.
+    /// Returns the encoded contents of `self` as a string slice.
     /// # Example
     /// Basic usage
     /// ```
