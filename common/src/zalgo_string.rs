@@ -47,7 +47,7 @@ impl ZalgoString {
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("42").unwrap();
     /// let mut chars = zs.as_str().chars();
-    /// // A ZalgoString always begins with an 'E'
+    /// // A `ZalgoString` always begins with an 'E'
     /// assert_eq!(chars.next(), Some('E'));
     /// // After that it gets weird
     /// assert_eq!(chars.next(), Some('\u{314}'));
