@@ -5,12 +5,12 @@ use serde::{Deserialize, Serialize};
 
 /// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
-/// encoded and decoded form.  
+/// encoded and decoded form.
 /// If the `serde_support` feature is enabled this struct derives the
-/// [`Serialize`] and [`Deserialize`] traits.  
+/// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
-pub struct ZalgoString{string: String}
+pub struct ZalgoString(String);
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
@@ -29,7 +29,62 @@ impl ZalgoString {
     /// ```
     #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
     pub fn new(s: &str) -> Result<Self, ZalgoError> {
-        zalgo_encode(s).map(|string| Self { string })
+        zalgo_encode(s).map(Self)
+    }
+
+    /// Returns the contents of `self` as a string slice.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Oh boy!").unwrap();
+    /// assert_eq!(zs.as_str(), "È̯͈͂͏͙́");
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`. For a `ZalgoString` these are the different Unicode combining characters that make it up.
+    /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+    /// The first character is 'E' and the characters after that are in the unicode range U+0300 to U+036F.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut chars = zs.chars();
+    /// // A ZalgoString always begins with an 'E'
+    /// assert_eq!(chars.next(), Some('E'));
+    /// // After that it gets weird
+    /// assert_eq!(chars.next(), Some('\u{33a}'));
+    /// ```
+    #[inline]
+    pub fn chars(&self) -> core::str::Chars<'_> {
+        self.0.chars()
+    }
+
+    /// Returns an iterator of the [`char`](prim@char)s of a `ZalgoString`, and their positions.
+    /// See [`str::char_indices`] and [`ZalgoString::chars`] for more information.
+    /// # Examples
+    /// Combining characters lie deep in the dark depths of Unicode,
+    /// and may not match with your intuition of what a character is.
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut ci = zs.char_indices();
+    /// assert_eq!(ci.next(), Some((0, 'E')));
+    /// assert_eq!(ci.next(), Some((1,'\u{33a}')));
+    /// // Note the 3 here, the combining characters can take up multiple bytes.
+    /// assert_eq!(ci.next(), Some((3, '\u{341}')));
+    /// // The final character begins at position 9
+    /// assert_eq!(ci.last(), Some((9, '\u{34f}')));
+    /// // even though the length in bytes is 11
+    /// assert_eq!(zs.len().get(), 11);
+    /// ```
+    pub fn char_indices(&self) -> core::str::CharIndices<'_> {
+        self.0.char_indices()
     }
 
     /// Returns an iterator over the decoded characters of the `ZalgoString`. These characters are guaranteed to be valid ASCII.
@@ -68,7 +123,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_string(self) -> String {
-        self.string
+        self.0
     }
 
     /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
@@ -86,6 +141,31 @@ impl ZalgoString {
         // Safety: we know that the starting string was encoded from valid ASCII to begin with
         // so every decoded byte is a valid utf-8 character.
         unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
+    }
+
+    /// Returns the contents of `self` as a byte slice.
+    /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Zalgo").unwrap();
+    /// let mut bytes = zs.as_bytes();
+    /// assert_eq!(bytes[0], 69);
+    /// assert_eq!(&bytes[1..5], &[204, 186, 205, 129]);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+
+    /// Returns an iterator over the bytes of the `ZalgoString`.
+    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes)
+    /// for more information.
+    #[inline]
+    pub fn bytes(&self) -> core::str::Bytes<'_> {
+        self.0.bytes()
     }
 
     /// Returns an iterator over the decoded bytes of the `ZalgoString`. These bytes are guaranteed to represent valid ASCII.
@@ -118,7 +198,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
-        self.string.into_bytes()
+        self.0.into_bytes()
     }
 
     /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
@@ -142,6 +222,24 @@ impl ZalgoString {
         bytes
     }
 
+    /// Returns the length of `self` in bytes. The allocated capacity is the same.
+    /// This length is twice the length of the original `String` plus one.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("Z").unwrap();
+    /// assert_eq!(zs.len().get(), 3);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> core::num::NonZeroUsize {
+        self.0
+            .len()
+            .try_into()
+            .expect("the length is always at least 1 due to the initial 'E' in encoded strings")
+    }
+
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
     /// This is computed without any decoding.
     /// # Example
@@ -152,15 +250,7 @@ impl ZalgoString {
     #[inline]
     #[must_use]
     pub fn decoded_len(&self) -> usize {
-        (self.len() - 1) / 2
-    }
-}
-
-impl core::ops::Deref for ZalgoString {
-    type Target = str;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.string
+        (self.len().get() - 1) / 2
     }
 }
 
@@ -248,7 +338,7 @@ macro_rules! impl_partial_eq {
             impl<'a> PartialEq<$rhs> for ZalgoString {
                 #[inline]
                 fn eq(&self, other: &$rhs) -> bool {
-                    &self.string == other
+                    &self.0 == other
                 }
             }
         )+
@@ -258,7 +348,7 @@ impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.string)
+        write!(f, "{}", self.0)
     }
 }
 
