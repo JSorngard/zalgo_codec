@@ -91,7 +91,9 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
 /// The error returned by [`zalgo_encode`], [`ZalgoString::new`], and [`zalgo_wrap_python`]
 /// if they encounter a byte they can not encode.
 pub enum ZalgoError {
+    /// Represents a valid ASCII character that is outside of the encodable set.
     NonprintableAscii(u8, usize, &'static str),
+    /// Represents some other unicode character.
     NotAscii(u8, usize),
 }
 
@@ -110,14 +112,19 @@ impl ZalgoError {
         }
     }
 
-    /// Returns the byte value of the unencodable character. Note that this might
-    /// not be the complete representation of the character in unicode, just the first
-    /// byte of it.
+    /// Returns the value of the first byte of the unencodable character.
     /// # Examples
     /// ```
     /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
-    /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(),  226);
+    /// ```
+    /// Note that this might not be the complete representation of
+    /// the character in unicode, just the first byte of it.
+    /// ```
+    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(), 226);
+    /// // Even though
+    /// assert_eq!("❤️".as_bytes(), &[226, 157, 164, 239, 184, 143])
     /// ```
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn byte(&self) -> u8 {
@@ -126,7 +133,10 @@ impl ZalgoError {
         }
     }
 
-    /// Return a representation of the unencodable byte if there is one.
+    /// Return a representation of the unencodable byte.
+    /// This exists if the character is an unencodable ASCII character.
+    /// If it is some other unicode character we only know its first byte, so we can not
+    /// accurately represent it.
     /// # Examples
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
