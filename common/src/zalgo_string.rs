@@ -129,7 +129,7 @@ impl ZalgoString {
         unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
     }
 
-    /// Returns the contents of `self` as a byte slice.
+    /// Returns the encoded contents of `self` as a byte slice.
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
     /// # Example
     /// Basic usage
