@@ -97,6 +97,12 @@ pub enum ZalgoError {
 
 impl ZalgoError {
     /// Returns the (1-indexed) line number of the line on which the unencodable byte occured.
+    /// # Examples
+    /// ```
+    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// assert_eq!(zalgo_encode("❤️").err().unwrap().line(), 1);
+    /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().unwrap().line(), 3);
+    /// ```
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
@@ -107,6 +113,7 @@ impl ZalgoError {
     /// Returns the byte value of the unencodable character. Note that this might
     /// not be the complete representation of the character in unicode, just the first
     /// byte of it.
+    /// # Examples
     /// ```
     /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
@@ -120,7 +127,7 @@ impl ZalgoError {
     }
 
     /// Return a representation of the unencodable byte if there is one.
-    /// # Example
+    /// # Examples
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
