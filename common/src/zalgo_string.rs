@@ -46,8 +46,9 @@ impl ZalgoString {
         &self.0
     }
 
-    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`. For a `ZalgoString` these are the different Unicode combining characters that make it up.
-    /// See [`core::str::chars`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.chars) for more information.
+    /// Returns an iterator over the [`char`](prim@char)s of the `ZalgoString`. 
+    /// For a `ZalgoString` these are the different Unicode combining characters that make it up.
+    /// See [`str::chars`] for more information.
     /// The first character is 'E' and the characters after that are in the unicode range U+0300 to U+036F.
     /// # Example
     /// Basic usage
@@ -161,8 +162,7 @@ impl ZalgoString {
     }
 
     /// Returns an iterator over the bytes of the `ZalgoString`.
-    /// See [`core::str::bytes`](https://doc.rust-lang.org/1.70.0/core/primitive.str.html#method.bytes)
-    /// for more information.
+    /// See [`str::bytes`] for more information.
     #[inline]
     pub fn bytes(&self) -> core::str::Bytes<'_> {
         self.0.bytes()
