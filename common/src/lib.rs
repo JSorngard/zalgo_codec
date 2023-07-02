@@ -128,6 +128,7 @@ impl ZalgoError {
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().unwrap().column(), 3);
     /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().unwrap().column(), 1);
     /// ```
+    #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn column(&self) -> usize {
         match self {
             Self::NonprintableAscii(_, _, column, _) | Self::NotAscii(_, _, column) => *column,
