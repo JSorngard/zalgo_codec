@@ -197,6 +197,7 @@ impl Error for ZalgoError {
 }
 
 /// Returns the representation of the given ASCII byte if it's not printable.
+#[inline]
 #[must_use = "the function returns a new value and does not modify the input"]
 const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
