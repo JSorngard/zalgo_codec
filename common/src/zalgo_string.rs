@@ -1,4 +1,4 @@
-use crate::{decode_byte_pair, fmt, zalgo_encode, ZalgoError};
+use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 use core::iter::{ExactSizeIterator, FusedIterator};
 #[cfg(feature = "serde_support")]
 use serde::{Deserialize, Serialize};
@@ -30,7 +30,7 @@ impl ZalgoString {
     /// assert!(ZalgoString::new("\r").is_err());
     /// ```
     #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
-    pub fn new(s: &str) -> Result<Self, ZalgoError> {
+    pub fn new(s: &str) -> Result<Self, Error> {
         zalgo_encode(s).map(|string| Self { string })
     }
 

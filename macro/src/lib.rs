@@ -39,10 +39,10 @@ use zalgo_codec_common::zalgo_decode;
 /// A more complex example is this program which expands to code that reads the
 /// command line input, encodes it, and prints out the result.
 /// ```
-/// use zalgo_codec_common::{zalgo_encode, ZalgoError};
+/// use zalgo_codec_common::{zalgo_encode, Error};
 /// use zalgo_codec_macro::zalgo_embed;
 ///
-/// fn main() -> Result<(), ZalgoError> {
+/// fn main() -> Result<(), Error> {
 ///     // This macro expands to
 ///     // let input = std::env::args().collect::<Vec<_>>()[1..].join(" ");
 ///     // let output = zalgo_encode(&input)?;

@@ -2,7 +2,6 @@
 //! Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
 
 use core::{fmt, str};
-use std::error::Error;
 
 pub mod zalgo_string;
 pub use zalgo_string::ZalgoString;
@@ -21,14 +20,14 @@ pub use zalgo_string::ZalgoString;
 /// ```
 /// # Notes
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
-pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
+pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     let mut line = 1;
     let mut column = 1;
     let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for byte in string_to_encode.bytes() {
         match nonprintable_char_repr(byte) {
-            Some(repr) => return Err(ZalgoError::NonprintableAscii(byte, line, column, repr)),
+            Some(repr) => return Err(Error::NonprintableAscii(byte, line, column, repr)),
             None => {
                 if byte == b'\n' {
                     line += 1;
@@ -44,7 +43,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, ZalgoError> {
                     result.push((v >> 6) & 1 | 0b11001100);
                     result.push((v & 63) | 0b10000000);
                 } else {
-                    return Err(ZalgoError::NotAscii(byte, line, column));
+                    return Err(Error::NotAscii(byte, line, column));
                 }
             }
         }
@@ -90,7 +89,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
+pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, Error> {
     let encoded_string = zalgo_encode(string_to_encode)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -98,18 +97,18 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, ZalgoError> {
 #[derive(Debug, Clone, PartialEq)]
 /// The error returned by [`zalgo_encode`], [`ZalgoString::new`], and [`zalgo_wrap_python`]
 /// if they encounter a byte they can not encode.
-pub enum ZalgoError {
+pub enum Error {
     /// Represents a valid ASCII character that is outside of the encodable set.
     NonprintableAscii(u8, usize, usize, &'static str),
     /// Represents some other unicode character.
     NotAscii(u8, usize, usize),
 }
 
-impl ZalgoError {
+impl Error {
     /// Returns the 1-indexed line number of the line on which the unencodable byte occured.
     /// # Examples
     /// ```
-    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().line(), 1);
     /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().unwrap().line(), 3);
     /// ```
@@ -124,7 +123,7 @@ impl ZalgoError {
     /// Columns are counted from left to right and the count resets for each new line.
     /// # Example
     /// ```
-    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().unwrap().column(), 3);
     /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().unwrap().column(), 1);
     /// ```
@@ -138,13 +137,13 @@ impl ZalgoError {
     /// Returns the value of the first byte of the unencodable character.
     /// # Examples
     /// ```
-    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
     /// ```
     /// Note that this might not be the complete representation of
     /// the character in unicode, just the first byte of it.
     /// ```
-    /// # use zalgo_codec_common::{ZalgoError, zalgo_encode};
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(), 226);
     /// // Even though
     /// assert_eq!("❤️".as_bytes(), &[226, 157, 164, 239, 184, 143])
@@ -175,7 +174,7 @@ impl ZalgoError {
     }
 }
 
-impl fmt::Display for ZalgoError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::NonprintableAscii(byte, line, column, repr) => write!(
@@ -190,8 +189,8 @@ impl fmt::Display for ZalgoError {
     }
 }
 
-impl Error for ZalgoError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         None
     }
 }
