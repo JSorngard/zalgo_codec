@@ -7,7 +7,7 @@ The encoded string will be ~2 times larger than the original in terms of bytes, 
 
 The crate also contains a small program that lets you test the codec by encoding/decoding text and files.  
 If you have cloned the repository you can build it with `cargo build --release --features binary`, and if you want to install it from crates.io
-you can do so with `cargo isntall zalgo-codec --features binary`.
+you can do so with `cargo install zalgo-codec --features binary`.
 
 Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes the encoded string, retaining the functionality of the original code.
 
