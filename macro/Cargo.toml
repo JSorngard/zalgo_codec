@@ -1,6 +1,6 @@
 [package]
 name = "zalgo-codec-macro"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 authors = ["Alex Keizer (alex@keizer.dev)", "Johanna Sörngård (jsorngard@gmail.com)"]
 description = "This crate provides the zalgo_embed! macro for compiling zalgo-encoded source code"
@@ -14,5 +14,5 @@ proc-macro = true
 
 
 [dependencies]
-zalgo-codec-common = {path = "../common"}
+zalgo-codec-common = "0.8.0"
 syn = "2.0"
