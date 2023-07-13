@@ -221,9 +221,12 @@ impl ZalgoString {
     /// This is computed without any decoding.
     /// # Example
     /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
     /// let s = "Zalgo, He comes!";
     /// let zs = ZalgoString::new(s);
     /// assert_eq!(s.len(), zs.decoded_len());
+    /// ```
     #[inline]
     #[must_use]
     pub fn decoded_len(&self) -> usize {
