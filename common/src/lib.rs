@@ -27,12 +27,14 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for byte in string_to_encode.bytes() {
+        // Only encode ASCII bytes corresponding to printable characters or newlines.
         if (32..127).contains(&byte) || byte == b'\n' {
             if byte == b'\n' {
                 line += 1;
-                // Still 1-indexed since this newline gets counted at the end of the loop iteration
+                // `column` is still 1-indexed since it gets incremented at the end of the current loop iteration.
                 column = 0;
             }
+
             let v = ((i16::from(byte) - 11).rem_euclid(133) - 21) as u8;
             result.push((v >> 6) & 1 | 0b11001100);
             result.push((v & 63) | 0b10000000);
