@@ -29,7 +29,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
         if (32..127).contains(&byte) || byte == b'\n' {
             if byte == b'\n' {
                 line += 1;
-                // Still 1-indexed since this newline gets counted at the end of the loop
+                // Still 1-indexed since this newline gets counted at the end of the loop iteration
                 column = 0;
             }
             let v = if byte == b'\n' {
