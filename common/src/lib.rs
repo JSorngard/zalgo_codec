@@ -20,6 +20,7 @@ pub use zalgo_string::ZalgoString;
 /// ```
 /// # Notes
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
+#[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     let mut line = 1;
     let mut column = 1;
@@ -43,7 +44,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
         }
         column += 1;
     }
-    
+
     // Safety: the encoding process does not produce invalid UTF-8
     // if given valid printable ASCII + newlines,
     // which is checked before this point
