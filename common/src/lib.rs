@@ -26,26 +26,24 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
     for byte in string_to_encode.bytes() {
-        match nonprintable_char_repr(byte) {
-            Some(repr) => return Err(Error::NonprintableAscii(byte, line, column, repr)),
-            None => {
-                if byte == b'\n' {
-                    line += 1;
-                    // Still 1-indexed since the newline will be counted at the end of the loop iteration.
-                    column = 0;
-                }
-                if byte < 127 {
-                    let v = if byte == b'\n' {
-                        111
-                    } else {
-                        (byte - 11) % 133 - 21
-                    };
-                    result.push((v >> 6) & 1 | 0b11001100);
-                    result.push((v & 63) | 0b10000000);
-                } else {
-                    return Err(Error::NotAscii(byte, line, column));
-                }
+        if (32..127).contains(&byte) || byte == b'\n' {
+            if byte == b'\n' {
+                line += 1;
+                // Still 1-indexed since this newline gets counted at the end of the loop
+                column = 0;
             }
+            let v = if byte == b'\n' {
+                111
+            } else {
+                (byte - 11) % 133 - 21
+            };
+            result.push((v >> 6) & 1 | 0b11001100);
+            result.push((v & 63) | 0b10000000);
+        } else {
+            return Err(match nonprintable_char_repr(byte) {
+                Some(repr) => Error::NonprintableAscii(byte, line, column, repr),
+                None => Error::NotAscii(byte, line, column),
+            });
         }
         column += 1;
     }
@@ -200,64 +198,49 @@ impl std::error::Error for Error {
 #[must_use = "the function returns a new value and does not modify the input"]
 const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
-        first_ten(byte as usize)
+        Some(
+            [
+                "Null",
+                "Start Of Heading",
+                "Start Of Text",
+                "End Of Text",
+                "End Of Transmission",
+                "Enquiry",
+                "Acknowledge",
+                "Bell",
+                "Backspace",
+                "Horizontal Tab",
+            ][byte as usize],
+        )
     } else if byte >= 11 && byte < 32 {
-        other_21(byte as usize)
+        Some(
+            [
+                "Vertical Tab",
+                "Form Feed",
+                "Carriage Return",
+                "Shift Out",
+                "Shift In",
+                "Data Link Escape",
+                "Data Control 1",
+                "Data Control 2",
+                "Data Control 3",
+                "Data Control 4",
+                "Negative Acknowledge",
+                "Synchronous Idle",
+                "End Of Transmission Block",
+                "Cancel",
+                "End Of Medium",
+                "Substitute",
+                "Escape",
+                "File Separator",
+                "Group Separator",
+                "Record Separator",
+                "Unit Separator",
+            ][byte as usize - 11],
+        )
     } else if byte == 127 {
-        last_one()
+        Some("Delete")
     } else {
         None
     }
-}
-
-#[cold]
-const fn first_ten(index: usize) -> Option<&'static str> {
-    Some(
-        [
-            "Null",
-            "Start Of Heading",
-            "Start Of Text",
-            "End Of Text",
-            "End Of Transmission",
-            "Enquiry",
-            "Acknowledge",
-            "Bell",
-            "Backspace",
-            "Horizontal Tab",
-        ][index],
-    )
-}
-
-#[cold]
-const fn other_21(index: usize) -> Option<&'static str> {
-    Some(
-        [
-            "Vertical Tab",
-            "Form Feed",
-            "Carriage Return",
-            "Shift Out",
-            "Shift In",
-            "Data Link Escape",
-            "Data Control 1",
-            "Data Control 2",
-            "Data Control 3",
-            "Data Control 4",
-            "Negative Acknowledge",
-            "Synchronous Idle",
-            "End Of Transmission Block",
-            "Cancel",
-            "End Of Medium",
-            "Substitute",
-            "Escape",
-            "File Separator",
-            "Group Separator",
-            "Record Separator",
-            "Unit Separator",
-        ][index - 11],
-    )
-}
-
-#[cold]
-const fn last_one() -> Option<&'static str> {
-    Some("Delete")
 }

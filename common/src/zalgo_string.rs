@@ -212,7 +212,10 @@ impl ZalgoString {
     /// assert_eq!(zs.len(), 3);
     /// ```
     #[inline]
-    #[must_use]
+    #[must_use = "the method returns a value and does not modify `self`"]
+    // Since the length is never empty it makes no sense to have an is_empty function.
+    // The decoded length can be empty though, so `decoded_is_empty` is provided instead.
+    #[allow(clippy::len_without_is_empty)]
     pub fn len(&self) -> usize {
         self.string.len()
     }
@@ -224,13 +227,29 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let s = "Zalgo, He comes!";
-    /// let zs = ZalgoString::new(s);
+    /// let zs = ZalgoString::new(s).unwrap();
     /// assert_eq!(s.len(), zs.decoded_len());
     /// ```
     #[inline]
-    #[must_use]
+    #[must_use = "the method returns a value and does not modify `self`"]
     pub fn decoded_len(&self) -> usize {
         (self.len() - 1) / 2
+    }
+
+    /// Returns whether the string would be empty if decoded.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::ZalgoString;
+    /// let zs = ZalgoString::new("").unwrap();
+    /// assert!(zs.decoded_is_empty());
+    /// let zs = ZalgoString::new("Blargh").unwrap();
+    /// assert!(!zs.decoded_is_empty());
+    /// ```
+    #[inline]
+    #[must_use = "the method returns a value and does not modify `self`"]
+    pub fn decoded_is_empty(&self) -> bool {
+        self.decoded_len() == 0
     }
 }
 
