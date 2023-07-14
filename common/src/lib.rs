@@ -43,8 +43,11 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
         }
         column += 1;
     }
-
-    Ok(String::from_utf8(result).expect("the encoding process does not produce invalid utf8 given valid ascii text, which is verified before this point"))
+    
+    // Safety: the encoding process does not produce invalid UTF-8
+    // if given valid printable ASCII + newlines,
+    // which is checked before this point
+    Ok(unsafe { String::from_utf8_unchecked(result) })
 }
 
 /// Takes in a string that was encoded by [`zalgo_encode`] and decodes it back into an ASCII string.
