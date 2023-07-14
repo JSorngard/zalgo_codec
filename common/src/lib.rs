@@ -32,11 +32,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
                 // Still 1-indexed since this newline gets counted at the end of the loop iteration
                 column = 0;
             }
-            let v = if byte == b'\n' {
-                111
-            } else {
-                (byte - 11) % 133 - 21
-            };
+            let v = ((i16::from(byte) - 11).rem_euclid(133) - 21) as u8;
             result.push((v >> 6) & 1 | 0b11001100);
             result.push((v & 63) | 0b10000000);
         } else {
