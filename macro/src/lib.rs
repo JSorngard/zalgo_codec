@@ -10,7 +10,7 @@ use zalgo_codec_common::zalgo_decode;
 
 /// This macro decodes a string that has been encoded with [`zalgo_encode`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/fn.zalgo_encode.html)
 /// and passes the results on to the compiler.
-/// 
+///
 /// You can use the program included in this crate to generate the input for the macro. It can be installed with `cargo install zalgo-codec --features binary`.
 /// # Examples
 /// We can use a function created in encoded source code:
