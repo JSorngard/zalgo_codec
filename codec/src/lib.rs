@@ -9,7 +9,7 @@
 //! but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes))
 //! you should only get one.
 //!
-//! A small program in included in the source repository and can be installed with
+//! A small program is included in the source repository and can be installed with
 //! `cargo install zalgo-codec --features binary`. This program lets you use the functions in the crate on text and files.
 //!
 //! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
