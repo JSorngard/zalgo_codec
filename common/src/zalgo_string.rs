@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 /// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// decoded and encoded form.
+/// 
 /// If the `serde_support` feature is enabled this struct derives the
 /// [`Serialize`] and [`Deserialize`] traits.
 #[derive(Debug, Clone, PartialEq, Hash)]
