@@ -47,6 +47,7 @@
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
 };
+#[cfg(feature = "macro")]
 pub use zalgo_codec_macro::zalgo_embed;
 
 #[cfg(test)]
@@ -77,6 +78,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "macro")]
     #[test]
     fn test_embed_function() {
         let code = "fn add(x: i32, y: i32) -> i32 {x + y}";
@@ -90,6 +92,7 @@ mod tests {
         assert_eq!(add(10, 20), 30)
     }
 
+    #[cfg(feature = "macro")]
     #[test]
     fn test_embed_expression() {
         let x = 20;
