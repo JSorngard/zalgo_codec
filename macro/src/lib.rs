@@ -4,7 +4,7 @@
 #![forbid(unsafe_code)]
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, LitStr};
+use syn::{parse_macro_input, spanned::Spanned, LitStr};
 
 use zalgo_codec_common::zalgo_decode;
 
@@ -63,5 +63,16 @@ use zalgo_codec_common::zalgo_decode;
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     let encoded = parse_macro_input!(encoded as LitStr).value();
 
-    zalgo_decode(&encoded).unwrap().parse().unwrap()
+    match zalgo_decode(&encoded) {
+        Ok(decoded) => match decoded.parse() {
+            Ok(token_stream) => token_stream,
+            Err(e) => syn::Error::new(encoded.span(), e).to_compile_error().into(),
+        },
+        Err(e) => syn::Error::new(
+            encoded.span(),
+            format!("the given string decodes into an {}", e),
+        )
+        .to_compile_error()
+        .into(),
+    }
 }
