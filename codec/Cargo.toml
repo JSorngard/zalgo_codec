@@ -22,7 +22,9 @@ unicode-segmentation = "1.10.1"
 default = ["macro"]
 ## Builds a binary that can be used to test out the codec
 binary = ["dep:clap"]
+## Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`]
 serde_support = ["zalgo-codec-common/serde_support"]
+## Enables the proc-macro [`zalgo_embed`]
 macro = ["dep:zalgo-codec-macro"]
 
 [package.metadata.docs.rs]
