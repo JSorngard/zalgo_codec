@@ -3,11 +3,13 @@
 
 use core::{fmt, str};
 
+/// Contains the implementation of [`ZalgoString`](zalgo_string::ZalgoString) as well as related iterators.
 pub mod zalgo_string;
+
 pub use zalgo_string::ZalgoString;
 
 /// Takes in an ASCII string without control characters (except newlines)
-/// and encodes it to zalgo text using a reversible encoding scheme.
+/// and encodes it into a single grapheme cluster using a reversible encoding scheme.
 ///
 /// The resulting string is a single unicode grapheme cluster and should
 /// only take up a single character space horizontally when displayed
@@ -97,7 +99,7 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, Error> {
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 /// The error returned by [`zalgo_encode`], [`ZalgoString::new`], and [`zalgo_wrap_python`]
 /// if they encounter a byte they can not encode.
 pub enum Error {
