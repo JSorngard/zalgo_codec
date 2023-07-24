@@ -47,6 +47,7 @@
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
 };
+
 #[cfg(feature = "macro")]
 pub use zalgo_codec_macro::zalgo_embed;
 
