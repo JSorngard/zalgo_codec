@@ -42,10 +42,10 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
             result.push((v >> 6) & 1 | 0b11001100);
             result.push((v & 63) | 0b10000000);
         } else {
-            return Err(match nonprintable_char_repr(byte) {
-                Some(repr) => Error::NonprintableAscii(byte, line, column, repr),
-                None => Error::NotAscii(byte, line, column),
-            });
+            match nonprintable_char_repr(byte) {
+                Some(repr) => return Err(Error::NonprintableAscii(byte, line, column, repr)),
+                None => return Err(Error::NotAscii(byte, line, column)),
+            }
         }
         column += 1;
     }
