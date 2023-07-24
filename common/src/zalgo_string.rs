@@ -138,7 +138,7 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::ZalgoString;
     /// let zs = ZalgoString::new("Zalgo").unwrap();
-    /// let mut bytes = zs.as_bytes();
+    /// let bytes = zs.as_bytes();
     /// assert_eq!(bytes[0], 69);
     /// assert_eq!(&bytes[1..5], &[204, 186, 205, 129]);
     /// ```
