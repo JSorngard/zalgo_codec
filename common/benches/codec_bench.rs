@@ -6,7 +6,7 @@ use rand::{
     seq::SliceRandom,
     thread_rng, Rng,
 };
-use zalgo_codec_common::{zalgo_decode, zalgo_encode};
+use zalgo_codec_common::{zalgo_decode, zalgo_encode, ZalgoString};
 
 struct PrintableAsciiAndNewline;
 
@@ -36,6 +36,16 @@ fn bench_codec(c: &mut Criterion) {
     group.bench_function("decode", |b| {
         b.iter(|| black_box(zalgo_decode(&encoded)).unwrap())
     });
+
+    drop(group);
+
+    c.bench_function("ZalgoString", |b| {
+        b.iter(|| {
+            let zs = black_box(ZalgoString::new(&string)).unwrap();
+            black_box(zs.into_decoded_string())
+        })
+    });
+
 }
 
 criterion_group!(benches, bench_codec);
