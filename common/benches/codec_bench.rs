@@ -45,7 +45,6 @@ fn bench_codec(c: &mut Criterion) {
             black_box(zs.into_decoded_string())
         })
     });
-
 }
 
 criterion_group!(benches, bench_codec);
