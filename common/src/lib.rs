@@ -72,6 +72,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
     let mut res = vec![0; (encoded.len() - 1) / 2];
     let bytes = encoded.as_bytes();
+    
     for (write, read) in (1..encoded.len()).step_by(2).enumerate() {
         res[write] = decode_byte_pair(bytes[read], bytes[read + 1]);
     }
