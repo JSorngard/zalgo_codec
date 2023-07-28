@@ -70,15 +70,13 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
-    let bytes: Vec<u8> = encoded
-        .bytes()
-        .skip(1)
-        .step_by(2)
-        .zip(encoded.bytes().skip(2).step_by(2))
-        .map(|(odd, even)| decode_byte_pair(odd, even))
-        .collect();
+    let mut res = vec![0; (encoded.len() - 1) / 2];
+    let bytes = encoded.as_bytes();
+    for (write, read) in (1..encoded.len()).step_by(2).enumerate() {
+        res[write] = decode_byte_pair(bytes[read], bytes[read + 1]);
+    }
 
-    String::from_utf8(bytes)
+    String::from_utf8(res)
 }
 
 #[must_use = "the function returns a new value and does not modify its inputs"]
