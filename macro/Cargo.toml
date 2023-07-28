@@ -14,5 +14,5 @@ proc-macro = true
 
 
 [dependencies]
-zalgo-codec-common = {path = "../common"}
+zalgo-codec-common = "0.8.2"
 syn = "2.0"
