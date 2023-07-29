@@ -63,10 +63,15 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// since the byte manipulations that this function does could result in invalid unicode in that case.
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
 ///
-/// # Example
+/// # Examples
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
+/// ```
+/// Decoding arbitrary strings will most likely lead to errors:
+/// ```
+/// # use zalgo_codec_common::zalgo_decode;
+/// assert!(zalgo_decode("Shmårgl").is_err());
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
@@ -74,7 +79,10 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error>
     let bytes = encoded.as_bytes();
 
     for (write, read) in (1..encoded.len()).step_by(2).enumerate() {
-        res[write] = decode_byte_pair(bytes[read], bytes[read + 1]);
+        match bytes.get(read + 1) {
+            Some(next) => res[write] = decode_byte_pair(bytes[read], *next),
+            None => break,
+        }
     }
 
     String::from_utf8(res)
