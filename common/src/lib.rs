@@ -40,7 +40,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     const BATCH_SIZE: usize = 16;
 
     for batch in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
-        let mut buffer = [0u8; 2 * BATCH_SIZE];
+        let mut buffer = [0; 2 * BATCH_SIZE];
         let mut encoded = 0;
         for byte in batch {
             // Only encode ASCII bytes corresponding to printable characters or newlines.
