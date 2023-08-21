@@ -41,7 +41,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 
     for batch in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
         let mut buffer = [0u8; 2 * BATCH_SIZE];
-        let mut i = 0;
+        let mut encoded = 0;
         for byte in batch {
             // Only encode ASCII bytes corresponding to printable characters or newlines.
             if (32..127).contains(byte) || *byte == b'\n' {
@@ -52,9 +52,9 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
                 }
 
                 let v = ((i16::from(*byte) - 11).rem_euclid(133) - 21) as u8;
-                buffer[i] = (v >> 6) & 1 | 0b11001100;
-                buffer[i + 1] = (v & 63) | 0b10000000;
-                i += 2;
+                buffer[encoded] = (v >> 6) & 1 | 0b11001100;
+                buffer[encoded + 1] = (v & 63) | 0b10000000;
+                encoded += 2;
             } else {
                 match nonprintable_char_repr(*byte) {
                     Some(repr) => return Err(Error::NonprintableAscii(*byte, line, column, repr)),
@@ -63,7 +63,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
             }
             column += 1;
         }
-        result.extend_from_slice(&buffer[..i]);
+        result.extend_from_slice(&buffer[..encoded]);
     }
 
     // Safety: the encoding process does not produce invalid UTF-8
