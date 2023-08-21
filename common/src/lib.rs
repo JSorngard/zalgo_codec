@@ -25,15 +25,24 @@ pub use zalgo_string::ZalgoString;
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
+    // The line we are currently encoding
     let mut line = 1;
+    // The column on that line we are currently encoding
     let mut column = 1;
+    // These are used for reporting a useful error if the encoding process fails.
+
+    // Every byte in the input will encode to two bytes. The extra byte is for the initial letter
+    // which is there in order for the output to be displayable in an intuitive way.
     let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
+
+    // We will encode this many bytes at a time before pushing onto the result vector.
     const BATCH_SIZE: usize = 16;
-    for bytes in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
-        let mut batch = [0u8; 2 * BATCH_SIZE];
+
+    for batch in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
+        let mut buffer = [0u8; 2 * BATCH_SIZE];
         let mut i = 0;
-        for byte in bytes {
+        for byte in batch {
             // Only encode ASCII bytes corresponding to printable characters or newlines.
             if (32..127).contains(byte) || *byte == b'\n' {
                 if *byte == b'\n' {
@@ -43,8 +52,8 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
                 }
 
                 let v = ((i16::from(*byte) - 11).rem_euclid(133) - 21) as u8;
-                batch[i] = (v >> 6) & 1 | 0b11001100;
-                batch[i + 1] = (v & 63) | 0b10000000;
+                buffer[i] = (v >> 6) & 1 | 0b11001100;
+                buffer[i + 1] = (v & 63) | 0b10000000;
                 i += 2;
             } else {
                 match nonprintable_char_repr(*byte) {
@@ -54,7 +63,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
             }
             column += 1;
         }
-        result.extend_from_slice(&batch[..i]);
+        result.extend_from_slice(&buffer[..i]);
     }
 
     // Safety: the encoding process does not produce invalid UTF-8
