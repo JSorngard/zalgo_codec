@@ -29,7 +29,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     let mut column = 1;
     let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
     result.push(b'E');
-    const BATCH_SIZE: usize = 4;
+    const BATCH_SIZE: usize = 16;
     for bytes in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
         let mut batch = [0u8; 2 * BATCH_SIZE];
         let mut i = 0;
@@ -55,6 +55,39 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
             column += 1;
         }
         result.extend_from_slice(&batch[..i]);
+    }
+
+    // Safety: the encoding process does not produce invalid UTF-8
+    // if given valid printable ASCII + newlines,
+    // which is checked before this point
+    Ok(unsafe { String::from_utf8_unchecked(result) })
+}
+
+#[must_use = "the function returns a new value and does not modify the input"]
+pub fn zalgo_encode_2(string_to_encode: &str) -> Result<String, Error> {
+    let mut line = 1;
+    let mut column = 1;
+    let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
+    result.push(b'E');
+    for byte in string_to_encode.bytes() {
+        // Only encode ASCII bytes corresponding to printable characters or newlines.
+        if (32..127).contains(&byte) || byte == b'\n' {
+            if byte == b'\n' {
+                line += 1;
+                // `column` is still 1-indexed since it gets incremented at the end of the current loop iteration.
+                column = 0;
+            }
+
+            let v = ((i16::from(byte) - 11).rem_euclid(133) - 21) as u8;
+            result.push((v >> 6) & 1 | 0b11001100);
+            result.push((v & 63) | 0b10000000);
+        } else {
+            match nonprintable_char_repr(byte) {
+                Some(repr) => return Err(Error::NonprintableAscii(byte, line, column, repr)),
+                None => return Err(Error::NotAscii(byte, line, column)),
+            }
+        }
+        column += 1;
     }
 
     // Safety: the encoding process does not produce invalid UTF-8
