@@ -333,18 +333,19 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 impl<'a> FusedIterator for DecodedChars<'a> {}
 impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 
-// Make `ZalgoString` comparable against every type that can represent itself as a `str`.
-impl<T> PartialEq<T> for ZalgoString
-where
-    T: AsRef<str>,
-{
-    fn eq(&self, other: &T) -> bool {
-        fn compare_with_str(s: &ZalgoString, other: &str) -> bool {
-            s.string == other
-        }
-        compare_with_str(self, other.as_ref())
-    }
+macro_rules! impl_partial_eq {
+    ($($rhs:ty),+) => {
+        $(
+            impl<'a> PartialEq<$rhs> for ZalgoString {
+                #[inline]
+                fn eq(&self, other: &$rhs) -> bool {
+                    &self.string == other
+                }
+            }
+        )+
+    };
 }
+impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
