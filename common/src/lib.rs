@@ -74,9 +74,12 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 
 /// Takes in a string that was encoded by [`zalgo_encode`] and decodes it back into an ASCII string.
 ///
+/// # Error
+///
 /// Returns an error if the decoded string is not valid UTF-8.
 /// This can happen if the input is a string that was not encoded by [`zalgo_encode`],
 /// since the byte manipulations that this function does could result in invalid unicode in that case.
+/// Even if no error is returned in such a case the results are not meaningful.
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
 ///
 /// # Examples
