@@ -333,19 +333,6 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 impl<'a> FusedIterator for DecodedChars<'a> {}
 impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 
-use std::borrow::Cow;
-impl<'a> From<ZalgoString> for Cow<'a, ZalgoString> {
-    fn from(value: ZalgoString) -> Self {
-        Cow::Owned(value)
-    }
-}
-
-impl<'a> From<&'a ZalgoString> for Cow<'a, ZalgoString> {
-    fn from(value: &'a ZalgoString) -> Self {
-        Cow::Borrowed(value)
-    }
-}
-
 // Make `ZalgoString` comparable against every type that can represent itself as a `str`.
 impl<T> PartialEq<T> for ZalgoString
 where
