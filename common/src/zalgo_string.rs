@@ -17,6 +17,7 @@ pub struct ZalgoString {
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
+    /// # Errors
     /// Returns an error if the input string contains bytes that don't correspond to printable
     /// ASCII characters or newlines.
     /// # Examples
@@ -30,7 +31,7 @@ impl ZalgoString {
     /// assert!(ZalgoString::new("❤️").is_err());
     /// assert!(ZalgoString::new("\r").is_err());
     /// ```
-    #[must_use = "this function returns a new `ZalgoString`, it does not modify the input"]
+    #[must_use = "this function returns a new `ZalgoString` and does not modify the input"]
     pub fn new(s: &str) -> Result<Self, Error> {
         zalgo_encode(s).map(|string| Self { string })
     }
@@ -69,6 +70,7 @@ impl ZalgoString {
     /// assert_eq!(zs.len(), 11);
     /// ```
     #[inline]
+    #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_str(&self) -> &str {
         &self.string
     }
@@ -142,6 +144,7 @@ impl ZalgoString {
     /// assert_eq!(&bytes[1..5], &[204, 186, 205, 129]);
     /// ```
     #[inline]
+    #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_bytes(&self) -> &[u8] {
         self.string.as_bytes()
     }
@@ -214,6 +217,7 @@ impl ZalgoString {
     // The decoded length can be empty though, so `decoded_is_empty` is provided instead.
     #[inline]
     #[allow(clippy::len_without_is_empty)]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn len(&self) -> usize {
         self.string.len()
     }
@@ -229,6 +233,7 @@ impl ZalgoString {
     /// assert_eq!(s.len(), zs.decoded_len());
     /// ```
     #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn decoded_len(&self) -> usize {
         (self.len() - 1) / 2
     }
@@ -244,6 +249,7 @@ impl ZalgoString {
     /// assert!(!zs.decoded_is_empty());
     /// ```
     #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn decoded_is_empty(&self) -> bool {
         self.decoded_len() == 0
     }
@@ -327,19 +333,31 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 impl<'a> FusedIterator for DecodedChars<'a> {}
 impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 
-macro_rules! impl_partial_eq {
-    ($($rhs:ty),+) => {
-        $(
-            impl<'a> PartialEq<$rhs> for ZalgoString {
-                #[inline]
-                fn eq(&self, other: &$rhs) -> bool {
-                    &self.string == other
-                }
-            }
-        )+
-    };
+use std::borrow::Cow;
+impl<'a> From<ZalgoString> for Cow<'a, ZalgoString> {
+    fn from(value: ZalgoString) -> Self {
+        Cow::Owned(value)
+    }
 }
-impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
+
+impl<'a> From<&'a ZalgoString> for Cow<'a, ZalgoString> {
+    fn from(value: &'a ZalgoString) -> Self {
+        Cow::Borrowed(value)
+    }
+}
+
+// Make `ZalgoString` comparable against every type that can represent itself as a `str`.
+impl<T> PartialEq<T> for ZalgoString
+where
+    T: AsRef<str>,
+{
+    fn eq(&self, other: &T) -> bool {
+        fn compare_with_str(s: &ZalgoString, other: &str) -> bool {
+            s.string == other
+        }
+        compare_with_str(self, other.as_ref())
+    }
+}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -369,5 +387,14 @@ mod test {
 
         let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_string(), "E");
+    }
+
+    #[test]
+    fn check_partial_eq() {
+        let enc = "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ";
+        let zs = ZalgoString::new("Zalgo\n He comes!").unwrap();
+        assert_eq!(zs, enc);
+        assert_eq!(zs, String::from(enc));
+        assert_eq!(zs, std::borrow::Cow::from(enc));
     }
 }
