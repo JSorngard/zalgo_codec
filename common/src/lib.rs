@@ -84,7 +84,8 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
 /// ```
-/// Decoding arbitrary strings will most likely lead to errors:
+/// Decoding arbitrary strings not produced by [`zalgo_encode`] will most likely lead to errors,
+/// and if it doesn't the results are not meaningful:
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
 /// assert!(zalgo_decode("Shmårgl").is_err());
