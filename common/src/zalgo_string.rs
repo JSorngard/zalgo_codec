@@ -1,16 +1,14 @@
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 use core::iter::{ExactSizeIterator, FusedIterator};
-#[cfg(feature = "serde_support")]
-use serde::{Deserialize, Serialize};
 
-/// A thin wrapper around a [`String`] that has been encoded with [`zalgo_encode`].
+/// A [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// decoded and encoded form.
 ///
 /// If the `serde_support` feature is enabled this struct derives the
 /// [`Serialize`] and [`Deserialize`] traits.
-#[derive(Debug, Clone, PartialEq, Hash)]
-#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde_support", derive(serde::Serialize, serde::Deserialize))]
 pub struct ZalgoString {
     string: String,
 }
