@@ -55,13 +55,13 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
                 buffer[encoded] = (v >> 6) & 1 | 0b11001100;
                 buffer[encoded + 1] = (v & 63) | 0b10000000;
                 encoded += 2;
+                column += 1;
             } else {
                 match nonprintable_char_repr(*byte) {
                     Some(repr) => return Err(Error::NonprintableAscii(*byte, line, column, repr)),
                     None => return Err(Error::NotAscii(*byte, line, column)),
                 }
             }
-            column += 1;
         }
         result.extend_from_slice(&buffer[..encoded]);
     }
