@@ -13,6 +13,7 @@ description = "A crate for converting an ASCII text string to a single unicode g
 zalgo-codec-common = {path = "../common"}
 zalgo-codec-macro = {path = "../macro", optional = true}
 clap = {version = "4.3", features = ["derive"], optional = true}
+anyhow = "1.0.75"
 
 [dev-dependencies]
 rand = "0.8"

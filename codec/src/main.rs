@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
@@ -60,15 +61,12 @@ struct Cli {
     force: bool,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     let config = Cli::parse();
 
     if let Some(ref destination) = config.out_path {
-        if destination.exists() && !config.force {
-            return Err(Box::new(std::io::Error::new(
-                std::io::ErrorKind::AlreadyExists,
-                "to overwrite the contents you can supply -f/--force",
-            )));
+        if destination.exists() {
+            return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()));
         }
     }
 
@@ -88,13 +86,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let encoded = match source {
                 Source::Text { mut text } => {
                     if text.len() == 1 {
-                        text.swap_remove(0)
+                        Ok(text.swap_remove(0))
                     } else {
-                        return Err(Box::new(std::io::Error::new(
-                            std::io::ErrorKind::InvalidData,
-                            "can only decode one grapheme cluster at a time",
-                        )));
-                    }
+                        Err(anyhow!("can only decode one grapheme cluster at a time"))
+                    }?
                 }
                 Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
             };
