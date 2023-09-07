@@ -65,7 +65,7 @@ fn main() -> Result<()> {
     let config = Cli::parse();
 
     if let Some(ref destination) = config.out_path {
-        if destination.exists() {
+        if destination.exists() && !config.force {
             return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()));
         }
     }
