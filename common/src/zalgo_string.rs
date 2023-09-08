@@ -6,7 +6,7 @@ use core::iter::{ExactSizeIterator, FusedIterator};
 /// decoded and encoded form.
 ///
 /// If the `serde_support` feature is enabled this struct derives the
-/// [`Serialize`] and [`Deserialize`] traits.
+/// [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(
     feature = "serde_support",
