@@ -11,7 +11,7 @@ you can do so with `cargo install zalgo-codec --features binary`.
 
 Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes the encoded string, retaining the functionality of the original code.
 
-# Examples
+## Examples
 
 We can execute encoded code with the macro:
 
@@ -59,11 +59,11 @@ E̬͏͍͉͓͕͍͒̀͐̀̈́ͅ͏͌͏͓͉͔͍͔͒̀̀́̌̀̓ͅ͏͎͓͔͔͕̓͒ͅͅ�
 \
 \
 
-# Explanation
+## Explanation
 Characters U+0300–U+036F are the combining characters for unicode Latin. The fun thing about combining characters is that you can add as many of these characters as you like to the original character and it does not create any new symbols, it only adds symbols on top of the character. It's supposed to be used in order to create characters such as á by taking a normal a and adding another character to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify any limit on the number of these characters. Conveniently, this gives us 112 different characters we can map to, which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters. The only issue is that we can't have new lines in this system, so to fix that, we can simply map 0x7F (DEL) to 0x0A (LF). This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
 
 
-# Links
+## Links
 The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) where the python code was first presented together with the above explanation
 
 ## License
@@ -71,9 +71,9 @@ The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the
 Licensed under either of
 
  * Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+   http://www.apache.org/licenses/LICENSE-2.0
  * MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+   http://opensource.org/licenses/MIT
 
 at your option.
 
