@@ -169,7 +169,6 @@ impl ZalgoString {
     /// let s = "Zalgo";
     /// let zs = ZalgoString::new(s)?;
     /// assert_eq!(s, zs.into_decoded_string());
-    /// // println!("{zs}"); // Error: value used after move
     /// # Ok(())
     /// # }
     /// ```
