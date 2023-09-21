@@ -51,7 +51,7 @@ impl ZalgoString {
     /// # Ok(())
     /// # }
     /// ```
-    /// Note that `ZalgoString` implements `PartialEq` with common string types,
+    /// Note that `ZalgoString` implements [`PartialEq`] with common string types,
     /// so the comparison in the above example could also be done directly
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
