@@ -239,7 +239,7 @@ impl ZalgoString {
         bytes
     }
 
-    /// Returns the length of `self` in bytes. The allocated capacity is the same.
+    /// Returns the length of `self` in bytes.
     /// This length is twice the length of the original `String` plus one.
     /// # Example
     /// Basic usage
@@ -258,6 +258,17 @@ impl ZalgoString {
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn len(&self) -> usize {
         self.string.len()
+    }
+
+    /// Returns the capacity of the undelying string.
+    ///
+    /// The `ZalgoString` is preallocated to the needed capacity of twice the length
+    /// of the original unencoded `String` plus one.
+    /// However, this size is not guaranteed since the allocator can choose to allocate more space.
+    #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
+    pub fn capacity(&self) -> usize {
+        self.string.capacity()
     }
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
