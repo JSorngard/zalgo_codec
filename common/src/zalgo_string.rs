@@ -148,10 +148,7 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
     /// let zs = ZalgoString::new("Zalgo\n He comes!")?;
-    /// let es = "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ";
-    /// assert_eq!(zs.to_string(), es);
-    /// assert_eq!(zs.into_string(), es);
-    /// // println!("{zs}"); // Error: value used after move
+    /// assert_eq!(zs.into_string(), "É̺͇͌͏̨ͯ̀̀̓ͅ͏͍͓́ͅ");
     /// # Ok(())
     /// # }
     /// ```
