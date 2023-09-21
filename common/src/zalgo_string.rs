@@ -289,6 +289,7 @@ impl ZalgoString {
     }
 
     /// Returns the length of `self` in bytes.
+    /// 
     /// This length is twice the length of the original `String` plus one.
     /// # Example
     /// Basic usage
@@ -321,6 +322,7 @@ impl ZalgoString {
     }
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
+    /// 
     /// This is computed without any decoding.
     /// # Example
     /// Basic usage
@@ -340,6 +342,7 @@ impl ZalgoString {
     }
 
     /// Returns whether the string would be empty if decoded.
+    /// 
     /// # Example
     /// Basic usage
     /// ```
