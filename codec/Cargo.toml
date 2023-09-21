@@ -10,8 +10,8 @@ description = "A crate for converting an ASCII text string to a single unicode g
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zalgo-codec-common = "0.8.7"
-zalgo-codec-macro = {version = "0.1.14", optional = true}
+zalgo-codec-common = {path = "../common"}
+zalgo-codec-macro = {path = "../macro", optional = true}
 clap = {version = "4.4", features = ["derive"], optional = true}
 anyhow = "1.0"
 
