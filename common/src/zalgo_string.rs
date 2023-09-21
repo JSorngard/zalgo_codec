@@ -140,7 +140,7 @@ impl ZalgoString {
     }
 
     /// Converts `self` into a `String`.
-    /// 
+    ///
     /// This simply returns the underlying `String` without any cloning or decoding.
     /// # Example
     /// Basic usage
@@ -159,7 +159,7 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a `String` in-place.
-    /// 
+    ///
     /// This method has no effect on the allocated capacity.
     /// # Example
     /// Basic usage
@@ -264,7 +264,7 @@ impl ZalgoString {
     }
 
     /// Decodes `self` into a byte vector in-place.
-    /// 
+    ///
     /// This method has no effect on the allocated capacity.
     /// # Example
     /// Basic usage
@@ -289,7 +289,7 @@ impl ZalgoString {
     }
 
     /// Returns the length of `self` in bytes.
-    /// 
+    ///
     /// This length is twice the length of the original `String` plus one.
     /// # Example
     /// Basic usage
@@ -322,7 +322,7 @@ impl ZalgoString {
     }
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
-    /// 
+    ///
     /// This is computed without any decoding.
     /// # Example
     /// Basic usage
@@ -342,7 +342,7 @@ impl ZalgoString {
     }
 
     /// Returns whether the string would be empty if decoded.
-    /// 
+    ///
     /// # Example
     /// Basic usage
     /// ```
