@@ -51,34 +51,13 @@ impl ZalgoString {
     /// # Ok(())
     /// # }
     /// ```
-    /// Iterate through the encoded [`char`](prim@char)s
+    /// Note that `ZalgoString` implements `PartialEq` with common string types,
+    /// so the comparison in the above example could also be done directly
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
-    /// let zs = ZalgoString::new("42")?;
-    /// let mut chars = zs.as_str().chars();
-    /// // A `ZalgoString` always begins with an 'E'
-    /// assert_eq!(chars.next(), Some('E'));
-    /// // After that it gets weird
-    /// assert_eq!(chars.next(), Some('\u{314}'));
-    /// # Ok(())
-    /// # }
-    /// ```
-    /// Combining characters lie deep in the dark depths of Unicode,
-    /// and may not match with your intuition of what a character is.
-    /// ```
-    /// # use zalgo_codec_common::{Error, ZalgoString};
-    /// # fn main() -> Result<(), Error> {
-    /// let zs = ZalgoString::new("Zalgo")?;
-    /// let mut ci = zs.as_str().char_indices();
-    /// assert_eq!(ci.next(), Some((0, 'E')));
-    /// assert_eq!(ci.next(), Some((1,'\u{33a}')));
-    /// // Note the 3 here, the combining characters can take up multiple bytes.
-    /// assert_eq!(ci.next(), Some((3, '\u{341}')));
-    /// // The final character begins at position 9
-    /// assert_eq!(ci.next_back(), Some((9, '\u{34f}')));
-    /// // even though the length in bytes is 11
-    /// assert_eq!(zs.len(), 11);
+    /// # let zs = ZalgoString::new("Oh boy!")?;
+    /// assert_eq!(zs, "È̯͈͂͏͙́");
     /// # Ok(())
     /// # }
     /// ```
@@ -88,7 +67,54 @@ impl ZalgoString {
         &self.string
     }
 
+    /// Returns an iterator over the encoded characters of the `ZalgoString`.
+    ///
+    /// The first character is an "E", the others are unicode combining characters.
+    /// # Example
+    /// Iterate through the encoded [`char`]s:
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// # fn main() -> Result<(), Error> {
+    /// let zs = ZalgoString::new("42")?;
+    /// let mut chars = zs.chars();
+    /// assert_eq!(chars.next(), Some('E'));
+    /// assert_eq!(chars.next(), Some('\u{314}'));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    pub fn chars(&self) -> core::str::Chars<'_> {
+        self.string.chars()
+    }
+
+    /// Returns an iterator over the characters of the `ZalgoString` and their positions.
+    ///
+    /// # Example
+    /// Combining characters lie deep in the dark depths of Unicode,
+    /// and may not match with your intuition of what a character is.
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// # fn main() -> Result<(), Error> {
+    /// let zs = ZalgoString::new("Zalgo")?;
+    /// let mut ci = zs.char_indices();
+    /// assert_eq!(ci.next(), Some((0, 'E')));
+    /// assert_eq!(ci.next(), Some((1,'\u{33a}')));
+    /// // Note the 3 here, the combining characters take up two bytes.
+    /// assert_eq!(ci.next(), Some((3, '\u{341}')));
+    /// // The final character begins at position 9
+    /// assert_eq!(ci.next_back(), Some((9, '\u{34f}')));
+    /// // even though the length in bytes is 11
+    /// assert_eq!(zs.len(), 11);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    pub fn char_indices(&self) -> core::str::CharIndices<'_> {
+        self.string.char_indices()
+    }
+
     /// Returns an iterator over the decoded characters of the `ZalgoString`.
+    ///
     /// These characters are guaranteed to be valid ASCII.
     /// # Example
     /// ```
@@ -114,6 +140,7 @@ impl ZalgoString {
     }
 
     /// Converts `self` into a `String`.
+    /// 
     /// This simply returns the underlying `String` without any cloning or decoding.
     /// # Example
     /// Basic usage
@@ -134,7 +161,9 @@ impl ZalgoString {
         self.string
     }
 
-    /// Decodes `self` into a `String` in-place. This method has no effect on the allocated capacity.
+    /// Decodes `self` into a `String` in-place.
+    /// 
+    /// This method has no effect on the allocated capacity.
     /// # Example
     /// Basic usage
     /// ```
@@ -155,6 +184,7 @@ impl ZalgoString {
     }
 
     /// Returns the encoded contents of `self` as a byte slice.
+    ///
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
     /// # Example
     /// Basic usage
@@ -174,7 +204,29 @@ impl ZalgoString {
         self.string.as_bytes()
     }
 
+    /// Returns an iterator over the encoded bytes of the `ZalgoString`.
+    ///
+    /// Since a `ZalgoString` always begins with an "E", the first byte is always 69.
+    /// After that the bytes no longer correspond to ASCII values.
+    /// # Example
+    /// Basic usage
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// # fn main() -> Result<(), Error> {
+    /// let zs = ZalgoString::new("Bytes")?;
+    /// let mut bytes = zs.bytes();
+    /// assert_eq!(bytes.next(), Some(69));
+    /// assert_eq!(bytes.nth(5), Some(148));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    pub fn bytes(&self) -> core::str::Bytes<'_> {
+        self.string.bytes()
+    }
+
     /// Returns an iterator over the decoded bytes of the `ZalgoString`.
+    ///
     /// These bytes are guaranteed to represent valid ASCII.
     /// # Example
     /// ```
