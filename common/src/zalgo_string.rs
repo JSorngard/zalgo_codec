@@ -260,7 +260,7 @@ impl ZalgoString {
         self.string.len()
     }
 
-    /// Returns the capacity of the underlying string.
+    /// Returns the capacity of the underlying string in bytes.
     ///
     /// The `ZalgoString` is preallocated to the needed capacity of twice the length
     /// of the original unencoded `String` plus one.
