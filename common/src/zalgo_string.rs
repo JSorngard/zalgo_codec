@@ -263,7 +263,9 @@ impl ZalgoString {
         self.string.into_bytes()
     }
 
-    /// Decodes `self` into a byte vector in-place. This method has no effect on the allocated capacity.
+    /// Decodes `self` into a byte vector in-place.
+    /// 
+    /// This method has no effect on the allocated capacity.
     /// # Example
     /// Basic usage
     /// ```
@@ -271,7 +273,6 @@ impl ZalgoString {
     /// # fn main() -> Result<(), Error> {
     /// let zs = ZalgoString::new("Zalgo")?;
     /// assert_eq!(b"Zalgo".to_vec(), zs.into_decoded_bytes());
-    /// // println!("{zs}"); // Error: value used after move
     /// # Ok(())
     /// # }
     /// ```
