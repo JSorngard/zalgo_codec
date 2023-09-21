@@ -87,7 +87,7 @@ impl ZalgoString {
         self.string.chars()
     }
 
-    /// Returns an iterator over the characters of the `ZalgoString` and their positions.
+    /// Returns an iterator over the encoded characters of the `ZalgoString` and their positions.
     ///
     /// # Example
     /// Combining characters lie deep in the dark depths of Unicode,
