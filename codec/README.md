@@ -1,3 +1,6 @@
+[![Latest Version](https://img.shields.io/crates/v/zalgo-codec.svg)](https://crates.io/crates/zalgo-codec)
+[![Build Status](https://github.com/JSorngard/zalgo-codec/actions/workflows/rust.yml/badge.svg)](https://github.com/JSorngard/zalgo-codec/actions/workflows/rust.yml)
+
 # zalgo codec
 
 This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. It is based on the encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro that lets you embed an encoded string and decode it into source code at compile time.  
