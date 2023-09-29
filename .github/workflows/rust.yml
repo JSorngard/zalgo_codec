@@ -14,19 +14,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Test
-      run: cargo fmt --verbose
-      
-  build:
+    - uses: dtolnay/rust-toolchain@stable
+    - name: cargo fmt --check
+      run: cargo fmt --check
+  check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --features binary --verbose
-      
+    - uses: dtolnay/rust-toolchain@stable
+    - name: cargo check --verbose
+      run: cargo check --verbose
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+    - name: cargo clippy -- -D warning
+      run: cargo clippy -- -D warnings
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Test
       run: cargo test --verbose
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --features binary
