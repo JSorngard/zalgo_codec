@@ -117,7 +117,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// zalgo-encodes an ASCII string containing Python code and
 /// wraps it in a decoder that decodes and executes it.
 /// The resulting Python code should retain the functionality of the original.
-/// # Notes
+/// # Known issues
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
 #[must_use = "the function returns a new value and does not modify the input"]
