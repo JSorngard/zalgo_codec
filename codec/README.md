@@ -4,16 +4,16 @@
 
 # zalgo codec
 
-This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. It is based on the encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner and extends them for Rust by providing a procedural macro that lets you embed an encoded string and decode it into source code at compile time.  
+This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. It also provides a procedural macro that lets you embed such a grapheme cluster and decode it into source code at compile time.  
 This lets you reach new lows in the field of self-documenting code.
 
-The encoded string will be ~2 times larger than the original in terms of bytes, but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes)) you should only get one.
+The encoded string will be ~2 times larger than the original in terms of bytes.
 
 The crate also contains a small program that lets you test the codec by encoding/decoding text and files.  
 If you have cloned the repository you can build it with `cargo build --release --features binary`, and if you want to install it from crates.io
 you can do so with `cargo install zalgo-codec --features binary`.
 
-Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes the encoded string, retaining the functionality of the original code.
+Additionally the crate provides a function to encode Python code and wrap the result in a decoder that decodes and executes it such that the result retains the functionality of the original code.
 
 ## Examples
 
@@ -68,7 +68,7 @@ Characters U+0300–U+036F are the combining characters for unicode Latin. The f
 
 
 ## Links
-The [original post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) where the python code was first presented together with the above explanation
+The crate is based on the encoding and decoding functions [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner. They were first presented in [this post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3) together with the above explanation.
 
 ## License
 
