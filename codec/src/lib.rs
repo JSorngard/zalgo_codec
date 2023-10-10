@@ -1,4 +1,4 @@
-//! This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. 
+//! This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back.
 //! It also provides a procedural macro that lets you embed such a grapheme cluster and decode it into source code at compile time.  
 //! This lets you reach new lows in the field of self-documenting code.
 //!
