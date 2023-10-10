@@ -1,13 +1,8 @@
-//! This crate lets you convert ASCII strings into single unicode grapheme clusters and back.
-//! It is based on the encoding and decoding functions
-//! [originally written in Python](https://github.com/DaCoolOne/DumbIdeas/tree/main/reddit_ph_compressor) by Scott Conner
-//! and extends them for Rust by providing a procedural macro that lets you embed an encoded string
-//! and decode it into source code at compile time.  
+//! This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back.
+//! It also provides a procedural macro that lets you embed such a grapheme cluster and decode it into source code at compile time.  
 //! This lets you reach new lows in the field of self-documenting code.
 //!
-//! The encoded string will be ~2 times larger than the original in terms of bytes,
-//! but if you count the number of grapheme clusters it contains (with e.g. [`UnicodeSegmentation::graphemes`](https://docs.rs/unicode-segmentation/latest/unicode_segmentation/trait.UnicodeSegmentation.html#tymethod.graphemes))
-//! you should only get one.
+//! The encoded string will be ~2 times larger than the original in terms of bytes.
 //!
 //! A small program that lets you use the functions in the crate on text and files is included in the source repository and can be installed with
 //! `cargo install zalgo-codec --features binary`.
@@ -35,14 +30,14 @@
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
 //! it only adds symbols on top of the character. It's supposed to be used in order to
-//! create characters such as á by taking a normal a and adding another character
+//! create characters such as `á` by taking a normal `a` and adding another character
 //! to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify
 //! any limit on the number of these characters.
 //! Conveniently, this gives us 112 different characters we can map to,
 //! which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
-//! This can be represented as (CHARACTER - 11) % 133 - 21, and decoded with (CHARACTER + 22) % 133 + 10.  
+//! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.  
 
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
