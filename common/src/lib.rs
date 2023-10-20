@@ -58,7 +58,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
                 column += 1;
             } else {
                 match nonprintable_char_repr(*byte) {
-                    Some(repr) => return Err(Error::NonprintableAscii(*byte, line, column, repr)),
+                    Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
                     None => return Err(Error::NotAscii(*byte, line, column)),
                 }
             }
@@ -131,7 +131,7 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, Error> {
 /// if they encounter a byte they can not encode.
 pub enum Error {
     /// Represents a valid ASCII character that is outside of the encodable set.
-    NonprintableAscii(u8, usize, usize, &'static str),
+    UnencodableAscii(u8, usize, usize, &'static str),
     /// Represents some other unicode character.
     NotAscii(u8, usize, usize),
 }
@@ -147,7 +147,7 @@ impl Error {
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
-            Self::NonprintableAscii(_, line, _, _) | Self::NotAscii(_, line, _) => *line,
+            Self::UnencodableAscii(_, line, _, _) | Self::NotAscii(_, line, _) => *line,
         }
     }
 
@@ -162,7 +162,7 @@ impl Error {
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn column(&self) -> usize {
         match self {
-            Self::NonprintableAscii(_, _, column, _) | Self::NotAscii(_, _, column) => *column,
+            Self::UnencodableAscii(_, _, column, _) | Self::NotAscii(_, _, column) => *column,
         }
     }
 
@@ -183,7 +183,7 @@ impl Error {
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn byte(&self) -> u8 {
         match self {
-            Self::NonprintableAscii(byte, _, _, _) | Self::NotAscii(byte, _, _) => *byte,
+            Self::UnencodableAscii(byte, _, _, _) | Self::NotAscii(byte, _, _) => *byte,
         }
     }
 
@@ -200,7 +200,7 @@ impl Error {
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
-            Self::NonprintableAscii(_, _, _, repr) => Some(*repr),
+            Self::UnencodableAscii(_, _, _, repr) => Some(*repr),
             Self::NotAscii(_, _, _) => None,
         }
     }
@@ -209,7 +209,7 @@ impl Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::NonprintableAscii(byte, line, column, repr) => write!(
+            Self::UnencodableAscii(byte, line, column, repr) => write!(
                 f,
                 "line {line} at column {column}: can not encode ASCII \"{repr}\" character with byte value {byte}"
             ),
