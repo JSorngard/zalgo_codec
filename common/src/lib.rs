@@ -3,7 +3,7 @@
 
 use core::{fmt, str};
 
-/// Contains the implementation of [`ZalgoString`](zalgo_string::ZalgoString) as well as related iterators.
+/// Contains the implementation of [`ZalgoString`] as well as related iterators.
 pub mod zalgo_string;
 
 pub use zalgo_string::ZalgoString;
@@ -18,8 +18,9 @@ pub use zalgo_string::ZalgoString;
 /// can be decoded to recover the original string with [`zalgo_decode`].
 /// # Example
 /// ```
-/// # use zalgo_codec_common::zalgo_encode;
-/// assert_eq!(zalgo_encode("Zalgo").unwrap(), "É̺͇͌͏");
+/// # use zalgo_codec_common::{Error, zalgo_encode};
+/// assert_eq!(zalgo_encode("Zalgo")?, "É̺͇͌͏");
+/// # Ok::<(), Error>(())
 /// ```
 /// # Notes
 /// Can not encode carriage returns, present in e.g. line endings on Windows.
@@ -85,7 +86,9 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// # Examples
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
-/// assert_eq!(zalgo_decode("É̺͇͌͏").unwrap(), "Zalgo");
+/// # use std::string::FromUtf8Error;
+/// assert_eq!(zalgo_decode("É̺͇͌͏")?, "Zalgo");
+/// # Ok::<(), FromUtf8Error>(())
 /// ```
 /// Decoding arbitrary strings not produced by [`zalgo_encode`] will most likely lead to errors,
 /// and if it doesn't the results are not meaningful:
