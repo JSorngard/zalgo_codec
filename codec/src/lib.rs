@@ -26,12 +26,12 @@
 //! ```
 //!
 //! # Features
-//! 
+//!
 //! `std`: implements the [`std::error::Error`] trait for the provided [`Error`] type.
 //! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
-//! 
-//! `serde_support`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`]. 
-//! 
+//!
+//! `serde_support`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`].
+//!
 //! `binary`: builds a test program that lets you apply the functions in the crate on text and files.
 //! Also enables the `std` feature.
 //!   
@@ -63,8 +63,8 @@ mod tests {
     extern crate alloc;
 
     use super::*;
-    use core::str;
     use alloc::string::String;
+    use core::str;
     use rand::{
         distributions::{DistString, Distribution},
         seq::SliceRandom,
