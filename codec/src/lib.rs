@@ -31,7 +31,7 @@
 //! as you like to the original character and it does not create any new symbols,
 //! it only adds symbols on top of the character. It's supposed to be used in order to
 //! create characters such as `á` by taking a normal `a` and adding another character
-//! to give it the mark (U+301, in this case). Fun fact, Unicode doesn't specify
+//! to give it the mark (U+301, in this case). Fun fact: Unicode doesn't specify
 //! any limit on the number of these characters.
 //! Conveniently, this gives us 112 different characters we can map to,
 //! which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-control characters.
