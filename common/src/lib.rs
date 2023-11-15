@@ -17,6 +17,11 @@ pub use zalgo_string::ZalgoString;
 /// The resulting string will be ~2 times larger than the original in terms of bytes, and it
 /// can be decoded to recover the original string with [`zalgo_decode`].
 /// 
+/// # Errors
+/// 
+/// Returns an error if the input contains a byte that does not correspond to a printable
+/// ASCII character or newline.
+/// 
 /// # Example
 /// 
 /// Basic usage:
@@ -83,7 +88,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 
 /// Takes in a string that was encoded by [`zalgo_encode`] and decodes it back into an ASCII string.
 ///
-/// # Error
+/// # Errors
 ///
 /// Returns an error if the decoded string is not valid UTF-8.
 /// This can happen if the input is a string that was not encoded by [`zalgo_encode`],
