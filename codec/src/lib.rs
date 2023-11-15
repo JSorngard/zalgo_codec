@@ -26,10 +26,14 @@
 //! ```
 //!
 //! # Features
-//! `std`: implements the [`std::error::Error`] trait for
-//! the provided [`Error`] type. If this feature is not enabled the library is `no_std`, but still links to the `alloc` crate.  
-//! `serde_support`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`].  
-//! `binary`: builds the test program that lets you apply the functions in the crate on text and files.
+//! 
+//! `std`: implements the [`std::error::Error`] trait for the provided [`Error`] type.
+//! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
+//! 
+//! `serde_support`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`]. 
+//! 
+//! `binary`: builds a test program that lets you apply the functions in the crate on text and files.
+//! Also enables the `std` feature.
 //!   
 //! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.

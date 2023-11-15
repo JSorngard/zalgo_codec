@@ -26,7 +26,7 @@ default = ["macro"]
 # Enables the "std" feature.
 binary = ["dep:clap", "std"]
 
-# Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`]
+# Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`].
 serde_support = ["zalgo-codec-common/serde_support"]
 
 # Enables the proc-macro [`zalgo_embed`]
@@ -34,7 +34,6 @@ macro = ["dep:zalgo-codec-macro"]
 
 # Enables the library to link to the standard library.
 # Used to implement the [`std::error::Error`] trait for [`zalgo_codec_common::Error`].
-# Automatically enabled by the "std" feature
 std = ["zalgo-codec-common/std"]
 
 [package.metadata.docs.rs]

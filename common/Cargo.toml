@@ -10,7 +10,7 @@ repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = {version = "1.0", features = ["derive"], optional = true}
+serde = {version = "1.0", default_features = false, features = ["alloc", "derive"], optional = true}
 
 [dev-dependencies]
 criterion = {version = "0.5", features = ["html_reports"]}
@@ -22,8 +22,8 @@ all-features = true
 [features]
 # Implements the [`Serialize`] and [`Deserialize`] traits from serde for the [`ZalgoString`] struct.
 serde_support = ["dep:serde"]
-# Lets the library depend on the std library. 
-# Used to e.g. implement the [`std::error::Error`] trait for [`zalgo_codec_common::Error`]
+
+# Implements the [`std::error::Error`] trait for [`zalgo_codec_common::Error`]
 std = []
 
 [[bench]]
