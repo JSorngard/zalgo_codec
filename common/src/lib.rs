@@ -224,11 +224,7 @@ impl fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        None
-    }
-}
+impl std::error::Error for Error {}
 
 /// Returns the representation of the given ASCII byte if it's not printable.
 #[inline]
