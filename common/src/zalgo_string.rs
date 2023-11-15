@@ -1,5 +1,12 @@
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
+
 use core::iter::{ExactSizeIterator, FusedIterator};
+
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Cow, string::String, vec::Vec};
+
+#[cfg(feature = "std")]
+use std::borrow::Cow;
 
 /// A [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
@@ -452,7 +459,7 @@ macro_rules! impl_partial_eq {
         )+
     };
 }
-impl_partial_eq! {String, &str, str, std::borrow::Cow<'a, str>}
+impl_partial_eq! {String, &str, str, Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -462,7 +469,9 @@ impl fmt::Display for ZalgoString {
 
 #[cfg(test)]
 mod test {
-    use super::ZalgoString;
+    use super::*;
+    #[cfg(not(feature = "std"))]
+    use alloc::string::ToString;
 
     #[test]
     fn check_into_decoded_string() {
@@ -490,6 +499,6 @@ mod test {
         let zs = ZalgoString::new("Zalgo\n He comes!").unwrap();
         assert_eq!(zs, enc);
         assert_eq!(zs, String::from(enc));
-        assert_eq!(zs, std::borrow::Cow::from(enc));
+        assert_eq!(zs, Cow::from(enc));
     }
 }

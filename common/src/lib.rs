@@ -38,6 +38,11 @@
 //! # Ok::<(), Error>(())
 //! ```
 //!
+//! # Features
+//! `std`: implements the [`std::error::Error`] trait for
+//! the provided [`Error`] type. If this feature is not enabled the library still links to the `alloc` crate.  
+//! `serde_support`: implements the [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits for [`ZalgoString`].
+//!
 //! # Explanation
 //!
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
@@ -53,7 +58,20 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.
 
+#![cfg_attr(all(not(test), not(feature = "std")), no_std)]
+
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    format,
+    string::{FromUtf8Error, String},
+    vec,
+    vec::Vec,
+};
 use core::{fmt, str};
+#[cfg(feature = "std")]
+use std::string::FromUtf8Error;
 
 /// Contains the implementation of [`ZalgoString`] as well as related iterators.
 pub mod zalgo_string;
@@ -168,7 +186,7 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// # Ok::<(), std::string::FromUtf8Error>(())
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
+pub fn zalgo_decode(encoded: &str) -> Result<String, FromUtf8Error> {
     let mut res = vec![0; (encoded.len() - 1) / 2];
     let bytes = encoded.as_bytes();
 
@@ -227,6 +245,8 @@ pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, Error> {
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// The error returned by [`zalgo_encode`], [`ZalgoString::new`], and [`zalgo_wrap_python`]
 /// if they encounter a byte they can not encode.
+///
+/// Only implements the [`Error`](std::error::Error) trait if the `std` feature is enabled.
 pub enum Error {
     /// Represents a valid ASCII character that is outside of the encodable set.
     UnencodableAscii(u8, usize, usize, &'static str),
@@ -319,6 +339,7 @@ impl fmt::Display for Error {
     }
 }
 
+#[cfg(feature = "std")]
 impl std::error::Error for Error {}
 
 /// Returns the representation of the given ASCII byte if it's not printable.

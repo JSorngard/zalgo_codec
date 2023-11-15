@@ -1,7 +1,7 @@
 [package]
 name = "zalgo-codec-common"
 authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner"]
-version = "0.9.0"
+version = "0.9.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "A crate for converting an ASCII text string to a single unicode grapheme cluster and back."
@@ -22,6 +22,9 @@ all-features = true
 [features]
 # Implements the [`Serialize`] and [`Deserialize`] traits from serde for the [`ZalgoString`] struct.
 serde_support = ["dep:serde"]
+# Lets the library depend on the std library. 
+# Used to e.g. implement the [`std::error::Error`] trait for [`zalgo_codec_common::Error`]
+std = []
 
 [[bench]]
 name = "codec_bench"

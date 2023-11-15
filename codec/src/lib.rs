@@ -24,6 +24,12 @@
 //! // The `add` function is now available
 //! assert_eq!(add(10, 20), 30);
 //! ```
+//!
+//! # Features
+//! `std`: implements the [`std::error::Error`] trait for
+//! the provided [`Error`] type. If this feature is not enabled the library is `no_std`, but still links to the `alloc` crate.  
+//! `serde_support`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`].  
+//! `binary`: builds the test program that lets you apply the functions in the crate on text and files.
 //!   
 //! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
@@ -39,6 +45,8 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.  
 
+#![cfg_attr(all(not(test), not(feature = "std")), no_std)]
+
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
 };
@@ -49,12 +57,12 @@ pub use zalgo_codec_macro::zalgo_embed;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core::str;
     use rand::{
         distributions::{DistString, Distribution},
         seq::SliceRandom,
         Rng,
     };
-    use std::str;
     use unicode_segmentation::UnicodeSegmentation;
 
     struct PrintableAsciiAndNewline;
