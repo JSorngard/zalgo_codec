@@ -16,14 +16,22 @@ pub use zalgo_string::ZalgoString;
 /// (though this can vary between platforms depending on how they deal with unicode).
 /// The resulting string will be ~2 times larger than the original in terms of bytes, and it
 /// can be decoded to recover the original string with [`zalgo_decode`].
+/// 
 /// # Example
+/// 
+/// Basic usage:
 /// ```
 /// # use zalgo_codec_common::{Error, zalgo_encode};
 /// assert_eq!(zalgo_encode("Zalgo")?, "É̺͇͌͏");
 /// # Ok::<(), Error>(())
 /// ```
-/// # Notes
-/// Can not encode carriage returns, present in e.g. line endings on Windows.
+/// Can not encode ASCII control characters except newlines.
+/// Notably this means that this function can not encode carriage returns,
+/// which are present in e.g. line endings on Windows:
+/// ```
+/// # use zalgo_codec_common::zalgo_encode;
+/// assert!(zalgo_encode("CRLF\r\n").is_err());
+/// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
     // The line we are currently encoding
@@ -84,17 +92,23 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
 ///
 /// # Examples
+/// Basic usage:
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
 /// # use std::string::FromUtf8Error;
 /// assert_eq!(zalgo_decode("É̺͇͌͏")?, "Zalgo");
 /// # Ok::<(), FromUtf8Error>(())
 /// ```
-/// Decoding arbitrary strings not produced by [`zalgo_encode`] will most likely lead to errors,
-/// and if it doesn't the results are not meaningful:
+/// Decoding arbitrary strings that were not produced by [`zalgo_encode`] will most likely lead to errors:
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
-/// assert!(zalgo_decode("Shmårgl").is_err());
+/// assert!(zalgo_decode("Zalgo").is_err());
+/// ```
+/// If it doesn't the results are not meaningful:
+/// ```
+/// # use zalgo_codec_common::zalgo_decode;
+/// assert_eq!(zalgo_decode("awö")?, "c");
+/// # Ok::<(), std::string::FromUtf8Error>(())
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, std::string::FromUtf8Error> {
@@ -136,7 +150,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// If the contents of the variable `py_hello_world_enc` in
 /// the above code snippet is saved to a file
 /// you can run it with python and it will produce the output
-/// that is expected of the code in the variable `py_hello_world`. 
+/// that is expected of the code in the variable `py_hello_world`.
 /// In the example below the file is named `enc.py`.
 /// ```bash
 /// $ python enc.py
