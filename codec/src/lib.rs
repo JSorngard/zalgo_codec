@@ -45,7 +45,7 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.  
 
-#![cfg_attr(all(not(test), not(feature = "std")), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
@@ -56,8 +56,11 @@ pub use zalgo_codec_macro::zalgo_embed;
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
+
     use super::*;
     use core::str;
+    use alloc::string::String;
     use rand::{
         distributions::{DistString, Distribution},
         seq::SliceRandom,
@@ -105,7 +108,7 @@ mod tests {
         let expr = "x + y";
 
         let encoded = zalgo_encode(expr).unwrap();
-        println!("{}", encoded);
+
         assert_eq!(encoded, "È͙̋̀͘");
 
         // It works on expressions, too!
@@ -132,7 +135,7 @@ mod tests {
             ASCII_CHAR_TABLE
         );
 
-        println!("Checking that randomly generated alphanumeric strings are encoded in a lossless fashion, and that they contain a single grapheme cluster");
+        // Checking that randomly generated alphanumeric strings are encoded in a lossless fashion, and that they contain a single grapheme cluster
         for _ in 0..100 {
             let s = PrintableAsciiAndNewline.sample_string(&mut rand::thread_rng(), 100);
             let encoded = zalgo_encode(&s).unwrap();
