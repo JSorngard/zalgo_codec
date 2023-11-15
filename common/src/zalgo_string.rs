@@ -5,7 +5,7 @@ use core::iter::{ExactSizeIterator, FusedIterator};
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// decoded and encoded form.
 ///
-/// If the `serde_support` feature is enabled this struct derives the
+/// If the `serde_support` feature is enabled this struct implements the
 /// [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(
