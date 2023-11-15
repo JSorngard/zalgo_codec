@@ -16,14 +16,14 @@ pub use zalgo_string::ZalgoString;
 /// (though this can vary between platforms depending on how they deal with unicode).
 /// The resulting string will be ~2 times larger than the original in terms of bytes, and it
 /// can be decoded to recover the original string with [`zalgo_decode`].
-/// 
+///
 /// # Errors
-/// 
+///
 /// Returns an error if the input contains a byte that does not correspond to a printable
 /// ASCII character or newline.
-/// 
+///
 /// # Example
-/// 
+///
 /// Basic usage:
 /// ```
 /// # use zalgo_codec_common::{Error, zalgo_encode};
