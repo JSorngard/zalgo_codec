@@ -120,7 +120,31 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// zalgo-encodes an ASCII string containing Python code and
 /// wraps it in a decoder that decodes and executes it.
 /// The resulting Python code should retain the functionality of the original.
+///
+/// # Example
+/// Encode a simple hello world program in Python
+/// ```
+/// # use zalgo_codec_common::{Error, zalgo_wrap_python};
+/// let py_hello_world = "print(\"Hello, world!\")\n";
+/// let py_hello_world_enc = zalgo_wrap_python(py_hello_world)?;
+/// assert_eq!(
+///     py_hello_world_enc,
+///     "b='Ę͉͎͔͐͒̈̂͌͌ͅ͏̌̀͗͏͒͌̈́́̂̉ͯ'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))",
+/// );
+/// # Ok::<(), Error>(())
+/// ```
+/// If the contents of the variable `py_hello_world_enc` in
+/// the above code snippet is saved to a file
+/// you can run it with python and it will produce the output
+/// that is expected of the code in the variable `py_hello_world`. 
+/// In the example below the file is named `enc.py`.
+/// ```bash
+/// $ python enc.py
+/// Hello, world!
+/// ```
+///
 /// # Known issues
+///
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
 #[must_use = "the function returns a new value and does not modify the input"]
