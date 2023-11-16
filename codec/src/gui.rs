@@ -149,6 +149,11 @@ impl Application for ZalgoCodecGui {
 }
 
 pub fn run() -> ! {
-    ZalgoCodecGui::run(iced::Settings::default()).unwrap();
-    std::process::exit(0);
+    match ZalgoCodecGui::run(iced::Settings::default()) {
+        Ok(()) => std::process::exit(0),
+        Err(e) => {
+            eprintln!("GUI failed with error: {e}");
+            std::process::exit(1);
+        }
+    }
 }
