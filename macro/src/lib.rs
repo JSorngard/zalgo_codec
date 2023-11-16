@@ -1,12 +1,12 @@
 //! This crate provides the proc-macro part of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/)
 //! by defining the procedural macro [`zalgo_embed!`].
-//! 
-//! It lets you take source code that's been converted into a single grapheme cluster by the 
+//!
+//! It lets you take source code that's been converted into a single grapheme cluster by the
 //! [`zalgo_encode`](zalgo_codec_common::zalgo_encode) function in the `zalgo-codec-common` crate
 //! and compile it as if it was never zalgo-ified.
-//! 
+//!
 //! # Example
-//! 
+//!
 //! If we run [`zalgo_encode`](zalgo_codec_common::zalgo_encode) on the text
 //! `fn add(x: i32, y: i32) -> i32 {x + y}` we can add the `add` function to our program
 //! by putting the resulting grapheme cluster inside [`zalgo_embed!`]:
