@@ -24,7 +24,8 @@ enum Source {
 enum Mode {
     #[cfg(feature = "gui")]
     /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
-    /// entered through a text box. Overrides all other options.
+    /// entered through a text box as well as copy the results or saving them to a file. 
+    /// Overrides all other options.
     Gui,
 
     /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
