@@ -148,7 +148,7 @@ impl Application for ZalgoCodecGui {
     }
 }
 
-pub fn run() -> ! {
+pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings::default()) {
         Ok(()) => std::process::exit(0),
         Err(e) => {
