@@ -114,36 +114,49 @@ impl Application for ZalgoCodecGui {
     }
 
     fn view(&self) -> Element<'_, Self::Message> {
+        const BUTTON_WIDTH: f32 = 70.0;
+        const SPACE_HEIGHT: f32 = 10.0;
         column![
             row![
                 column![
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     TextInput::new("Type or paste text here!", &self.input_field)
                         .on_input(|s| ToplevelMessage::User(UserAction::EditedInputText(s)))
                         .on_paste(|s| ToplevelMessage::User(UserAction::EditedInputText(s))),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     if self.working {
                         Button::new("Encode")
                     } else {
                         Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
                             GuiButton::Encode,
                         )))
-                    },
+                    }
+                    .width(Length::Fixed(BUTTON_WIDTH)),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     if self.working {
                         Button::new("Decode")
                     } else {
                         Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
                             GuiButton::Decode,
                         )))
-                    },
+                    }
+                    .width(Length::Fixed(BUTTON_WIDTH)),
                 ]
                 .width(Length::FillPortion(3)),
                 Space::with_width(Length::Fill),
                 column![
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     Text::new(&self.output_field),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     Button::new("Copy")
-                        .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Copy))),
-                    Button::new("Save as").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::SaveAs
-                    ))),
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Copy)))
+                        .width(Length::Fixed(BUTTON_WIDTH)),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
+                    Button::new("Save as")
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(
+                            GuiButton::SaveAs
+                        )))
+                        .width(Length::Fixed(BUTTON_WIDTH)),
                 ]
                 .width(Length::FillPortion(3)),
             ]
