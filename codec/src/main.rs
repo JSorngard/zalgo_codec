@@ -1,154 +1,140 @@
-use cli_clipboard::set_contents;
-use iced::{
-    self, executor,
-    widget::{button::Button, column, row, text::Text, text_input::TextInput, Space},
-    Application, Command, Element, Length, Theme,
-};
-use rfd::FileDialog;
+#[cfg(feature = "gui")]
+mod gui;
+
+use std::path::PathBuf;
+
+#[cfg(feature = "gui")]
+use gui::run;
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum GuiButton {
-    Encode,
-    Decode,
-    Copy,
-    SaveAs,
+use anyhow::{anyhow, Result};
+use clap::{Parser, Subcommand};
+
+#[derive(Debug, Clone, Subcommand)]
+enum Source {
+    /// Operate on all text after the command.
+    Text { text: Vec<String> },
+
+    /// Operate on the contents of the file at the path given after the command.
+    /// Ignores carriage return characters.
+    File { path: PathBuf },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum UserAction {
-    EditedInputText(String),
-    Pressed(GuiButton),
+#[derive(Debug, Clone, Subcommand)]
+enum Mode {
+    #[cfg(feature = "gui")]
+    /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
+    /// entered through a text box.
+    Gui,
+
+    /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
+    Encode {
+        #[command(subcommand)]
+        source: Source,
+    },
+
+    /// Turn python code into a decoder wrapped around encoded source code.
+    Wrap {
+        /// The path to the file that is to be encoded. Ignores carriage return characters.
+        path: PathBuf,
+    },
+
+    /// Turn text that has been encoded back into its normal form.
+    Decode {
+        #[command(subcommand)]
+        source: Source,
+    },
+
+    /// Unwrap and decode a wrapped python file.
+    Unwrap {
+        /// The path to the file to unwrap and decode.
+        path: PathBuf,
+    },
 }
 
-#[derive(Debug, Clone)]
-enum ToplevelMessage {
-    CodecFinished(String),
-    User(UserAction),
+#[derive(Debug, Clone, Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    mode: Mode,
+
+    #[arg(short, long)]
+    /// An optional path to a location where the result should be saved.
+    /// If this is left unspecified the result is printed to stdout
+    /// (not everything might appear visually, but it's still there).
+    /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
+    /// you might want to use this option instead of an OS pipe to save to a file
+    /// in order to avoid broken text. NOTE: If this option is used it must occur before any commands.
+    #[cfg_attr(feature = "gui", doc = "Does nothing if the GUI mode is selected")]
+    out_path: Option<PathBuf>,
+
+    #[arg(short, long, required = false, requires = "out_path")]
+    /// Overwrite the output file if it already exists.
+    /// Only valid if OUT_PATH is also provided
+    #[cfg_attr(feature = "gui", doc = "and the GUI mode is not selected")]
+    force: bool,
 }
 
-#[derive(Debug)]
-struct ZalgoCodecGui {
-    input_field: String,
-    output_field: String,
-    error_messages: Vec<String>,
-}
+fn main() -> Result<()> {
+    let config = Cli::parse();
 
-impl ZalgoCodecGui {
-    fn new() -> Self {
-        Self {
-            input_field: String::default(),
-            output_field: String::default(),
-            error_messages: Vec::default(),
-        }
-    }
-}
-
-impl Application for ZalgoCodecGui {
-    type Executor = executor::Default;
-    type Flags = ();
-    type Theme = Theme;
-    type Message = ToplevelMessage;
-
-    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        (ZalgoCodecGui::new(), Command::none())
-    }
-
-    fn title(&self) -> String {
-        String::from("zalgo codec GUI")
-    }
-
-    fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
-        match message {
-            Self::Message::CodecFinished(result) => {
-                self.output_field = result;
-                Command::none()
+    if let Some(ref destination) = config.out_path {
+        if destination.exists() && !config.force {
+            match config.mode {
+                #[cfg(feature = "gui")]
+                Mode::Gui => (),
+                _ => return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy())),
             }
-            Self::Message::User(action) => match action {
-                UserAction::EditedInputText(text) => {
-                    self.input_field = text;
-                    Command::none()
-                }
-                UserAction::Pressed(GuiButton::Encode) => {
-                    let input = self.input_field.clone();
-                    Command::perform(async move { zalgo_encode(&input) }, |res| {
-                        ToplevelMessage::CodecFinished(res.map_or_else(|e| e.to_string(), |ok| ok))
-                    })
-                }
-                UserAction::Pressed(GuiButton::Decode) => {
-                    let input = self.input_field.clone();
-                    if input.is_empty() {
-                        Command::perform(
-                            async { String::from("the input string was empty") },
-                            |s| ToplevelMessage::CodecFinished(s),
-                        )
-                    } else {
-                        Command::perform(async move { zalgo_decode(&input) }, |res| {
-                            ToplevelMessage::CodecFinished(
-                                res.map_or_else(|e| e.to_string(), |ok| ok),
-                            )
-                        })
-                    }
-                }
-                UserAction::Pressed(GuiButton::Copy) => {
-                    if let Err(e) = set_contents(self.output_field.clone()) {
-                        self.error_messages.push(e.to_string());
-                    }
-                    Command::none()
-                }
-                UserAction::Pressed(GuiButton::SaveAs) => {
-                    if let Some(path) = FileDialog::new().set_file_name("zalgo.txt").save_file() {
-                        if let Err(e) = std::fs::write(path, &self.output_field) {
-                            self.error_messages.push(e.to_string());
-                        }
-                    }
-                    Command::none()
-                }
-            },
         }
     }
 
-    fn view(&self) -> Element<'_, Self::Message> {
-        column![
-            row![
-                column![
-                    TextInput::new("Type or paste text here!", &self.input_field)
-                        .on_input(|s| ToplevelMessage::User(UserAction::EditedInputText(s)))
-                        .on_paste(|s| ToplevelMessage::User(UserAction::EditedInputText(s))),
-                    Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::Encode
-                    ))),
-                    Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::Decode
-                    ))),
-                ]
-                .width(Length::FillPortion(3)),
-                Space::with_width(Length::Fill),
-                column![
-                    Text::new(&self.output_field),
-                    Button::new("Copy")
-                        .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Copy))),
-                    Button::new("Save as").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::SaveAs
-                    ))),
-                ]
-                .width(Length::FillPortion(3)),
-            ]
-            .width(Length::Fill),
-            Text::new(
-                self.error_messages
-                    .iter()
-                    .rev()
-                    .fold(String::new(), |toast, msg| format!("{toast}\n{msg}"))
-            )
-            .width(Length::Fill),
-        ]
-        .width(Length::Fill)
-        .into()
-    }
-}
+    let output = match config.mode {
+        #[cfg(feature = "gui")]
+        Mode::Gui => run(),
+        Mode::Encode { source } => {
+            let text = match source {
+                Source::Text { text } => text.join(" "),
+                Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
+            };
+            zalgo_encode(&text)?
+        }
+        Mode::Wrap { path } => {
+            let text = std::fs::read_to_string(path)?.replace('\r', "");
+            zalgo_wrap_python(&text)?
+        }
+        Mode::Decode { source } => {
+            let encoded = match source {
+                Source::Text { mut text } => {
+                    if text.len() == 1 {
+                        Ok(text.swap_remove(0))
+                    } else {
+                        Err(anyhow!("can only decode one grapheme cluster at a time"))
+                    }?
+                }
+                Source::File { path } => std::fs::read_to_string(path)?.replace('\r', ""),
+            };
 
-fn main() {
-    let is = iced::Settings::default();
-    ZalgoCodecGui::run(is).unwrap()
+            zalgo_decode(&encoded)?
+        }
+        Mode::Unwrap { path } => {
+            let contents = std::fs::read_to_string(path)?;
+            let mut chars = contents.chars();
+            for _ in 0..3 {
+                chars.next();
+            }
+            for _ in 0..89 {
+                chars.next_back();
+            }
+            let encoded: String = chars.collect();
+            zalgo_decode(&encoded)?
+        }
+    };
+
+    match config.out_path {
+        Some(dst) => Ok(std::fs::write(dst, output)?),
+        None => {
+            println!("{output}");
+            Ok(())
+        }
+    }
 }
