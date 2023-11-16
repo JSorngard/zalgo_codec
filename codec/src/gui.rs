@@ -161,6 +161,7 @@ impl Application for ZalgoCodecGui {
     }
 }
 
+/// Runs the GUI version of the application and then exits.
 pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings {
         window: iced::window::Settings {
