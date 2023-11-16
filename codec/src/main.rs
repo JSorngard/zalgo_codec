@@ -24,7 +24,7 @@ enum Source {
 enum Mode {
     #[cfg(feature = "gui")]
     /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
-    /// entered through a text box as well as copy the results or saving them to a file. 
+    /// entered through a text box as well as copy the results or saving them to a file.
     /// Overrides all other options.
     Gui,
 

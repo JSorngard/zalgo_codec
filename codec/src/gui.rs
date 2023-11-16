@@ -11,6 +11,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
 enum GuiButton {
     Encode,
     Decode,
+    Wrap,
     Copy,
     SaveAs,
 }
@@ -95,6 +96,13 @@ impl Application for ZalgoCodecGui {
                         })
                     }
                 }
+                UserAction::Pressed(GuiButton::Wrap) => {
+                    self.working = true;
+                    let input = self.input_field.clone();
+                    Command::perform(async move { zalgo_wrap_python(&input) }, |res| {
+                        ToplevelMessage::CodecFinished(res.map_or_else(|e| e.to_string(), |ok| ok))
+                    })
+                }
                 UserAction::Pressed(GuiButton::Copy) => {
                     if let Err(e) = set_contents(self.output_field.clone()) {
                         self.error_messages.push(e.to_string());
@@ -141,6 +149,14 @@ impl Application for ZalgoCodecGui {
                         )))
                     }
                     .width(Length::Fixed(BUTTON_WIDTH)),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
+                    if self.working {
+                        Button::new("Wrap")
+                    } else {
+                        Button::new("Wrap")
+                            .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Wrap)))
+                    }
+                    .width(Length::Fixed(BUTTON_WIDTH)),
                 ]
                 .width(Length::FillPortion(3)),
                 Space::with_width(Length::Fill),
@@ -178,7 +194,7 @@ impl Application for ZalgoCodecGui {
 pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings {
         window: iced::window::Settings {
-            size: (500, 200),
+            size: (500, 180),
             ..Default::default()
         },
         ..Default::default()
