@@ -32,6 +32,7 @@ struct ZalgoCodecGui {
     input_field: String,
     output_field: String,
     error_messages: Vec<String>,
+    working: bool,
 }
 
 impl ZalgoCodecGui {
@@ -40,6 +41,7 @@ impl ZalgoCodecGui {
             input_field: String::default(),
             output_field: String::default(),
             error_messages: Vec::default(),
+            working: false,
         }
     }
 }
@@ -61,6 +63,7 @@ impl Application for ZalgoCodecGui {
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Self::Message::CodecFinished(result) => {
+                self.working = false;
                 self.output_field = result;
                 Command::none()
             }
@@ -71,6 +74,7 @@ impl Application for ZalgoCodecGui {
                 }
                 UserAction::Pressed(GuiButton::Encode) => {
                     let input = self.input_field.clone();
+                    self.working = true;
                     Command::perform(async move { zalgo_encode(&input) }, |res| {
                         ToplevelMessage::CodecFinished(res.map_or_else(|e| e.to_string(), |ok| ok))
                     })
@@ -83,6 +87,7 @@ impl Application for ZalgoCodecGui {
                             ToplevelMessage::CodecFinished,
                         )
                     } else {
+                        self.working = true;
                         Command::perform(async move { zalgo_decode(&input) }, |res| {
                             ToplevelMessage::CodecFinished(
                                 res.map_or_else(|e| e.to_string(), |ok| ok),
@@ -115,12 +120,20 @@ impl Application for ZalgoCodecGui {
                     TextInput::new("Type or paste text here!", &self.input_field)
                         .on_input(|s| ToplevelMessage::User(UserAction::EditedInputText(s)))
                         .on_paste(|s| ToplevelMessage::User(UserAction::EditedInputText(s))),
-                    Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::Encode
-                    ))),
-                    Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                        GuiButton::Decode
-                    ))),
+                    if self.working {
+                        Button::new("Encode")
+                    } else {
+                        Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
+                            GuiButton::Encode
+                        )))
+                    },
+                    if self.working {
+                        Button::new("Decode")
+                    } else {
+                        Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
+                            GuiButton::Decode
+                        )))
+                    },
                 ]
                 .width(Length::FillPortion(3)),
                 Space::with_width(Length::Fill),
