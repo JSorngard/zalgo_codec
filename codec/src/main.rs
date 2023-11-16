@@ -25,6 +25,7 @@ enum Mode {
     #[cfg(feature = "gui")]
     /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
     /// entered through a text box.
+    /// Overrides all other options.
     Gui,
 
     /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
@@ -65,13 +66,11 @@ struct Cli {
     /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
     /// you might want to use this option instead of an OS pipe to save to a file
     /// in order to avoid broken text. NOTE: If this option is used it must occur before any commands.
-    #[cfg_attr(feature = "gui", doc = "Does nothing if the GUI mode is selected")]
     out_path: Option<PathBuf>,
 
     #[arg(short, long, required = false, requires = "out_path")]
     /// Overwrite the output file if it already exists.
     /// Only valid if OUT_PATH is also provided
-    #[cfg_attr(feature = "gui", doc = "and the GUI mode is not selected")]
     force: bool,
 }
 
