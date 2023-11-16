@@ -124,14 +124,14 @@ impl Application for ZalgoCodecGui {
                         Button::new("Encode")
                     } else {
                         Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                            GuiButton::Encode
+                            GuiButton::Encode,
                         )))
                     },
                     if self.working {
                         Button::new("Decode")
                     } else {
                         Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
-                            GuiButton::Decode
+                            GuiButton::Decode,
                         )))
                     },
                 ]
@@ -162,7 +162,13 @@ impl Application for ZalgoCodecGui {
 }
 
 pub fn run_gui() -> ! {
-    match ZalgoCodecGui::run(iced::Settings::default()) {
+    match ZalgoCodecGui::run(iced::Settings {
+        window: iced::window::Settings {
+            size: (500, 200),
+            ..Default::default()
+        },
+        ..Default::default()
+    }) {
         Ok(()) => std::process::exit(0),
         Err(e) => {
             eprintln!("GUI failed with error: {e}");
