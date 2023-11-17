@@ -34,6 +34,8 @@
 //!
 //! `binary`: builds a test program that lets you apply the functions in the crate on text and files.
 //! Also enables the `std` feature.
+//! 
+//! `gui`: adds a GUI mode to the test program. Also enables the `binary` feature.
 //!   
 //! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
