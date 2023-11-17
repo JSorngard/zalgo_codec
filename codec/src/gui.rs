@@ -136,7 +136,7 @@ impl Application for ZalgoCodecGui {
                 UserAction::Pressed(GuiButton::Copy) => {
                     if let Err(e) = set_contents(self.output_field.clone()) {
                         let s = e.to_string();
-                        Command::perform(async move {}, |_| ToplevelMessage::PushNotification(s))
+                        Command::perform(async {}, |_| ToplevelMessage::PushNotification(s))
                     } else {
                         Command::none()
                     }
