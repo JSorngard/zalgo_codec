@@ -22,9 +22,16 @@ enum UserAction {
     Pressed(GuiButton),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum TimedAction {
+    PopNotification,
+}
+
 #[derive(Debug, Clone)]
 enum ToplevelMessage {
     CodecFinished(String),
+    TimerFinised(TimedAction),
+    PushNotification(String),
     User(UserAction),
 }
 
@@ -32,8 +39,7 @@ enum ToplevelMessage {
 struct ZalgoCodecGui {
     input_field: String,
     output_field: String,
-    error_messages: Vec<String>,
-    working: bool,
+    notifications: Vec<String>,
 }
 
 impl ZalgoCodecGui {
@@ -41,8 +47,7 @@ impl ZalgoCodecGui {
         Self {
             input_field: String::default(),
             output_field: String::default(),
-            error_messages: Vec::default(),
-            working: false,
+            notifications: Vec::default(),
         }
     }
 }
@@ -64,8 +69,20 @@ impl Application for ZalgoCodecGui {
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Self::Message::CodecFinished(result) => {
-                self.working = false;
                 self.output_field = result;
+                Command::none()
+            }
+            Self::Message::PushNotification(notification) => {
+                self.notifications.push(notification);
+                Command::perform(
+                    async { std::thread::sleep(std::time::Duration::from_secs(5)) },
+                    |_| ToplevelMessage::TimerFinised(TimedAction::PopNotification),
+                )
+            }
+            Self::Message::TimerFinised(action) => {
+                match action {
+                    TimedAction::PopNotification => self.notifications.pop(),
+                };
                 Command::none()
             }
             Self::Message::User(action) => match action {
@@ -75,9 +92,9 @@ impl Application for ZalgoCodecGui {
                 }
                 UserAction::Pressed(GuiButton::Encode) => {
                     let input = self.input_field.clone();
-                    self.working = true;
-                    Command::perform(async move { zalgo_encode(&input) }, |res| {
-                        ToplevelMessage::CodecFinished(res.map_or_else(|e| e.to_string(), |ok| ok))
+                    Command::perform(async move { zalgo_encode(&input) }, |res| match res {
+                        Ok(encoded) => ToplevelMessage::CodecFinished(encoded),
+                        Err(e) => ToplevelMessage::PushNotification(e.to_string()),
                     })
                 }
                 UserAction::Pressed(GuiButton::Decode) => {
@@ -85,37 +102,41 @@ impl Application for ZalgoCodecGui {
                     if input.is_empty() {
                         Command::perform(
                             async { String::from("the input string was empty") },
-                            ToplevelMessage::CodecFinished,
+                            |s| ToplevelMessage::PushNotification(s),
                         )
                     } else {
-                        self.working = true;
-                        Command::perform(async move { zalgo_decode(&input) }, |res| {
-                            ToplevelMessage::CodecFinished(
-                                res.map_or_else(|e| e.to_string(), |ok| ok),
-                            )
+                        Command::perform(async move { zalgo_decode(&input) }, |res| match res {
+                            Ok(decoded) => ToplevelMessage::CodecFinished(decoded),
+                            Err(e) => ToplevelMessage::PushNotification(e.to_string()),
                         })
                     }
                 }
                 UserAction::Pressed(GuiButton::Wrap) => {
-                    self.working = true;
                     let input = self.input_field.clone();
-                    Command::perform(async move { zalgo_wrap_python(&input) }, |res| {
-                        ToplevelMessage::CodecFinished(res.map_or_else(|e| e.to_string(), |ok| ok))
+                    Command::perform(async move { zalgo_wrap_python(&input) }, |res| match res {
+                        Ok(wrapped) => ToplevelMessage::CodecFinished(wrapped),
+                        Err(e) => ToplevelMessage::PushNotification(e.to_string()),
                     })
                 }
                 UserAction::Pressed(GuiButton::Copy) => {
                     if let Err(e) = set_contents(self.output_field.clone()) {
-                        self.error_messages.push(e.to_string());
+                        let s = e.to_string();
+                        Command::perform(async move {}, |_| ToplevelMessage::PushNotification(s))
+                    } else {
+                        Command::none()
                     }
-                    Command::none()
                 }
                 UserAction::Pressed(GuiButton::SaveAs) => {
                     if let Some(path) = FileDialog::new().set_file_name("zalgo.txt").save_file() {
                         if let Err(e) = std::fs::write(path, &self.output_field) {
-                            self.error_messages.push(e.to_string());
+                            let s = e.to_string();
+                            Command::perform(async {}, |_| ToplevelMessage::PushNotification(s))
+                        } else {
+                            Command::none()
                         }
+                    } else {
+                        Command::none()
                     }
-                    Command::none()
                 }
             },
         }
@@ -132,31 +153,21 @@ impl Application for ZalgoCodecGui {
                         .on_input(|s| ToplevelMessage::User(UserAction::EditedInputText(s)))
                         .on_paste(|s| ToplevelMessage::User(UserAction::EditedInputText(s))),
                     Space::with_height(Length::Fixed(SPACE_HEIGHT)),
-                    if self.working {
-                        Button::new("Encode")
-                    } else {
-                        Button::new("Encode").on_press(ToplevelMessage::User(UserAction::Pressed(
+                    Button::new("Encode")
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(
                             GuiButton::Encode,
                         )))
-                    }
-                    .width(Length::Fixed(BUTTON_WIDTH)),
+                        .width(Length::Fixed(BUTTON_WIDTH)),
                     Space::with_height(Length::Fixed(SPACE_HEIGHT)),
-                    if self.working {
-                        Button::new("Decode")
-                    } else {
-                        Button::new("Decode").on_press(ToplevelMessage::User(UserAction::Pressed(
+                    Button::new("Decode")
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(
                             GuiButton::Decode,
                         )))
-                    }
-                    .width(Length::Fixed(BUTTON_WIDTH)),
+                        .width(Length::Fixed(BUTTON_WIDTH)),
                     Space::with_height(Length::Fixed(SPACE_HEIGHT)),
-                    if self.working {
-                        Button::new("Wrap")
-                    } else {
-                        Button::new("Wrap")
-                            .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Wrap)))
-                    }
-                    .width(Length::Fixed(BUTTON_WIDTH)),
+                    Button::new("Wrap")
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Wrap)))
+                        .width(Length::Fixed(BUTTON_WIDTH)),
                 ]
                 .width(Length::FillPortion(3)),
                 Space::with_width(Length::Fill),
@@ -178,12 +189,13 @@ impl Application for ZalgoCodecGui {
             ]
             .width(Length::Fill),
             Text::new(
-                self.error_messages
+                self.notifications
                     .iter()
                     .rev()
                     .fold(String::new(), |toast, msg| format!("{toast}\n{msg}"))
             )
-            .width(Length::Fill),
+            .width(Length::Fill)
+            .height(Length::Fill),
         ]
         .width(Length::Fill)
         .into()
@@ -194,7 +206,7 @@ impl Application for ZalgoCodecGui {
 pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings {
         window: iced::window::Settings {
-            size: (500, 180),
+            size: (500, 250),
             ..Default::default()
         },
         ..Default::default()
