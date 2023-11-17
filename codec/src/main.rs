@@ -121,7 +121,7 @@ fn main() -> Result<()> {
             for _ in 0..3 {
                 chars.next();
             }
-            for _ in 0..89 {
+            for _ in 0..88 {
                 chars.next_back();
             }
             let encoded: String = chars.collect();

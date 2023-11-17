@@ -12,6 +12,7 @@ enum GuiButton {
     Encode,
     Decode,
     Wrap,
+    Unwrap,
     Copy,
     SaveAs,
 }
@@ -118,6 +119,20 @@ impl Application for ZalgoCodecGui {
                         Err(e) => ToplevelMessage::PushNotification(e.to_string()),
                     })
                 }
+                UserAction::Pressed(GuiButton::Unwrap) => {
+                    let mut chars = self.input_field.chars();
+                    for _ in 0..3 {
+                        chars.next();
+                    }
+                    for _ in 0..88 {
+                        chars.next_back();
+                    }
+                    let encoded: String = chars.collect();
+                    Command::perform(async move { zalgo_decode(&encoded) }, |res| match res {
+                        Ok(unwrapped) => ToplevelMessage::CodecFinished(unwrapped),
+                        Err(e) => ToplevelMessage::PushNotification(e.to_string()),
+                    })
+                }
                 UserAction::Pressed(GuiButton::Copy) => {
                     if let Err(e) = set_contents(self.output_field.clone()) {
                         let s = e.to_string();
@@ -167,6 +182,12 @@ impl Application for ZalgoCodecGui {
                     Space::with_height(Length::Fixed(SPACE_HEIGHT)),
                     Button::new("Wrap")
                         .on_press(ToplevelMessage::User(UserAction::Pressed(GuiButton::Wrap)))
+                        .width(Length::Fixed(BUTTON_WIDTH)),
+                    Space::with_height(Length::Fixed(SPACE_HEIGHT)),
+                    Button::new("Unwrap")
+                        .on_press(ToplevelMessage::User(UserAction::Pressed(
+                            GuiButton::Unwrap
+                        )))
                         .width(Length::Fixed(BUTTON_WIDTH)),
                 ]
                 .width(Length::FillPortion(3)),
