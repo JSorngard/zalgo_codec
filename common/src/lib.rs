@@ -30,11 +30,22 @@
 //! # use zalgo_codec_common::{ZalgoString, Error};
 //! let s = "Zalgo";
 //! let zstr = ZalgoString::new(s)?;
+//!
+//! // Implements PartialEq with common string types
 //! assert_eq!(zstr, "É̺͇͌͏");
+//!
+//! // Utility functions
 //! assert_eq!(zstr.len(), 2 * s.len() + 1);
 //! assert_eq!(zstr.decoded_len(), s.len());
+//!
+//! // Iterate over bytes and chars, in both encoded and decoded form
 //! assert_eq!(zstr.bytes().next(), Some(69));
+//! assert_eq!(zstr.decoded_bytes().nth_back(2), Some(b'l'));
+//! assert_eq!(zstr.chars().nth(1), Some('\u{33a}'));
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
+//!
+//! // Decode inplace
+//! assert_eq!(zstr.into_decoded_string(), "Zalgo");
 //! # Ok::<(), Error>(())
 //! ```
 //!
