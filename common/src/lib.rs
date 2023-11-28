@@ -50,6 +50,7 @@
 //! ```
 //!
 //! # Features
+//! 
 //! `std`: implements the [`std::error::Error`] trait for the provided [`Error`] type.
 //! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
 //!
