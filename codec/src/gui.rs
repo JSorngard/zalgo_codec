@@ -227,7 +227,7 @@ impl Application for ZalgoCodecGui {
 pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings {
         window: iced::window::Settings {
-            size: (500, 250),
+            size: (500, 300),
             ..Default::default()
         },
         ..Default::default()
