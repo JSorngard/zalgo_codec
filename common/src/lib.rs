@@ -30,11 +30,22 @@
 //! # use zalgo_codec_common::{ZalgoString, Error};
 //! let s = "Zalgo";
 //! let zstr = ZalgoString::new(s)?;
+//!
+//! // Implements PartialEq with common string types
 //! assert_eq!(zstr, "É̺͇͌͏");
+//!
+//! // Utility functions
 //! assert_eq!(zstr.len(), 2 * s.len() + 1);
 //! assert_eq!(zstr.decoded_len(), s.len());
+//!
+//! // Iterate over bytes and chars, in both encoded and decoded form
 //! assert_eq!(zstr.bytes().next(), Some(69));
+//! assert_eq!(zstr.decoded_bytes().nth_back(2), Some(b'l'));
+//! assert_eq!(zstr.chars().nth(1), Some('\u{33a}'));
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
+//!
+//! // Decode inplace
+//! assert_eq!(zstr.into_decoded_string(), "Zalgo");
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -42,7 +53,7 @@
 //! `std`: implements the [`std::error::Error`] trait for the provided [`Error`] type.
 //! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
 //!
-//! `serde_support`: implements the [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits for [`ZalgoString`].
+//! `serde`: implements the [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits for [`ZalgoString`].
 //!
 //! # Explanation
 //!
@@ -58,6 +69,12 @@
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.
+//!
+//! # Executable
+//!
+//! There is an executable available for experimenting with the codec on text and files.
+//! It can be installed with `cargo install zalgo-codec --features binary`.
+//! You can optionally enable the `gui` feature to include an optional GUI mode for the program.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 

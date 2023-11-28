@@ -1,41 +1,55 @@
+#[cfg(feature = "gui")]
+mod gui;
+
+use std::path::PathBuf;
+
+#[cfg(feature = "gui")]
+use gui::run_gui;
+use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
+
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
-use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
 
 #[derive(Debug, Clone, Subcommand)]
 enum Source {
-    /// Operate on all text after the command
+    /// Operate on all text after the command.
     Text { text: Vec<String> },
 
     /// Operate on the contents of the file at the path given after the command.
-    /// Ignores carriage return characters
+    /// Ignores carriage return characters.
     File { path: PathBuf },
 }
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
-    /// Turn normal (printable ascii + newline) text into a single grapheme cluster
+    #[cfg(feature = "gui")]
+    /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
+    /// entered through a text box as well as copy the results or save them to a file.
+    /// It is currently not possible to enter newlines into the text box.
+    /// Overrides all other options.
+    Gui,
+
+    /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
     Encode {
         #[command(subcommand)]
         source: Source,
     },
 
-    /// Turn python code into a decoder wrapped around encoded source code
+    /// Turn python code into a decoder wrapped around encoded source code.
     Wrap {
-        /// The path to the file that is to be encoded. Ignores carriage return characters
+        /// The path to the file that is to be encoded. Ignores carriage return characters.
         path: PathBuf,
     },
 
-    /// Turn text that has been encoded back into its normal form
+    /// Turn text that has been encoded back into its normal form.
     Decode {
         #[command(subcommand)]
         source: Source,
     },
 
-    /// Unwrap and decode a wrapped python file
+    /// Unwrap and decode a wrapped python file.
     Unwrap {
-        /// The path to the file to unwrap and decode
+        /// The path to the file to unwrap and decode.
         path: PathBuf,
     },
 }
@@ -52,7 +66,7 @@ struct Cli {
     /// (not everything might appear visually, but it's still there).
     /// If your OS uses a text encoding other than UTF-8 (e.g. Windows uses UTF-16)
     /// you might want to use this option instead of an OS pipe to save to a file
-    /// in order to avoid broken text. NOTE: If this option is used it must occur before any commands
+    /// in order to avoid broken text. NOTE: If this option is used it must occur before any commands.
     out_path: Option<PathBuf>,
 
     #[arg(short, long, required = false, requires = "out_path")]
@@ -66,11 +80,17 @@ fn main() -> Result<()> {
 
     if let Some(ref destination) = config.out_path {
         if destination.exists() && !config.force {
-            return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()));
+            match config.mode {
+                #[cfg(feature = "gui")]
+                Mode::Gui => (),
+                _ => return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy())),
+            }
         }
     }
 
     let output = match config.mode {
+        #[cfg(feature = "gui")]
+        Mode::Gui => run_gui(),
         Mode::Encode { source } => {
             let text = match source {
                 Source::Text { text } => text.join(" "),

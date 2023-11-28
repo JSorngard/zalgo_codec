@@ -12,13 +12,10 @@ use std::borrow::Cow;
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// decoded and encoded form.
 ///
-/// If the `serde_support` feature is enabled this struct implements the
+/// If the `serde` feature is enabled this struct implements the
 /// [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ZalgoString {
     string: String,
 }

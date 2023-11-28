@@ -12,8 +12,11 @@ description = "A crate for converting an ASCII text string to a single unicode g
 [dependencies]
 zalgo-codec-common = {path = "../common"}
 zalgo-codec-macro = {path = "../macro", optional = true}
-clap = {version = "4.4", features = ["derive"], optional = true}
 anyhow = "1.0"
+iced = {version = "0.10", optional = true}
+rfd = {version = "0.12", optional = true}
+cli-clipboard = {version = "0.4", optional = true}
+clap = {version = "4.4", features = ["derive"], optional = true}
 
 [dev-dependencies]
 rand = "0.8"
@@ -22,12 +25,14 @@ unicode-segmentation = "1.10.1"
 [features]
 default = ["macro"]
 
-# Builds a binary that can be used to test out the codec
-# Enables the "std" feature.
-binary = ["dep:clap", "std"]
+# Builds a binary that can be used to test out the codec.
+binary = ["std", "dep:clap"]
+
+# Builds an optional GUI into the binary.
+gui = ["binary", "dep:iced", "dep:rfd", "dep:cli-clipboard"]
 
 # Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`].
-serde_support = ["zalgo-codec-common/serde_support"]
+serde = ["zalgo-codec-common/serde"]
 
 # Enables the proc-macro [`zalgo_embed`]
 macro = ["dep:zalgo-codec-macro"]

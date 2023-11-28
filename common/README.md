@@ -8,7 +8,7 @@ There are two ways of interacting with the codec.
 The first is to call the encoding and decoding functions directly,
 and the second is to use the `ZalgoString` wrapper type.
 
-# Examples
+## Examples
 
 Encode a string to a grapheme cluster with `zalgo_encode`:
 ```rust
@@ -33,7 +33,7 @@ assert_eq!(zstr.bytes().next(), Some(69));
 assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 ```
 
-# Explanation
+## Explanation
 Characters U+0300–U+036F are the combining characters for unicode Latin.
 The fun thing about combining characters is that you can add as many of these characters
 as you like to the original character and it does not create any new symbols,
@@ -46,3 +46,9 @@ which nicely maps to the ASCII character range 0x20 -> 0x7F, aka all the non-con
 The only issue is that we can't have new lines in this system, so to fix that,
 we can simply map 0x7F (DEL) to 0x0A (LF).
 This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.
+
+## Experiment with the codec
+
+There is an executable available for experimenting with the codec on text and files.
+It can be installed with `cargo install zalgo-codec --features binary`. 
+You can optionally enable the `gui` feature during installation to include a GUI mode for the program.
