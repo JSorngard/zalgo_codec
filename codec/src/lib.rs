@@ -62,7 +62,7 @@
 //! `serde`: implements the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].
 //!   
 //! # Explanation
-//! 
+//!
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
 //! The fun thing about combining characters is that you can add as many of these characters
 //! as you like to the original character and it does not create any new symbols,
