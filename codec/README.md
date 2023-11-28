@@ -65,7 +65,7 @@ Characters U+0300–U+036F are the combining characters for unicode Latin. The f
 
 ## Experiment with the codec
 
-The crate also contains a small program that lets you test the codec by encoding/decoding text and files.  
+The crate contains a small program that lets you test the codec by encoding/decoding text and files.  
 if you want to install it from crates.io you can do so with `cargo install zalgo-codec --features binary`. 
 You can also optionally enable the `gui` feature to give the program a GUI mode.
 
