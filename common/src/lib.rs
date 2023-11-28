@@ -73,7 +73,7 @@
 //! # Experiment with the codec
 //!
 //! There is an executable available for experimenting with the codec on text and files.
-//! It can be installed with `cargo install zalgo-codec --features binary`. 
+//! It can be installed with `cargo install zalgo-codec --features binary`.
 //! You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
 
 #![cfg_attr(not(feature = "std"), no_std)]
