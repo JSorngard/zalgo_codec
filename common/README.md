@@ -51,4 +51,4 @@ This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHA
 
 There is an executable available for experimenting with the codec on text and files.
 It can be installed with `cargo install zalgo-codec --features binary`. 
-You can optionally enable the `gui` feature during installation to include a GUI mode for the program.
+You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.

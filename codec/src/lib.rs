@@ -4,9 +4,6 @@
 //!
 //! The encoded string will be ~2 times larger than the original in terms of bytes.
 //!
-//! A small program that lets you use the functions in the crate on text and files is included in the source repository and can be installed with
-//! `cargo install zalgo-codec --features binary`.
-//!
 //! Additionally the crate provides a function to encode Python code and wrap the result in a decoder that
 //! decodes and executes the encoded string, retaining the functionality of the original code.
 //!
@@ -31,11 +28,6 @@
 //! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
 //!
 //! `serde`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`].
-//!
-//! `binary`: builds a test program that lets you apply the functions in the crate on text and files.
-//! Also enables the `std` feature.
-//!
-//! `gui`: adds a GUI mode to the test program. Also enables the `binary` feature.
 //!   
 //! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
@@ -50,6 +42,12 @@
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.  
+//! 
+//! # Experiment with the codec
+//! 
+//! There is an executable available for experimenting with the codec on text and files.
+//! It can be installed with `cargo install zalgo-codec --features binary`. 
+//! You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
