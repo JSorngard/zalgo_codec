@@ -2,6 +2,7 @@
 name = "zalgo-codec-macro"
 version = "0.1.16"
 edition = "2021"
+keywords = ["unicode", "obfuscation", "encoding", "zalgo"]
 authors = ["Alex Keizer (alex@keizer.dev)", "Johanna Sörngård (jsorngard@gmail.com)"]
 description = "Provides the zalgo_embed! macro for compiling source code that's been converted into a single grapheme cluster by the zalgo-codec-common crate"
 repository = "https://github.com/JSorngard/zalgo_codec/tree/main/macro"
