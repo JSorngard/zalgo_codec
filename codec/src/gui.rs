@@ -209,6 +209,7 @@ impl Application for ZalgoCodecGui {
                 .width(Length::FillPortion(3)),
             ]
             .width(Length::Fill),
+            Space::with_height(SPACE_HEIGHT),
             Text::new(
                 self.notifications
                     .iter()
