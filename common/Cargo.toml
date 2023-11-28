@@ -21,8 +21,6 @@ rand = "0.8"
 all-features = true
 
 [features]
-default = ["std"]
-
 # Implements the [`Serialize`] and [`Deserialize`] traits from serde for the [`ZalgoString`] struct.
 serde = ["dep:serde"]
 
