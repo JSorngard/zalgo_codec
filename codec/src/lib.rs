@@ -11,11 +11,43 @@
 //! The first one is to call the encoding and decoding functions directly,
 //! and the second one is to use the [`ZalgoString`] wrapper type.
 //!
-//! # Example
-//! The cursed character is the result of using [`zalgo_encode`] on the text `fn add(x: i32, y: i32) -> i32 {x + y}`.
+//! # Examples
+//!
+//! Encode a string to a grapheme cluster with `zalgo_encode`:
+//! ```
+//! # use zalgo_codec::{Error, zalgo_encode};
+//! let s = "Zalgo";
+//! let encoded = zalgo_encode(s)?;
+//! assert_eq!(encoded, "É̺͇͌͏");
+//! # Ok::<(), Error>(())
+//! ```
+//! Decode a grapheme cluster back into a string:
+//! ```
+//! # use zalgo_codec::zalgo_decode;
+//! # extern crate alloc;
+//! # use alloc::string::FromUtf8Error;
+//! let encoded = "É̺͇͌͏";
+//! let s = zalgo_decode(encoded)?;
+//! assert_eq!(s, "Zalgo");
+//! # Ok::<(), FromUtf8Error>(())
+//! ```
+//! The `ZalgoString` type can be used to encode a string and handle the result in various ways:
+//! ```
+//! # use zalgo_codec::{Error, ZalgoString};
+//! let s = "Zalgo";
+//! let zstr = ZalgoString::new(s)?;
+//! assert_eq!(zstr, "É̺͇͌͏");
+//! assert_eq!(zstr.len(), 2 * s.len() + 1);
+//! assert_eq!(zstr.decoded_len(), s.len());
+//! assert_eq!(zstr.bytes().next(), Some(69));
+//! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
+//! # Ok::<(), Error>(())
+//! ```
+//!
+//! Encode rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro.
 //! ```
 //! # use zalgo_codec::zalgo_embed;
-//! // We can add that text to our code with the macro
+//! // This grapheme cluster was made by encoding "fn add(x: i32, y: i32) -> i32 {x + y}".
 //! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //!
 //! // The `add` function is now available
@@ -24,10 +56,10 @@
 //!
 //! # Features
 //!
-//! `std`: implements the [`std::error::Error`] trait for the provided [`Error`] type.
+//! `std`: links the standard library and uses it to implement the [`std::error::Error`] trait for the provided [`Error`] type.
 //! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
 //!
-//! `serde`: implements the `Serialize` and `Deserialize` traits from `serde` for [`ZalgoString`].
+//! `serde`: implements the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].
 //!   
 //! # Explanation
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
