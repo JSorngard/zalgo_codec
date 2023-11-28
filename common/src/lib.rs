@@ -69,6 +69,12 @@
 //! The only issue is that we can't have new lines in this system, so to fix that,
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.
+//! 
+//! # Executable
+//! 
+//! There is an executable available for experimenting with the codec on text and files.
+//! It can be installed with `cargo install zalgo-codec --features binary`. 
+//! You can optionally enable the `gui` feature to include an optional GUI mode for the program.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
