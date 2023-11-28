@@ -3,6 +3,7 @@ name = "zalgo-codec"
 authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner", "Alex Keizer (alex@keizer.dev)"]
 version = "0.9.1"
 edition = "2021"
+keywords = ["unicode", "obfuscation", "encoding", "zalgo"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/JSorngard/zalgo_codec"
 description = "A crate for converting an ASCII text string to a single unicode grapheme cluster and back. Provides a macro for embedding Rust source code that has been encoded in this way. Additionally provides a function that encodes Python code and wraps it in a decoder so that it retains its functionality."
