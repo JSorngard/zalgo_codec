@@ -44,7 +44,7 @@
 //! # Ok::<(), Error>(())
 //! ```
 //!
-//! Encode rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro.
+//! Encode Rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro.
 //! ```
 //! # use zalgo_codec::zalgo_embed;
 //! // This grapheme cluster was made by encoding "fn add(x: i32, y: i32) -> i32 {x + y}".
