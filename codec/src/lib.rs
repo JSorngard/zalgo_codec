@@ -31,7 +31,7 @@
 //! assert_eq!(s, "Zalgo");
 //! # Ok::<(), FromUtf8Error>(())
 //! ```
-//! The `ZalgoString` type can be used to encode a string and handle the result in various ways:
+//! The [`ZalgoString`] type can be used to encode a string and handle the result in various ways:
 //! ```
 //! # use zalgo_codec::{Error, ZalgoString};
 //! let s = "Zalgo";
