@@ -1,5 +1,4 @@
 [![Latest Version](https://img.shields.io/crates/v/zalgo-codec.svg)](https://crates.io/crates/zalgo-codec)
-[![Build Status](https://github.com/JSorngard/zalgo_codec/actions/workflows/rust.yml/badge.svg)](https://github.com/JSorngard/zalgo_codec/actions/workflows/rust.yml)
 
 # zalgo codec
 
