@@ -51,8 +51,8 @@
 //!
 //! # Features
 //!
-//! `std`: links the standard library and uses it to implement the [`std::error::Error`] trait for the provided [`Error`] type.
-//! If this feature is not enabled the library is `no_std`, but still uses the `alloc` crate.
+//! `std` *(enabled by default)*: links the standard library and uses it to implement the [`std::error::Error`] trait for the provided [`Error`] type.
+//! If this feature is not enabled the library is `#[no_std]`, but still uses the `alloc` crate.
 //!
 //! `serde`: implements the [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits
 //! from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].

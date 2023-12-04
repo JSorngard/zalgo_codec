@@ -24,7 +24,7 @@ rand = "0.8"
 unicode-segmentation = "1.10.1"
 
 [features]
-default = ["macro"]
+default = ["macro", "std"]
 
 # Builds a binary that can be used to test out the codec.
 binary = ["std", "dep:clap"]
