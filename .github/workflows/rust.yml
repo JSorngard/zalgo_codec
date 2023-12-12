@@ -56,7 +56,7 @@ jobs:
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
       - name: cargo llvm-cov
-        run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
+        run: cargo llvm-cov --all-features --lcov --output-path lcov.info
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
