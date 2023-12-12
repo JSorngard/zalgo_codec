@@ -42,7 +42,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: cargo build --features binary,gui
+      run: cargo build --features binary
   coverage:
     runs-on: ubuntu-latest
     steps:
