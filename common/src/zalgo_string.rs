@@ -20,7 +20,9 @@ pub struct ZalgoString(String);
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
+    ///
     /// # Errors
+    ///
     /// Returns an error if the input string contains bytes that don't correspond to printable
     /// ASCII characters or newlines.
     /// # Examples
@@ -43,7 +45,9 @@ impl ZalgoString {
     }
 
     /// Returns the *encoded* contents of `self` as a string slice.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -72,7 +76,9 @@ impl ZalgoString {
     /// Returns an iterator over the encoded characters of the `ZalgoString`.
     ///
     /// The first character is an "E", the others are unicode combining characters.
+    ///
     /// # Example
+    ///
     /// Iterate through the encoded [`char`]s:
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -92,6 +98,7 @@ impl ZalgoString {
     /// Returns an iterator over the encoded characters of the `ZalgoString` and their positions.
     ///
     /// # Example
+    ///
     /// Combining characters lie deep in the dark depths of Unicode,
     /// and may not match with your intuition of what a character is.
     /// ```
@@ -118,6 +125,7 @@ impl ZalgoString {
     /// Returns an iterator over the decoded characters of the `ZalgoString`.
     ///
     /// These characters are guaranteed to be valid ASCII.
+    ///
     /// # Example
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -144,7 +152,9 @@ impl ZalgoString {
     /// Converts `self` into a `String`.
     ///
     /// This simply returns the underlying `String` without any cloning or decoding.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -163,7 +173,9 @@ impl ZalgoString {
     /// Decodes `self` into a `String` in-place.
     ///
     /// This method has no effect on the allocated capacity.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -184,7 +196,9 @@ impl ZalgoString {
     /// Returns the encoded contents of `self` as a byte slice.
     ///
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -206,7 +220,9 @@ impl ZalgoString {
     ///
     /// Since a `ZalgoString` always begins with an "E", the first byte is always 69.
     /// After that the bytes no longer correspond to ASCII values.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -226,6 +242,7 @@ impl ZalgoString {
     /// Returns an iterator over the decoded bytes of the `ZalgoString`.
     ///
     /// These bytes are guaranteed to represent valid ASCII.
+    ///
     /// # Example
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -249,7 +266,9 @@ impl ZalgoString {
 
     /// Converts `self` into a byte vector.
     /// This simply returns the underlying buffer without any cloning or decoding.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -268,7 +287,9 @@ impl ZalgoString {
     /// Decodes `self` into a byte vector in-place.
     ///
     /// This method has no effect on the allocated capacity.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -293,7 +314,9 @@ impl ZalgoString {
     /// Returns the length of `self` in bytes.
     ///
     /// This length is twice the length of the original `String` plus one.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -326,7 +349,9 @@ impl ZalgoString {
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
     ///
     /// This is computed without any decoding.
+    ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
@@ -346,6 +371,7 @@ impl ZalgoString {
     /// Returns whether the string would be empty if decoded.
     ///
     /// # Example
+    ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
