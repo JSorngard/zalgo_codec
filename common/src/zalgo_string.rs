@@ -16,9 +16,7 @@ use std::borrow::Cow;
 /// [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ZalgoString {
-    string: String,
-}
+pub struct ZalgoString(String);
 
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
@@ -41,7 +39,7 @@ impl ZalgoString {
     /// ```
     #[must_use = "this function returns a new `ZalgoString` and does not modify the input"]
     pub fn new(s: &str) -> Result<Self, Error> {
-        zalgo_encode(s).map(|string| Self { string })
+        zalgo_encode(s).map(|string| Self(string))
     }
 
     /// Returns the *encoded* contents of `self` as a string slice.
@@ -68,7 +66,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_str(&self) -> &str {
-        &self.string
+        &self.0
     }
 
     /// Returns an iterator over the encoded characters of the `ZalgoString`.
@@ -88,7 +86,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn chars(&self) -> core::str::Chars<'_> {
-        self.string.chars()
+        self.0.chars()
     }
 
     /// Returns an iterator over the encoded characters of the `ZalgoString` and their positions.
@@ -114,7 +112,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn char_indices(&self) -> core::str::CharIndices<'_> {
-        self.string.char_indices()
+        self.0.char_indices()
     }
 
     /// Returns an iterator over the decoded characters of the `ZalgoString`.
@@ -159,7 +157,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_string(self) -> String {
-        self.string
+        self.0
     }
 
     /// Decodes `self` into a `String` in-place.
@@ -201,7 +199,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_bytes(&self) -> &[u8] {
-        self.string.as_bytes()
+        self.0.as_bytes()
     }
 
     /// Returns an iterator over the encoded bytes of the `ZalgoString`.
@@ -222,7 +220,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn bytes(&self) -> core::str::Bytes<'_> {
-        self.string.bytes()
+        self.0.bytes()
     }
 
     /// Returns an iterator over the decoded bytes of the `ZalgoString`.
@@ -264,7 +262,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_bytes(self) -> Vec<u8> {
-        self.string.into_bytes()
+        self.0.into_bytes()
     }
 
     /// Decodes `self` into a byte vector in-place.
@@ -311,7 +309,7 @@ impl ZalgoString {
     #[allow(clippy::len_without_is_empty)]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn len(&self) -> usize {
-        self.string.len()
+        self.0.len()
     }
 
     /// Returns the capacity of the underlying encoded string in bytes.
@@ -322,7 +320,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn capacity(&self) -> usize {
-        self.string.capacity()
+        self.0.capacity()
     }
 
     /// Returns the length of the `ZalgoString` in bytes if it were to be decoded.  
@@ -450,7 +448,7 @@ macro_rules! impl_partial_eq {
             impl<'a> PartialEq<$rhs> for ZalgoString {
                 #[inline]
                 fn eq(&self, other: &$rhs) -> bool {
-                    &self.string == other
+                    &self.0 == other
                 }
             }
         )+
@@ -460,7 +458,7 @@ impl_partial_eq! {String, &str, str, Cow<'a, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.string)
+        write!(f, "{}", self.0)
     }
 }
 
