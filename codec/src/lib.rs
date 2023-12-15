@@ -56,7 +56,7 @@
 //!
 //! `serde`: implements the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].
 //!
-//! `macro`*(enabled by default)*: exports the procedural macro [`zalgo_embed!`].
+//! `macro` *(enabled by default)*: exports the procedural macro [`zalgo_embed!`].
 //!   
 //! # Explanation
 //!
