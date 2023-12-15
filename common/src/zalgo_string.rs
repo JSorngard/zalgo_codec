@@ -27,7 +27,9 @@ impl ZalgoString {
     ///
     /// Returns an error if the input string contains bytes that don't correspond to printable
     /// ASCII characters or newlines.
+    /// 
     /// # Examples
+    /// 
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
@@ -129,6 +131,7 @@ impl ZalgoString {
     /// These characters are guaranteed to be valid ASCII.
     ///
     /// # Example
+    /// 
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
@@ -246,6 +249,7 @@ impl ZalgoString {
     /// These bytes are guaranteed to represent valid ASCII.
     ///
     /// # Example
+    /// 
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
