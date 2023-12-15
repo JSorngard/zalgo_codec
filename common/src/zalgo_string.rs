@@ -27,9 +27,9 @@ impl ZalgoString {
     ///
     /// Returns an error if the input string contains bytes that don't correspond to printable
     /// ASCII characters or newlines.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
@@ -131,7 +131,7 @@ impl ZalgoString {
     /// These characters are guaranteed to be valid ASCII.
     ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
@@ -149,9 +149,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn decoded_chars(&self) -> DecodedChars<'_> {
-        DecodedChars {
-            dcb: self.decoded_bytes(),
-        }
+        DecodedChars(self.decoded_bytes())
     }
 
     /// Converts `self` into a `String`.
@@ -249,7 +247,7 @@ impl ZalgoString {
     /// These bytes are guaranteed to represent valid ASCII.
     ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// # fn main() -> Result<(), Error> {
@@ -263,11 +261,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
-        DecodedBytes {
-            zs: self.as_bytes(),
-            index: 1,
-            back_index: self.as_bytes().len(),
-        }
+        DecodedBytes(self.0.bytes().skip(1))
     }
 
     /// Converts `self` into a byte vector.
@@ -402,42 +396,30 @@ impl ZalgoString {
 /// See its documentation for more.
 #[derive(Debug, Clone)]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct DecodedBytes<'a> {
-    zs: &'a [u8],
-    index: usize,
-    back_index: usize,
-}
+pub struct DecodedBytes<'a>(core::iter::Skip<core::str::Bytes<'a>>);
 
 impl<'a> Iterator for DecodedBytes<'a> {
     type Item = u8;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.back_index {
-            let t = decode_byte_pair(self.zs[self.index], self.zs[self.index + 1]);
-            self.index += 2;
-            Some(t)
-        } else {
-            None
-        }
+        self.0
+            .next()
+            .zip(self.0.next())
+            .map(|(odd, even)| decode_byte_pair(odd, even))
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let left = (self.back_index.saturating_sub(self.index)) / 2;
+        let left = self.0.size_hint().0 / 2;
         (left, Some(left))
     }
 }
 
 impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
-        if self.back_index > self.index {
-            let t = Some(decode_byte_pair(
-                self.zs[self.back_index - 2],
-                self.zs[self.back_index - 1],
-            ));
-            self.back_index -= 2;
-            t
-        } else {
-            None
-        }
+        self.0
+            .next_back()
+            .zip(self.0.next_back())
+            .map(|(even, odd)| decode_byte_pair(odd, even))
     }
 }
 
@@ -450,24 +432,23 @@ impl<'a> ExactSizeIterator for DecodedBytes<'a> {}
 /// See it's documentation for more.
 #[derive(Debug, Clone)]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct DecodedChars<'a> {
-    dcb: DecodedBytes<'a>,
-}
+pub struct DecodedChars<'a>(DecodedBytes<'a>);
 
 impl<'a> Iterator for DecodedChars<'a> {
     type Item = char;
     fn next(&mut self) -> Option<Self::Item> {
-        self.dcb.next().map(char::from)
+        self.0.next().map(char::from)
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.dcb.size_hint()
+        self.0.size_hint()
     }
 }
 
 impl<'a> DoubleEndedIterator for DecodedChars<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
-        self.dcb.next_back().map(char::from)
+        self.0.next_back().map(char::from)
     }
 }
 
