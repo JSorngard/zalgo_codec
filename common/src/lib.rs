@@ -93,7 +93,6 @@ use core::{fmt, str};
 #[cfg(feature = "std")]
 use std::string::FromUtf8Error;
 
-/// Contains the implementation of [`ZalgoString`] as well as related iterators.
 pub mod zalgo_string;
 
 pub use zalgo_string::ZalgoString;

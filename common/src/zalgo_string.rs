@@ -1,3 +1,5 @@
+//! Contains the implementation of [`ZalgoString`] as well as related iterators.
+
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
 use core::iter::{ExactSizeIterator, FusedIterator};
