@@ -186,6 +186,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
 ///
 /// # Examples
+///
 /// Basic usage:
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
@@ -230,6 +231,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// The resulting Python code should retain the functionality of the original.
 ///
 /// # Example
+///
 /// Encode a simple hello world program in Python
 /// ```
 /// # use zalgo_codec_common::{Error, zalgo_wrap_python};
@@ -289,6 +291,7 @@ pub enum Error {
 
 impl Error {
     /// Returns the 1-indexed line number of the line on which the unencodable byte occured.
+    ///
     /// # Examples
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
@@ -304,6 +307,7 @@ impl Error {
 
     /// Returns the 1-indexed column where the unencodable byte occured.
     /// Columns are counted from left to right and the count resets for each new line.
+    ///
     /// # Example
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
@@ -318,7 +322,9 @@ impl Error {
     }
 
     /// Returns the value of the first byte of the unencodable character.
+    ///
     /// # Examples
+    ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
@@ -342,7 +348,9 @@ impl Error {
     /// This exists if the character is an unencodable ASCII character.
     /// If it is some other unicode character we only know its first byte, so we can not
     /// accurately represent it.
+    ///
     /// # Examples
+    ///
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
