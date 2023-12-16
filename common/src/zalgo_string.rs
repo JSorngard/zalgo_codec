@@ -243,6 +243,7 @@ impl ZalgoString {
     }
 
     /// Converts `self` into a byte vector.
+    ///
     /// This simply returns the underlying buffer without any cloning or decoding.
     ///
     /// # Example
