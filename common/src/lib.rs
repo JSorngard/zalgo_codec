@@ -128,6 +128,9 @@ pub use zalgo_string::ZalgoString;
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_encode(string: &str) -> Result<String, Error> {
+    // We will encode this many bytes at a time before pushing onto the result vector.
+    const BATCH_SIZE: usize = 16;
+
     // The line we are currently encoding
     let mut line = 1;
     // The column on that line we are currently encoding
@@ -138,9 +141,6 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
     // which is there in order for the output to be displayable in an intuitive way.
     let mut result = Vec::with_capacity(2 * string.len() + 1);
     result.push(b'E');
-
-    // We will encode this many bytes at a time before pushing onto the result vector.
-    const BATCH_SIZE: usize = 16;
 
     for batch in string.as_bytes().chunks(BATCH_SIZE) {
         let mut buffer = [0; 2 * BATCH_SIZE];
@@ -155,8 +155,8 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 }
 
                 let v = ((i16::from(*byte) - 11).rem_euclid(133) - 21) as u8;
-                buffer[encoded] = (v >> 6) & 1 | 0b11001100;
-                buffer[encoded + 1] = (v & 63) | 0b10000000;
+                buffer[encoded] = (v >> 6) & 1 | 0b1100_1100;
+                buffer[encoded + 1] = (v & 63) | 0b1000_0000;
                 encoded += 2;
                 column += 1;
             } else {
@@ -255,6 +255,20 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 ///
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
+///
+/// # Errors
+///
+/// Returns an error if the input contains a byte that does not correspond to a printable
+/// ASCII character or newline.
+/// ```
+/// # use zalgo_codec_common::{Error, zalgo_wrap_python};
+/// assert_eq!(
+///     zalgo_wrap_python(r#"print("That will be 5€ please")"#),
+///     // € is not an ASCII character, the first byte in its utf-8 representation is 226
+///     // and it is the 22nd character on the first line in the string.
+///     Err(Error::NotAscii(226, 1, 22))
+/// );
+/// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_wrap_python(python: &str) -> Result<String, Error> {
     let encoded_string = zalgo_encode(python)?;

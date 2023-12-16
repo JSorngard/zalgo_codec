@@ -91,7 +91,7 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
         },
         Err(e) => syn::Error::new(
             encoded.span(),
-            format!("the given string decodes into an {}", e),
+            format!("the given string decodes into an {e}"),
         )
         .to_compile_error()
         .into(),
