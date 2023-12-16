@@ -9,8 +9,14 @@ use core::fmt;
 /// Only implements the [`Error`](std::error::Error) trait if the `std` feature is enabled.
 pub enum Error {
     /// Represents a valid ASCII character that is outside of the encodable set.
+    /// The first `u8` in the variant is the byte value of the character, the first `usize`
+    /// is the 1-indexed line number where the character occured, the second `usize` is
+    /// the 1-indexed column in which the character occured and the `&str` is a description
+    /// of the character.
     UnencodableAscii(u8, usize, usize, &'static str),
-    /// Represents some other unicode character.
+    /// Represents some other character.
+    /// The two `usize`s represent the same thing as in the `UnencodableAscii` variant,
+    /// but the `u8` is only the first byte of the character.
     NotAscii(u8, usize, usize),
 }
 
