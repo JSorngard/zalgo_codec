@@ -293,6 +293,7 @@ impl Error {
     /// Returns the 1-indexed line number of the line on which the unencodable byte occured.
     ///
     /// # Examples
+    /// 
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("❤️").err().unwrap().line(), 1);
@@ -309,6 +310,7 @@ impl Error {
     /// Columns are counted from left to right and the count resets for each new line.
     ///
     /// # Example
+    /// 
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().unwrap().column(), 3);
