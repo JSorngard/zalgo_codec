@@ -127,7 +127,7 @@ pub use zalgo_string::ZalgoString;
 /// assert!(zalgo_encode("CRLF\r\n").is_err());
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
+pub fn zalgo_encode(string: &str) -> Result<String, Error> {
     // The line we are currently encoding
     let mut line = 1;
     // The column on that line we are currently encoding
@@ -136,13 +136,13 @@ pub fn zalgo_encode(string_to_encode: &str) -> Result<String, Error> {
 
     // Every byte in the input will encode to two bytes. The extra byte is for the initial letter
     // which is there in order for the output to be displayable in an intuitive way.
-    let mut result = Vec::with_capacity(2 * string_to_encode.len() + 1);
+    let mut result = Vec::with_capacity(2 * string.len() + 1);
     result.push(b'E');
 
     // We will encode this many bytes at a time before pushing onto the result vector.
     const BATCH_SIZE: usize = 16;
 
-    for batch in string_to_encode.as_bytes().chunks(BATCH_SIZE) {
+    for batch in string.as_bytes().chunks(BATCH_SIZE) {
         let mut buffer = [0; 2 * BATCH_SIZE];
         let mut encoded = 0;
         for byte in batch {
@@ -256,8 +256,8 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// May not work correctly on python versions before 3.10,
 /// see [this github issue](https://github.com/DaCoolOne/DumbIdeas/issues/1) for more information.
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_wrap_python(string_to_encode: &str) -> Result<String, Error> {
-    let encoded_string = zalgo_encode(string_to_encode)?;
+pub fn zalgo_wrap_python(python: &str) -> Result<String, Error> {
+    let encoded_string = zalgo_encode(python)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
 
