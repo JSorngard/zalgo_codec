@@ -43,7 +43,7 @@ impl ZalgoString {
     /// ```
     #[must_use = "this function returns a new `ZalgoString` and does not modify the input"]
     pub fn new(s: &str) -> Result<Self, Error> {
-        zalgo_encode(s).map(|string| Self(string))
+        zalgo_encode(s).map(Self)
     }
 
     /// Returns the *encoded* contents of `self` as a string slice.
