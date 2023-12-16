@@ -44,6 +44,7 @@
 //! # Ok::<(), Error>(())
 //! ```
 //!
+// This ensures that `cargo test` still works if the macro feature is disabled.
 #![cfg_attr(
     feature = "macro",
     doc = " Encode Rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro:\n ```\n # use zalgo_codec::zalgo_embed;\n // This grapheme cluster was made by encoding \"fn add(x: i32, y: i32) -> i32 {x + y}\"\n zalgo_embed!(\"E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝\");\n\n // The `add` function is now available\n assert_eq!(add(10, 20), 30);\n ```"
