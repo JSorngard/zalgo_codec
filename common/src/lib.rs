@@ -222,8 +222,8 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, FromUtf8Error> {
     String::from_utf8(res)
 }
 
-#[must_use = "the function returns a new value and does not modify its inputs"]
 #[inline]
+#[must_use = "the function returns a new value and does not modify its inputs"]
 fn decode_byte_pair(odd: u8, even: u8) -> u8 {
     ((odd << 6 & 64 | even & 63) + 22) % 133 + 10
 }

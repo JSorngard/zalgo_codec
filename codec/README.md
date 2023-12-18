@@ -1,4 +1,5 @@
 [![Latest Version](https://img.shields.io/crates/v/zalgo-codec.svg)](https://crates.io/crates/zalgo-codec)
+[![codecov](https://codecov.io/gh/JSorngard/zalgo_codec/graph/badge.svg?token=X7TTODVC8I)](https://codecov.io/gh/JSorngard/zalgo_codec)
 
 # zalgo codec
 
