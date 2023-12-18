@@ -361,10 +361,10 @@ impl ZalgoString {
     /// Encodes the given string slice and appends the result to the end of `self`.
     ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if given the string slice contains any character that is not either
     /// a printable ASCII character or a newline.
-    /// 
+    ///
     /// # Example
     ///
     /// ```
