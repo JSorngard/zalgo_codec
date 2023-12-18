@@ -364,6 +364,29 @@ impl ZalgoString {
     pub fn decoded_is_empty(&self) -> bool {
         self.decoded_len() == 0
     }
+
+    /// Encodes the given string and appends the result to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let s1 = "Zalgo";
+    /// let s2 = ", He comes!";
+    /// let mut zs = ZalgoString::new(s1)?;
+    /// zs.encode_and_push_str(s2)?;
+    /// assert_eq!(
+    ///     zs.into_decoded_string(),
+    ///     format!("{s1}{s2}")
+    /// );
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn encode_and_push_str(&mut self, s: &str) -> Result<(), Error> {
+        let zs = zalgo_encode(s)?;
+        let (_, combining_chars) = zs.split_at(1);
+        self.string.push_str(combining_chars);
+        Ok(())
+    }
 }
 
 /// An iterator over the decoded bytes of a [`ZalgoString`].
@@ -497,5 +520,17 @@ mod test {
         assert_eq!(zs, enc);
         assert_eq!(zs, String::from(enc));
         assert_eq!(zs, Cow::from(enc));
+    }
+
+    #[test]
+    fn check_push_str() {
+        let s1 = "Zalgo";
+        let s2 = ", He comes";
+        let mut zs = ZalgoString::new(s1).unwrap();
+        zs.encode_and_push_str(s2).unwrap();
+        assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
+        zs.encode_and_push_str("").unwrap();
+        assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
+        assert!(zs.encode_and_push_str("å").is_err());
     }
 }
