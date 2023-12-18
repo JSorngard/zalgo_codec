@@ -365,7 +365,7 @@ impl ZalgoString {
         self.decoded_len() == 0
     }
 
-    /// Encodes the given string and appends the result to `self`.
+    /// Encodes the given string and appends the result to the end of `self`.
     ///
     /// # Example
     ///
