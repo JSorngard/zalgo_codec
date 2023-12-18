@@ -358,8 +358,13 @@ impl ZalgoString {
         self.decoded_len() == 0
     }
 
-    /// Encodes the given string and appends the result to the end of `self`.
+    /// Encodes the given string slice and appends the result to the end of `self`.
     ///
+    /// # Errors
+    /// 
+    /// Returns an error if given the string slice contains any character that is not either
+    /// a printable ASCII character or a newline.
+    /// 
     /// # Example
     ///
     /// ```
