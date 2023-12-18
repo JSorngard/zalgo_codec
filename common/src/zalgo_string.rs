@@ -377,7 +377,7 @@ impl ZalgoString {
     pub fn encode_and_push_str(&mut self, s: &str) -> Result<(), Error> {
         let zs = zalgo_encode(s)?;
         let (_, combining_chars) = zs.split_at(1);
-        self.string.push_str(combining_chars);
+        self.0.push_str(combining_chars);
         Ok(())
     }
 }
