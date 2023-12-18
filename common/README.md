@@ -2,7 +2,7 @@
 
 A crate for converting a string containing only printable ASCII and newlines
 into a single unicode grapheme cluster and back.
-Provides the non-macro functionality of the crate [`zalgo-codec`](https://docs.rs/zalgo-codec/latest/zalgo_codec/).
+Provides the non-macro functionality of the crate [`zalgo-codec`](https://crates.io/crates/zalgo-codec).
 
 There are two ways of interacting with the codec.
 The first is to call the encoding and decoding functions directly,

@@ -43,15 +43,17 @@
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 //! # Ok::<(), Error>(())
 //! ```
-//!
-//! Encode Rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro.
+//! Encode Rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro:
 //! ```
+//! # #[cfg(feature = "macro")]
+//! # {
 //! # use zalgo_codec::zalgo_embed;
-//! // This grapheme cluster was made by encoding "fn add(x: i32, y: i32) -> i32 {x + y}".
+//! // This grapheme cluster was made by encoding "add(x: i32, y: i32) -> i32 {x + y}"
 //! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //!
 //! // The `add` function is now available
 //! assert_eq!(add(10, 20), 30);
+//! # }
 //! ```
 //!
 //! # Features
@@ -61,7 +63,7 @@
 //!
 //! `serde`: implements the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].
 //!
-//! `macro`*(enabled by default)*: exports the procedural macro [`zalgo_embed!`].
+//! `macro` *(enabled by default)*: exports the procedural macro [`zalgo_embed!`].
 //!   
 //! # Explanation
 //!
