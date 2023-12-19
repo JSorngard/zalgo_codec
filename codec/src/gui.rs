@@ -103,7 +103,7 @@ impl Application for ZalgoCodecGui {
                     if input.is_empty() {
                         Command::perform(
                             async { String::from("the input string was empty") },
-                            |s| ToplevelMessage::PushNotification(s),
+                            ToplevelMessage::PushNotification,
                         )
                     } else {
                         Command::perform(async move { zalgo_decode(&input) }, |res| match res {
