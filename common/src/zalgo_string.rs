@@ -386,6 +386,20 @@ impl ZalgoString {
         self.0.push_str(combining_chars);
         Ok(())
     }
+
+    /// Returns a string slice of just the combining characters of the `ZalgoString` without the inital 'E'.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Hi")?;
+    /// assert_eq!(zs.as_combining_chars(), "\u{328}\u{349}");
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn as_combining_chars(&self) -> &str {
+        self.0.split_at(1).1
+    }
 }
 
 /// An iterator over the decoded bytes of a [`ZalgoString`].
