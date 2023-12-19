@@ -533,4 +533,13 @@ mod test {
         assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
         assert!(zs.encode_and_push_str("å").is_err());
     }
+
+    #[test]
+    fn check_as_combining_chars() {
+        assert_eq!(
+            ZalgoString::new("Hi").unwrap().as_combining_chars(),
+            "\u{328}\u{349}"
+        );
+        assert_eq!(ZalgoString::new("").unwrap().as_combining_chars(), "");
+    }
 }
