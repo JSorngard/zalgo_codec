@@ -362,7 +362,7 @@ impl ZalgoString {
     ///
     /// # Errors
     ///
-    /// Returns an error if given the string slice contains any character that is not either
+    /// Returns an error if the given string slice contains any character that is not either
     /// a printable ASCII character or a newline.
     ///
     /// # Example
