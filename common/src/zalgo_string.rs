@@ -398,6 +398,7 @@ impl ZalgoString {
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn as_combining_chars(&self) -> &str {
         self.0.split_at(1).1
     }
