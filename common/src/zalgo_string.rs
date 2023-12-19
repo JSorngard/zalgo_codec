@@ -493,7 +493,7 @@ impl fmt::Display for ZalgoString {
 mod test {
     use super::*;
     #[cfg(not(feature = "std"))]
-    use alloc::{string::ToString, format};
+    use alloc::{format, string::ToString};
 
     #[test]
     fn check_into_decoded_string() {
