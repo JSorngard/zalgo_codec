@@ -21,7 +21,13 @@ members = ["."]
 debug = 1
 
 [[bin]]
-name = "zalgostring"
-path = "fuzz_targets/fuzz_zalgostring.rs"
+name = "zalgostring_new"
+path = "fuzz_targets/fuzz_zalgostring_new.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "zalgostring_push_str"
+path = "fuzz_targets/fuzz_zalgostring_push_str.rs"
 test = false
 doc = false
