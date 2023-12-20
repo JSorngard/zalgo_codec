@@ -74,7 +74,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 ///     Ok(())
 /// }
 /// ```
-/// Do the opposite of [`obfstr`](https://crates.io/crates/obfstr): obfuscate a string while coding and deobfuscate it during compile time
+/// Do the opposite of [`obfstr`](https://docs.rs/obfstr/latest/obfstr/): obfuscate a string while coding and deobfuscate it during compile time
 /// ```
 /// # use zalgo_codec_macro::zalgo_embed;
 /// const SECRET: &str = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
