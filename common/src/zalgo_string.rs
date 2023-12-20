@@ -556,4 +556,10 @@ mod test {
         );
         assert_eq!(ZalgoString::new("").unwrap().as_combining_chars(), "");
     }
+
+    #[test]
+    fn check_decoded_chars() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!("oglaZ", zs.decoded_chars().rev().collect::<String>());
+    }
 }
