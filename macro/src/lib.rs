@@ -81,6 +81,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 /// 
 /// assert_eq!(SECRET, "Don't read this mom!");
 /// ```
+/// To do something more like `obfstr`, use [`zalgofy!`].
 ///
 /// # Errors
 ///
