@@ -100,7 +100,7 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
 
 /// At compile time this proc-macro converts the given string literal into a string that contains a single grapheme cluster.
 ///
-/// # Examples
+/// # Example
 ///
 /// Basic usage:
 /// ```
