@@ -367,9 +367,12 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// let s1 = "Zalgo";
     /// let s2 = ", He comes!";
+    /// 
     /// let mut zs1 = ZalgoString::new(s1)?;
     /// let zs2 = ZalgoString::new(s2)?;
+    /// 
     /// zs1.push_zalgo_str(&zs2);
+    /// 
     /// assert_eq!(zs1.into_decoded_string(), format!("{s1}{s2}"));
     /// # Ok::<(), Error>(())
     /// ```
