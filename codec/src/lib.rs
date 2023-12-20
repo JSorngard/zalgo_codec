@@ -203,4 +203,10 @@ mod tests {
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
     }
+
+    #[test]
+    fn check_zalgofy() {
+        const ZS: &str = zalgofy!("Zalgo");
+        assert_eq!(zalgo_decode(ZS).unwrap(), "Zalgo");
+    }
 }
