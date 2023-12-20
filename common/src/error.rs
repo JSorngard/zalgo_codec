@@ -126,9 +126,12 @@ mod test {
         assert_eq!(err.byte(), 195);
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
+        assert_eq!(err.representation(), None);
+
         let err = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
         assert_eq!(err.byte(), 13);
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 2);
+        assert_eq!(err.representation(), Some("Carriage Return"));
     }
 }
