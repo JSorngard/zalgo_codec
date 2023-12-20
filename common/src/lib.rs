@@ -99,7 +99,7 @@ pub mod zalgo_string;
 pub use error::Error;
 pub use zalgo_string::ZalgoString;
 
-/// Takes in an ASCII string without control characters (except newlines)
+/// Takes in a string slice that consists of only printable ACII and newline characters
 /// and encodes it into a single grapheme cluster using a reversible encoding scheme.
 ///
 /// The resulting string is a single unicode grapheme cluster and should
