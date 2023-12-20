@@ -375,8 +375,8 @@ impl ZalgoString {
     /// assert_eq!(zs1.into_decoded_string(), format!("{s1}{s2}"));
     /// # Ok::<(), Error>(())
     /// ```
-    pub fn push_zalgo_str(&mut self, zs: &ZalgoString) {
-        self.0.push_str(zs.as_combining_chars());
+    pub fn push_zalgo_str(&mut self, zalgo_string: &ZalgoString) {
+        self.0.push_str(zalgo_string.as_combining_chars());
     }
 
     /// Returns a string slice of just the combining characters of the `ZalgoString` without the inital 'E'.
