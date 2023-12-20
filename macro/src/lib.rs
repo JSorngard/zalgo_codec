@@ -113,13 +113,13 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
 /// # use zalgo_codec_macro::zalgofy;
 /// use zalgo_codec_common::zalgo_decode;
 /// # use std::string::FromUtf8Error;
-/// 
+///
 /// // Embeds the string "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}" into the binary.
 /// const ZS: &str = zalgofy!("Zalgo");
 /// assert_eq!(zalgo_decode(ZS)?, "Zalgo");
 /// # Ok::<(), FromUtf8Error>(())
 /// ```
-/// 
+///
 /// # Errors
 ///
 /// Gives a compile error if any character in the string is not either a printable ACII or newline character.
