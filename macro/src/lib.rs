@@ -2,7 +2,7 @@
 //! by defining the procedural macro [`zalgo_embed!`].
 //!
 //! It lets you take source code that's been converted into a single grapheme cluster by the
-//! [`zalgo_encode`](zalgo_codec_common::zalgo_encode) function in the `zalgo-codec-common` crate
+//! [`zalgo-codec-common`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/) crate
 //! and compile it as if it was never zalgo-ified.
 //!
 //! # Example
