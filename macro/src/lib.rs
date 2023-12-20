@@ -78,6 +78,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 /// ```
 /// # use zalgo_codec_macro::zalgo_embed;
 /// const SECRET: &str = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
+/// 
 /// assert_eq!(SECRET, "Don't read this mom!");
 /// ```
 ///
