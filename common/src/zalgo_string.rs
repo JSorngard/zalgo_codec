@@ -391,7 +391,7 @@ impl ZalgoString {
     ///
     /// Note that [`zalgo_decode`](crate::zalgo_decode) assumes that the initial 'E' is present,
     /// and can not decode the result of this function.
-    /// 
+    ///
     /// # Example
     ///
     /// ```
