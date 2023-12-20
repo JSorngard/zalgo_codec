@@ -115,3 +115,20 @@ impl fmt::Display for Error {
 
 #[cfg(feature = "std")]
 impl std::error::Error for Error {}
+
+#[cfg(test)]
+mod test {
+    use super::Error;
+
+    #[test]
+    fn test_error() {
+        let err = Error::NotAscii(195, 1, 7);
+        assert_eq!(err.byte(), 195);
+        assert_eq!(err.line(), 1);
+        assert_eq!(err.column(), 7);
+        let err = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
+        assert_eq!(err.byte(), 13);
+        assert_eq!(err.line(), 1);
+        assert_eq!(err.column(), 2);
+    }
+}
