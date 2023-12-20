@@ -94,7 +94,7 @@ pub use zalgo_codec_common::{
 };
 
 #[cfg(feature = "macro")]
-pub use zalgo_codec_macro::zalgo_embed;
+pub use zalgo_codec_macro::{zalgo_embed, zalgofy};
 
 #[cfg(test)]
 mod tests {

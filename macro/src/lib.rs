@@ -7,7 +7,7 @@
 //!
 //! # Example
 //!
-//! If we run [`zalgo_encode`](zalgo_codec_common::zalgo_encode) on the text
+//! If we run [`zalgo_encode`] on the text
 //! `fn add(x: i32, y: i32) -> i32 {x + y}` we can add the `add` function to our program
 //! by putting the resulting grapheme cluster inside [`zalgo_embed!`]:
 //! ```
@@ -25,7 +25,7 @@ use alloc::format;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, spanned::Spanned, LitStr};
 
-use zalgo_codec_common::zalgo_decode;
+use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 
 /// This macro decodes a string that has been encoded with [`zalgo_encode`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/fn.zalgo_encode.html)
 /// and passes the results on to the compiler.
@@ -95,5 +95,53 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
         )
         .to_compile_error()
         .into(),
+    }
+}
+
+/// Converts the given string into a string that contains a single grapheme cluster.
+///
+/// # Examples
+///
+/// Basic usage:
+/// ```
+/// # use zalgo_codec_macro::zalgofy;
+/// let zs = zalgofy!("Zalgo");
+/// assert_eq!(zs, "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}");
+/// ```
+/// Obfuscate a string at compile time and decode it at runtime:
+///```
+/// # use zalgo_codec_macro::zalgofy;
+/// use zalgo_codec_common::zalgo_decode;
+/// # use std::string::FromUtf8Error;
+/// 
+/// // Embeds the string "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}" into the binary.
+/// const ZS: &str = zalgofy!("Zalgo");
+/// assert_eq!(zalgo_decode(ZS)?, "Zalgo");
+/// # Ok::<(), FromUtf8Error>(())
+/// ```
+/// 
+/// # Errors
+///
+/// Gives a compile error if any character in the string is not either a printable ACII or newline character.
+///
+/// ```compile_fail
+/// # use zalgo_codec_macro::zalgofy;
+/// // compile error: "line 2 at column 3: byte value 195 does not correspond to an ASCII character"
+/// let zs = zalgofy!("a\naeö");
+/// ```
+#[proc_macro]
+pub fn zalgofy(string: TokenStream) -> TokenStream {
+    let string = parse_macro_input!(string as LitStr).value();
+    match zalgo_encode(&string) {
+        Ok(encoded) => {
+            let string = format!("\"{encoded}\"");
+            match string.parse() {
+                Ok(token_stream) => token_stream,
+                Err(e) => syn::Error::new(string.span(), e)
+                    .into_compile_error()
+                    .into(),
+            }
+        }
+        Err(e) => syn::Error::new(string.span(), e).to_compile_error().into(),
     }
 }
