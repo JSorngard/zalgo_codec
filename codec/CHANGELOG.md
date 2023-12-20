@@ -6,6 +6,6 @@ and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macr
 
 ## 0.10.0
 
- - Make `anyhow` an optional dependency
+ - Make `anyhow` an optional dependency that is only enabled when the binary is built.
 
 ## 0.9.6
