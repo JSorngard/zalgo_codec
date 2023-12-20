@@ -94,7 +94,7 @@ pub use zalgo_codec_common::{
 };
 
 #[cfg(feature = "macro")]
-pub use zalgo_codec_macro::zalgo_embed;
+pub use zalgo_codec_macro::{zalgo_embed, zalgofy};
 
 #[cfg(test)]
 mod tests {
@@ -202,5 +202,11 @@ mod tests {
         assert!(zalgo_encode("\t").is_err());
         assert!(zalgo_encode("\r").is_err());
         assert!(zalgo_encode("\0").is_err());
+    }
+
+    #[test]
+    fn check_zalgofy() {
+        const ZS: &str = zalgofy!("Zalgo");
+        assert_eq!(zalgo_decode(ZS).unwrap(), "Zalgo");
     }
 }
