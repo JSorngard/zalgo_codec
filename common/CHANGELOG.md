@@ -6,7 +6,7 @@ This document contains all changes to the crate since version 0.9.4.
 
 ### Breaking changes
 
- - Change the `encode_and_push_str` method to `push_zalgo_str` that takes an already encoded `ZalgoString`
+ - Change the `encode_and_push_str` method to `push_zalgo_str` that takes a reference to an already encoded `ZalgoString`
  for a more intuitive API that doesn't hide as many allocations.
 
 ### Minor changes
