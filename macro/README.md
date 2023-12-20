@@ -12,5 +12,5 @@ If we run [`zalgo-codec-common::zalgo_encode`](https://docs.rs/zalgo-codec-commo
 by putting the resulting grapheme cluster inside `zalgo_embed!`:
 ```rust
 zalgo_embed!("E͎͓͕͉̞͉͆̀͑́͒̈̀̓̒̉̀̍̀̓̒̀͛̀̊̀͘̚͘͘͝ͅ");
-assert_eq!(add(10, 20), 30);
+assert_eq!(square(10), 100);
 ```
