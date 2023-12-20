@@ -2,7 +2,15 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
-## 0.9.6
+## 0.10.0
+
+### Breaking changes
+
+ - Change the `encode_and_push_str` method to `push_zalgo_str` that takes an already encoded `ZalgoString`
+ for a more intuitive API that doesn't hide as many allocations.
+
+### Minor changes
+
  - Documentation improvements
  - Make the implementation of `PartialEq` for `ZalgoString` and other string types symmetric. That is, it's now possible
  to write equality checks that involve a `ZalgoString` in both directions, so both 
