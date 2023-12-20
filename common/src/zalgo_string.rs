@@ -358,8 +358,7 @@ impl ZalgoString {
         self.decoded_len() == 0
     }
 
-    /// Takes in a reference to a `ZalgoString` and appends its combining characters to
-    /// the end of `self`.
+    /// Appends the combining characters of a different `ZalgoString` to the end of `self`.
     ///
     /// # Example
     ///
