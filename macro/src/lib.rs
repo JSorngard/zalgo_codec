@@ -23,7 +23,7 @@ extern crate alloc;
 
 use alloc::format;
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, spanned::Spanned, LitStr};
+use syn::{parse_macro_input, spanned::Spanned, Error, LitStr};
 
 use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 
@@ -100,13 +100,13 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     match zalgo_decode(&encoded) {
         Ok(decoded) => match decoded.parse() {
             Ok(token_stream) => token_stream,
-            Err(e) => syn::Error::new(encoded.span(), e).to_compile_error().into(),
+            Err(e) => Error::new(encoded.span(), e).into_compile_error().into(),
         },
-        Err(e) => syn::Error::new(
+        Err(e) => Error::new(
             encoded.span(),
             format!("the given string decodes into an {e}"),
         )
-        .to_compile_error()
+        .into_compile_error()
         .into(),
     }
 }
@@ -145,11 +145,9 @@ pub fn zalgofy(string: TokenStream) -> TokenStream {
             let string = format!("\"{encoded}\"");
             match string.parse() {
                 Ok(token_stream) => token_stream,
-                Err(e) => syn::Error::new(string.span(), e)
-                    .into_compile_error()
-                    .into(),
+                Err(e) => Error::new(string.span(), e).into_compile_error().into(),
             }
         }
-        Err(e) => syn::Error::new(string.span(), e).to_compile_error().into(),
+        Err(e) => Error::new(string.span(), e).to_compile_error().into(),
     }
 }
