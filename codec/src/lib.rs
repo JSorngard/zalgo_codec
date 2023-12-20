@@ -21,7 +21,7 @@
 //! assert_eq!(encoded, "É̺͇͌͏");
 //! # Ok::<(), Error>(())
 //! ```
-//! Decode a grapheme cluster back into a string:
+//! Decode the grapheme cluster back into a string with [`zalgo_decode`]:
 //! ```
 //! # use zalgo_codec::zalgo_decode;
 //! # extern crate alloc;
