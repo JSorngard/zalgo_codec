@@ -31,7 +31,9 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 /// and passes the results on to the compiler.
 ///
 /// To generate the encoded string used as input you can use the provided program. It can be installed with `cargo install zalgo-codec --features binary`.
+///
 /// # Examples
+///
 /// We can use a function created in encoded source code:
 /// ```
 /// # use zalgo_codec_common::zalgo_encode;
@@ -78,7 +80,9 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 /// let secret_string = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
 /// assert_eq!(secret_string, "Don't read this mom!");
 /// ```
+///
 /// # Limitations
+///
 /// The encoded code must be valid macro output.
 #[proc_macro]
 pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
