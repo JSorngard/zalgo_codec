@@ -3,7 +3,8 @@
 This crate provides the macro part of the crate [`zalgo-codec`](https://crates.io/crates/zalgo-codec) by defining the procedural macro `zalgo_embed!`.
 
 It lets you take source code that's been converted into a single grapheme cluster by the
-[`zalgo-codec-common`](https://crates.io/crates/zalgo-codec-common) crate and compile it as if it was never zalgo-ified.
+[`zalgo-codec-common`](https://crates.io/crates/zalgo-codec-common) crate and compile it as if it was never zalgo-ified.  
+This lets you reach new lows in the field of self-documenting code.
 
 ## Example
 
