@@ -358,12 +358,8 @@ impl ZalgoString {
         self.decoded_len() == 0
     }
 
-    /// Encodes the given string slice and appends the result to the end of `self`.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the given string slice contains any character that is not either
-    /// a printable ASCII character or a newline.
+    /// Takes in a reference to a `ZalgoString` and appends its combining characters to
+    /// the end of `self`.
     ///
     /// # Example
     ///
@@ -371,20 +367,14 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// let s1 = "Zalgo";
     /// let s2 = ", He comes!";
-    /// let mut zs = ZalgoString::new(s1)?;
-    /// zs.encode_and_push_str(s2)?;
-    /// assert_eq!(
-    ///     zs.into_decoded_string(),
-    ///     format!("{s1}{s2}")
-    /// );
+    /// let mut zs1 = ZalgoString::new(s1)?;
+    /// let zs2 = ZalgoString::new(s2)?;
+    /// zs1.push_zalgo_str(&zs2);
+    /// assert_eq!(zs1.into_decoded_string(), format!("{s1}{s2}"));
     /// # Ok::<(), Error>(())
     /// ```
-    pub fn encode_and_push_str(&mut self, s: &str) -> Result<(), Error> {
-        let zs = zalgo_encode(s)?;
-        // Get rid of the initial 'E'.
-        let (_, combining_chars) = zs.split_at(1);
-        self.0.push_str(combining_chars);
-        Ok(())
+    pub fn push_zalgo_str(&mut self, zs: &ZalgoString) {
+        self.0.push_str(zs.as_combining_chars());
     }
 
     /// Returns a string slice of just the combining characters of the `ZalgoString` without the inital 'E'.
@@ -541,11 +531,9 @@ mod test {
         let s1 = "Zalgo";
         let s2 = ", He comes";
         let mut zs = ZalgoString::new(s1).unwrap();
-        zs.encode_and_push_str(s2).unwrap();
+        let zs2 = ZalgoString::new(s2).unwrap();
+        zs.push_zalgo_str(&zs2);
         assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
-        zs.encode_and_push_str("").unwrap();
-        assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
-        assert!(zs.encode_and_push_str("å").is_err());
     }
 
     #[test]
