@@ -475,16 +475,23 @@ impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 macro_rules! impl_partial_eq {
     ($($rhs:ty),+) => {
         $(
-            impl<'a> PartialEq<$rhs> for ZalgoString {
+            impl PartialEq<$rhs> for ZalgoString {
                 #[inline]
                 fn eq(&self, other: &$rhs) -> bool {
                     &self.0 == other
                 }
             }
+
+            impl PartialEq<ZalgoString> for $rhs {
+                #[inline]
+                fn eq(&self, other: &ZalgoString) -> bool {
+                    self == &other.0
+                }
+            }
         )+
     };
 }
-impl_partial_eq! {String, &str, str, Cow<'a, str>}
+impl_partial_eq! {String, &str, str, Cow<'_, str>}
 
 impl fmt::Display for ZalgoString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -525,6 +532,8 @@ mod test {
         assert_eq!(zs, enc);
         assert_eq!(zs, String::from(enc));
         assert_eq!(zs, Cow::from(enc));
+        assert_eq!(String::from(enc), zs);
+        assert_eq!(Cow::from(enc), zs);
     }
 
     #[test]
