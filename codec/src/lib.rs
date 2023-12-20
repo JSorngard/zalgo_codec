@@ -13,7 +13,7 @@
 //!
 //! # Examples
 //!
-//! Encode a string to a grapheme cluster with `zalgo_encode`:
+//! Encode a string to a grapheme cluster with [`zalgo_encode`]:
 //! ```
 //! # use zalgo_codec::{Error, zalgo_encode};
 //! let s = "Zalgo";
