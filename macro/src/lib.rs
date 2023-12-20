@@ -98,26 +98,15 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
     }
 }
 
-/// Converts the given string into a string that contains a single grapheme cluster.
+/// At compile time this proc-macro converts the given string literal into a string that contains a single grapheme cluster.
 ///
 /// # Examples
 ///
 /// Basic usage:
 /// ```
 /// # use zalgo_codec_macro::zalgofy;
-/// let zs = zalgofy!("Zalgo");
-/// assert_eq!(zs, "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}");
-/// ```
-/// Obfuscate a string at compile time and decode it at runtime:
-///```
-/// # use zalgo_codec_macro::zalgofy;
-/// use zalgo_codec_common::zalgo_decode;
-/// # use std::string::FromUtf8Error;
-///
-/// // Embeds the string "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}" into the binary.
 /// const ZS: &str = zalgofy!("Zalgo");
-/// assert_eq!(zalgo_decode(ZS)?, "Zalgo");
-/// # Ok::<(), FromUtf8Error>(())
+/// assert_eq!(ZS, "É̺͇͌͏");
 /// ```
 ///
 /// # Errors

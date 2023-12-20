@@ -204,6 +204,7 @@ mod tests {
         assert!(zalgo_encode("\0").is_err());
     }
 
+    #[cfg(feature = "macro")]
     #[test]
     fn check_zalgofy() {
         const ZS: &str = zalgofy!("Zalgo");
