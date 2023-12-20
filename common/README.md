@@ -52,3 +52,18 @@ This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHA
 There is an executable available for experimenting with the codec on text and files.
 It can be installed with `cargo install zalgo-codec --features binary`. 
 You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
+
+## License
+
+Licensed under either of
+
+ * [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+ * [MIT license](http://opensource.org/licenses/MIT)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
