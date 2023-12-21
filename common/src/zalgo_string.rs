@@ -401,8 +401,8 @@ impl ZalgoString {
 
 /// Implements the `+` operator for concaternating two `ZalgoString`s.
 /// Memorywise it works the same as the `Add` implementation for the normal
-/// `String` type: it consumes the lefthand side and extends its buffer.
-/// The combining characters of the right hand side is then copied into it.
+/// `String` type: it consumes the lefthand side, extends its buffer, and
+/// copies the combining characters of the right hand side into it.
 impl core::ops::Add<&ZalgoString> for ZalgoString {
     type Output = ZalgoString;
     #[inline]
