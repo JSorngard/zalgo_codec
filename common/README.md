@@ -57,8 +57,8 @@ You can optionally enable the `gui` feature during installation to include a rud
 
 Licensed under either of
 
- * [Apache License, Version 2.0](./LICENSE-APACHE)
- * [MIT license](./LICENSE-MIT)
+ * [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+ * [MIT license](http://opensource.org/licenses/MIT)
 
 at your option.
 
