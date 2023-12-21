@@ -1,4 +1,4 @@
-//! Contains the definition of the error type used by the eoncoding functions in the crate.
+//! Contains the definition of the error type used by the encoding functions in the crate.
 
 use core::fmt;
 
