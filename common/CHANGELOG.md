@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.10.1
+
+ - Change the links to licenses in the readme to be compatible with crates.io.
+
 ## 0.10.0
 
 ### Breaking changes
