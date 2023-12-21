@@ -101,8 +101,8 @@ The crate is based on the encoding and decoding functions [originally written in
 
 Licensed under either of
 
- * [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
- * [MIT license](http://opensource.org/licenses/MIT)
+ * [Apache License, Version 2.0](./LICENSE-APACHE)
+ * [MIT license](./LICENSE-MIT)
 
 at your option.
 
