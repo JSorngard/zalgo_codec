@@ -27,8 +27,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("❤️").err().unwrap().line(), 1);
-    /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().unwrap().line(), 3);
+    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.line()), Some(1));
+    /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().map(|e| e.line()), Some(3));
     /// ```
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
@@ -44,8 +44,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().unwrap().column(), 3);
-    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().unwrap().column(), 1);
+    /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().map(|e| e.column()), Some(3));
+    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().map(|e|e.column()), Some(1));
     /// ```
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn column(&self) -> usize {
@@ -60,13 +60,13 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("\r").err().unwrap().byte(), 13);
+    /// assert_eq!(zalgo_encode("\r").err().map(|e| e.byte()), Some(13));
     /// ```
     /// Note that this might not be the complete representation of
     /// the character in unicode, just the first byte of it.
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("❤️").err().unwrap().byte(), 226);
+    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.byte()), Some(226));
     /// // Even though
     /// assert_eq!("❤️".as_bytes(), &[226, 157, 164, 239, 184, 143])
     /// ```
@@ -86,8 +86,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
-    /// assert_eq!(zalgo_encode("\r").err().unwrap().representation(), Some("Carriage Return"));
-    /// assert_eq!(zalgo_encode("❤️").err().unwrap().representation(), None);
+    /// assert_eq!(zalgo_encode("\r").err().map(|e| e.representation()).flatten(), Some("Carriage Return"));
+    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.representation()).flatten(), None);
     /// ```
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn representation(&self) -> Option<&'static str> {
