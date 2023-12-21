@@ -399,6 +399,27 @@ impl ZalgoString {
     }
 }
 
+/// Implements the `+` operator for concaternating two `ZalgoString`s.
+/// Memorywise it works the same as the `Add` implementation for the normal
+/// `String` type: it consumes the lefthand side and extends its buffer.
+/// The combining characters of the right hand side is then copied into it.
+impl core::ops::Add<&ZalgoString> for ZalgoString {
+    type Output = ZalgoString;
+    fn add(mut self, rhs: &Self) -> Self::Output {
+        self.push_zalgo_str(rhs);
+        self
+    }
+}
+
+/// Implements the `+=` operator for appending to a `ZalgoString`.
+///
+/// This just calls [`push_zalgo_str`](ZalgoString::push_zalgo_str).
+impl core::ops::AddAssign<&ZalgoString> for ZalgoString {
+    fn add_assign(&mut self, rhs: &ZalgoString) {
+        self.push_zalgo_str(rhs);
+    }
+}
+
 /// An iterator over the decoded bytes of a [`ZalgoString`].
 ///
 /// This struct is obtained by calling the [`decoded_bytes`](ZalgoString::decoded_bytes) method on a [`ZalgoString`].
