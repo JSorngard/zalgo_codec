@@ -375,7 +375,7 @@ impl ZalgoString {
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
-    pub fn push_zalgo_str(&mut self, zalgo_string: &ZalgoString) {
+    pub fn push_zalgo_str(&mut self, zalgo_string: &Self) {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
