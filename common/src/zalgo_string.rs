@@ -405,6 +405,7 @@ impl ZalgoString {
 /// The combining characters of the right hand side is then copied into it.
 impl core::ops::Add<&ZalgoString> for ZalgoString {
     type Output = ZalgoString;
+    #[inline]
     fn add(mut self, rhs: &Self) -> Self::Output {
         self.push_zalgo_str(rhs);
         self
@@ -415,6 +416,7 @@ impl core::ops::Add<&ZalgoString> for ZalgoString {
 ///
 /// This just calls [`push_zalgo_str`](ZalgoString::push_zalgo_str).
 impl core::ops::AddAssign<&ZalgoString> for ZalgoString {
+    #[inline]
     fn add_assign(&mut self, rhs: &ZalgoString) {
         self.push_zalgo_str(rhs);
     }
