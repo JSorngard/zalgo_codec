@@ -559,6 +559,11 @@ mod test {
         let zs2 = ZalgoString::new(s2).unwrap();
         zs.push_zalgo_str(&zs2);
         assert_eq!(zs.clone().into_decoded_string(), format!("{s1}{s2}"));
+        zs += &zs2;
+        assert_eq!(
+            (zs + &zs2).into_decoded_string(),
+            format!("{s1}{s2}{s2}{s2}")
+        );
     }
 
     #[test]
