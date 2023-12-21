@@ -432,6 +432,7 @@ pub struct DecodedBytes<'a>(core::iter::Skip<core::str::Bytes<'a>>);
 
 impl<'a> Iterator for DecodedBytes<'a> {
     type Item = u8;
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.0
             .next()
@@ -447,6 +448,7 @@ impl<'a> Iterator for DecodedBytes<'a> {
 }
 
 impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0
             .next_back()
@@ -468,6 +470,7 @@ pub struct DecodedChars<'a>(DecodedBytes<'a>);
 
 impl<'a> Iterator for DecodedChars<'a> {
     type Item = char;
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next().map(char::from)
     }
@@ -479,6 +482,7 @@ impl<'a> Iterator for DecodedChars<'a> {
 }
 
 impl<'a> DoubleEndedIterator for DecodedChars<'a> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.next_back().map(char::from)
     }
@@ -509,6 +513,7 @@ macro_rules! impl_partial_eq {
 impl_partial_eq! {String, &str, str, Cow<'_, str>}
 
 impl fmt::Display for ZalgoString {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.0)
     }
