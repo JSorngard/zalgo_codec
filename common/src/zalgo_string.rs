@@ -512,6 +512,7 @@ macro_rules! impl_partial_eq {
 }
 impl_partial_eq! {String, &str, str, Cow<'_, str>}
 
+/// Displays the encoded form of the `ZalgoString`.
 impl fmt::Display for ZalgoString {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
