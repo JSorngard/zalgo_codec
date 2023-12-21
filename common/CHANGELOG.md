@@ -14,6 +14,7 @@ This document contains all changes to the crate since version 0.9.4.
  to write equality checks that involve a `ZalgoString` in both directions, so both 
  `assert_ne!(ZalgoString::new("stuff")?, "stuff");` and `assert_ne!("stuff", ZalgoString::new("stuff")?);` compile.
  - Implement `Add` and `AddAssign` to enable the user to append the encoded contents of one `ZalgoString` onto the end of another.
+ - Implement `Index<SeveralRangeTypes<usize>>` for `ZalgoString` for the same set of ranges that `String` implements `Index` for.
  - Documentation improvements
 
 ## 0.9.5

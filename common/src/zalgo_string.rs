@@ -2,7 +2,10 @@
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
-use core::iter::{ExactSizeIterator, FusedIterator};
+use core::{
+    iter::{ExactSizeIterator, FusedIterator},
+    ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
+};
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::String, vec::Vec};
@@ -398,6 +401,21 @@ impl ZalgoString {
         self.0.split_at(1).1
     }
 }
+
+macro_rules! impl_indexing {
+    ($($t:ty),*) => {
+        $(
+            impl Index<$t> for ZalgoString {
+                type Output = str;
+                #[inline]
+                fn index(&self, index: $t) -> &Self::Output {
+                    &self.0[index]
+                }
+            }
+        )*
+    };
+}
+impl_indexing! {Range<usize>, RangeFrom<usize>, RangeFull, RangeInclusive<usize>, RangeTo<usize>, RangeToInclusive<usize>}
 
 /// Implements the `+` operator for concaternating two `ZalgoString`s.
 /// Memorywise it works the same as the `Add` implementation for the normal
