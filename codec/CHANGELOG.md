@@ -7,9 +7,13 @@ and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macr
 ## 0.10.1
 
  - Change the links to licenses in the readme to be compatible with crates.io.
+ - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.10.0
 
  - Make `anyhow` an optional dependency that is only enabled when the binary is built.
+ - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.9.6
+
+ - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
