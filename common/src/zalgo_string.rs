@@ -415,7 +415,7 @@ impl ZalgoString {
 
     /// Same as [`String::reserve_exact`], see it for more information.
     ///
-    /// Reserves the capacity for exactly `additional` bytes more than the current length.
+    /// Reserves capacity for exactly `additional` bytes more than the current length.
     /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
     /// After calling `reserve_exact`, capacity will be greater than or equal to `self.len() + additional`.
     ///
