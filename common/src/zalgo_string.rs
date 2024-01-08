@@ -398,9 +398,10 @@ impl ZalgoString {
         self.0.split_at(1).1
     }
 
+    /// Reserves capacity for at least `additional` bytes more than the current length.
+    ///
     /// Same as [`String::reserve`], see it for more information.
     ///
-    /// Reserves capacity for at least `additional` bytes more than the current length.
     /// The allocator may reserve more space to speculatively avoid frequent allocations.
     /// After calling reserve, capacity will be greater than or equal to `self.len() + additional`.  
     ///
@@ -408,6 +409,17 @@ impl ZalgoString {
     ///
     /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
     /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// let c = zs.capacity();
+    /// zs.reserve(5);
+    /// assert!(zs.capacity() >= c + 5);
+    /// # Ok::<(), Error>(())
+    /// ```
     #[inline]
     pub fn reserve(&mut self, additional: usize) {
         self.0.reserve(additional)
