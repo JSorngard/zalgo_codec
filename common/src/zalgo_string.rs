@@ -399,13 +399,13 @@ impl ZalgoString {
     }
 
     /// Same as [`String::reserve`], see it for more information.
-    /// 
-    /// Reserves capacity for at least additional bytes more than the current length. 
+    ///
+    /// Reserves capacity for at least additional bytes more than the current length.
     /// The allocator may reserve more space to speculatively avoid frequent allocations.
     /// After calling reserve, capacity will be greater than or equal to `self.len() + additional`.  
-    /// 
+    ///
     /// Does nothing if the capacity is already sufficient.
-    /// 
+    ///
     /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
     /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
     #[inline]
@@ -414,13 +414,13 @@ impl ZalgoString {
     }
 
     /// Same as [`String::reserve_exact`], see it for more information.
-    /// 
+    ///
     /// Reserves the minimum capacity for at least additional bytes more than the current length.
     /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
     /// After calling `reserve_exact`, capacity will be greater than or equal to `self.len() + additional`.
-    /// 
+    ///
     /// Does nothing if the capacity is already sufficient.
-    /// 
+    ///
     /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
     /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
     #[inline]
