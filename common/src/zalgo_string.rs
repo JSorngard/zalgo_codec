@@ -400,7 +400,7 @@ impl ZalgoString {
 
     /// Same as [`String::reserve`], see it for more information.
     ///
-    /// Reserves capacity for at least additional bytes more than the current length.
+    /// Reserves capacity for at least `additional` bytes more than the current length.
     /// The allocator may reserve more space to speculatively avoid frequent allocations.
     /// After calling reserve, capacity will be greater than or equal to `self.len() + additional`.  
     ///
@@ -415,7 +415,7 @@ impl ZalgoString {
 
     /// Same as [`String::reserve_exact`], see it for more information.
     ///
-    /// Reserves the minimum capacity for at least additional bytes more than the current length.
+    /// Reserves the capacity for exactly `additional` bytes more than the current length.
     /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
     /// After calling `reserve_exact`, capacity will be greater than or equal to `self.len() + additional`.
     ///
