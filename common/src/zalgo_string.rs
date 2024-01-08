@@ -397,6 +397,36 @@ impl ZalgoString {
     pub fn as_combining_chars(&self) -> &str {
         self.0.split_at(1).1
     }
+
+    /// Same as [`String::reserve`], see it for more information.
+    ///
+    /// Reserves capacity for at least additional bytes more than the current length.
+    /// The allocator may reserve more space to speculatively avoid frequent allocations.
+    /// After calling reserve, capacity will be greater than or equal to `self.len() + additional`.  
+    ///
+    /// Does nothing if the capacity is already sufficient.
+    ///
+    /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
+    /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
+    #[inline]
+    pub fn reserve(&mut self, additional: usize) {
+        self.0.reserve(additional)
+    }
+
+    /// Same as [`String::reserve_exact`], see it for more information.
+    ///
+    /// Reserves the minimum capacity for at least additional bytes more than the current length.
+    /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
+    /// After calling `reserve_exact`, capacity will be greater than or equal to `self.len() + additional`.
+    ///
+    /// Does nothing if the capacity is already sufficient.
+    ///
+    /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
+    /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
+    #[inline]
+    pub fn reserve_exact(&mut self, additional: usize) {
+        self.0.reserve_exact(additional)
+    }
 }
 
 /// Implements the `+` operator for concaternating two `ZalgoString`s.
@@ -585,5 +615,25 @@ mod test {
     fn check_decoded_chars() {
         let zs = ZalgoString::new("Zalgo").unwrap();
         assert_eq!("oglaZ", zs.decoded_chars().rev().collect::<String>());
+    }
+
+    #[test]
+    fn test_reserve() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.reserve(5);
+        assert!(zs.capacity() >= 11 + 5);
+        let c = zs.capacity();
+        zs.reserve(1);
+        assert_eq!(zs.capacity(), c);
+    }
+
+    #[test]
+    fn test_reserve_exact() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.reserve_exact(5);
+        assert_eq!(zs.capacity(), 11 + 5);
+        let c = zs.capacity();
+        zs.reserve_exact(1);
+        assert_eq!(zs.capacity(), c);
     }
 }
