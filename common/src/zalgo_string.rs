@@ -425,16 +425,28 @@ impl ZalgoString {
         self.0.reserve(additional)
     }
 
+    /// Reserves capacity for exactly `additional` bytes more than the current length.
+    ///
     /// Same as [`String::reserve_exact`], see it for more information.
     ///
-    /// Reserves capacity for exactly `additional` bytes more than the current length.
     /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
-    /// After calling `reserve_exact`, capacity will be greater than or equal to `self.len() + additional`.
+    /// After calling `reserve_exact`, capacity will be equal to `self.len() + additional`.
     ///
     /// Does nothing if the capacity is already sufficient.
     ///
     /// Keep in mind that an encoded ASCII character takes up two bytes, and that a `ZalgoString`
     /// always begins with an unencoded "E" which means that the total length in bytes is always an odd number.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// let c = zs.capacity();
+    /// zs.reserve_exact(5);
+    /// assert_eq!(zs.capacity(), c + 5);
+    /// # Ok::<(), Error>(())
+    /// ```
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional)
