@@ -616,4 +616,24 @@ mod test {
         let zs = ZalgoString::new("Zalgo").unwrap();
         assert_eq!("oglaZ", zs.decoded_chars().rev().collect::<String>());
     }
+
+    #[test]
+    fn test_reserve() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.reserve(5);
+        assert!(zs.capacity() >= 11 + 5);
+        let c = zs.capacity();
+        zs.reserve(1);
+        assert_eq!(zs.capacity(), c);
+    }
+
+    #[test]
+    fn test_reserve_exact() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.reserve_exact(5);
+        assert_eq!(zs.capacity(), 11 + 5);
+        let c = zs.capacity();
+        zs.reserve_exact(1);
+        assert_eq!(zs.capacity(), c);
+    }
 }
