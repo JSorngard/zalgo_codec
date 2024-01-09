@@ -464,8 +464,7 @@ impl ZalgoString {
     ///
     /// # Panics
     ///
-    /// Panics if `new_len` does not lie on a a [`char`] boundary.
-    /// For a `ZalgoString` these boundaries are always at odd indices.
+    /// Panics if `new_len` is even and shorter than or equal to `self.len()`.
     ///
     /// # Example
     ///
@@ -477,9 +476,19 @@ impl ZalgoString {
     /// assert_eq!(zs.into_decoded_string(), "Za");
     /// # Ok::<(), Error>(())
     /// ```
+    /// Panics if `new_len` is even:
+    /// ```should_panic
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.truncate(0);
+    /// # Ok::<(), Error>(())
+    /// ```
     #[inline]
     pub fn truncate(&mut self, new_len: usize) {
-        self.0.truncate(new_len)
+        if new_len <= self.len() {
+            assert_eq!(new_len % 2, 1, "the new length must be odd");
+            self.0.truncate(new_len)
+        }
     }
 }
 
