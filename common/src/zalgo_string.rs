@@ -721,6 +721,8 @@ mod test {
     #[test]
     fn test_truncate() {
         let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.truncate(100);
+        assert_eq!(zs, "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}");
         zs.truncate(5);
         assert_eq!(zs, "E\u{33a}\u{341}");
         assert_eq!(zs.into_decoded_string(), "Za");
