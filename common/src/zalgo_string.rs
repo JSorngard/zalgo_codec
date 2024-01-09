@@ -725,7 +725,9 @@ mod test {
     #[test]
     fn test_clear() {
         let mut zs = ZalgoString::new("Zalgo").unwrap();
+        let c = zs.capacity();
         zs.clear();
+        assert_eq!(zs.capacity(), c);
         assert_eq!(zs.len(), 1);
         assert_eq!(zs.decoded_len(), 0);
         assert!(zs.into_decoded_string().is_empty());
