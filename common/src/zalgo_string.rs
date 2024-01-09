@@ -464,7 +464,7 @@ impl ZalgoString {
     ///
     /// # Panics
     ///
-    /// Panics if `new_len` is even and shorter than or equal to `self.len()`.
+    /// Panics if `new_len` is even.
     ///
     /// # Example
     ///
