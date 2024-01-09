@@ -491,9 +491,19 @@ impl ZalgoString {
         }
     }
 
-    /// Truncates this `ZalgoString`, removing all contents (except the initial "E").
+    /// Truncates this `ZalgoString`, removing all contents except the initial "E".
     ///
-    /// This means the ZalgoString will have a length of one, but it does not affect its capacity
+    /// This means the ZalgoString will have a length of one, but it does not affect its capacity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.clear();
+    /// assert!(zs.decoded_is_empty());
+    /// # Ok::<(), Error>(())
+    /// ```
     pub fn clear(&mut self) {
         self.truncate(1)
     }
