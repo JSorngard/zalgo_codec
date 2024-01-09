@@ -466,7 +466,7 @@ impl ZalgoString {
     ///
     /// Panics if `new_len` is even.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
