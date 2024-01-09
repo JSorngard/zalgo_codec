@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.10.3
+
+ - Add `truncate` and `clear` to `ZalgoString`.
+
 ## 0.10.2
 
  - Add `reserve` and `reserve_exact` to `ZalgoString`.

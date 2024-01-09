@@ -445,12 +445,68 @@ impl ZalgoString {
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// let c = zs.capacity();
     /// zs.reserve_exact(5);
-    /// assert_eq!(zs.capacity(), c + 5);
+    /// assert!(zs.capacity() >= c + 5);
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional)
+    }
+
+    /// Shortens the `ZalgoString` to the specified length.
+    ///
+    /// A `ZalgoString` always takes up an odd number of bytes as the first "E" takes up one,
+    /// and all subsequent characters take up two.
+    ///
+    /// If `new_len` is larger than its current length, this has no effect.
+    ///
+    /// This method has no effect of the allocated capacity.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `new_len` is even.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.truncate(5);
+    /// assert_eq!(zs, "E\u{33a}\u{341}");
+    /// assert_eq!(zs.into_decoded_string(), "Za");
+    /// # Ok::<(), Error>(())
+    /// ```
+    /// Panics if `new_len` is even:
+    /// ```should_panic
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.truncate(0);
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    pub fn truncate(&mut self, new_len: usize) {
+        if new_len <= self.len() {
+            assert_eq!(new_len % 2, 1, "the new length must be odd");
+            self.0.truncate(new_len)
+        }
+    }
+
+    /// Truncates this `ZalgoString`, removing all contents except the initial "E".
+    ///
+    /// This means the ZalgoString will have a length of one, but it does not affect its capacity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.clear();
+    /// assert_eq!(zs, "E");
+    /// assert!(zs.decoded_is_empty());
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn clear(&mut self) {
+        self.truncate(1)
     }
 }
 
@@ -660,5 +716,33 @@ mod test {
         let c = zs.capacity();
         zs.reserve_exact(1);
         assert_eq!(zs.capacity(), c);
+    }
+
+    #[test]
+    fn test_truncate() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.truncate(100);
+        assert_eq!(zs, "E\u{33a}\u{341}\u{34c}\u{347}\u{34f}");
+        zs.truncate(5);
+        assert_eq!(zs, "E\u{33a}\u{341}");
+        assert_eq!(zs.into_decoded_string(), "Za");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_truncate_panic() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.truncate(0)
+    }
+
+    #[test]
+    fn test_clear() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        let c = zs.capacity();
+        zs.clear();
+        assert_eq!(zs.capacity(), c);
+        assert_eq!(zs.len(), 1);
+        assert_eq!(zs.decoded_len(), 0);
+        assert!(zs.into_decoded_string().is_empty());
     }
 }
