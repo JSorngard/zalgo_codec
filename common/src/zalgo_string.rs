@@ -452,6 +452,33 @@ impl ZalgoString {
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional)
     }
+
+    /// Shortens the `ZalgoString` to the specified length.
+    ///
+    /// A `ZalgoString` always takes up an odd number of bytes as the first "E" takes up one,
+    /// and all subsequent characters take up two.
+    ///
+    /// If `new_len` is larger than its current length, this has no effect.
+    ///
+    /// This method has no effect of the allocated capacity.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `new_len` does not lie on a a [`char`] boundary.
+    /// For a `ZalgoString` these boundaries are always at odd indices.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.truncate(5);
+    /// assert_eq!(zs.into_decoded_string(), "Za");
+    /// ```
+    #[inline]
+    pub fn truncate(&mut self, new_len: usize) {
+        self.0.truncate(new_len)
+    }
 }
 
 /// Implements the `+` operator for concaternating two `ZalgoString`s.
