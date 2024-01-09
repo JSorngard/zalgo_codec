@@ -429,7 +429,8 @@ impl ZalgoString {
     ///
     /// Same as [`String::reserve_exact`].
     ///
-    /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate to speculatively avoid frequent allocations.
+    /// Unlike [`reserve`](ZalgoString::reserve), this will not deliberately over-allocate
+    /// to speculatively avoid frequent allocations.
     /// After calling `reserve_exact`, capacity will be equal to or greater than `self.len() + additional`.
     ///
     /// Does nothing if the capacity is already sufficient.
