@@ -501,6 +501,7 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// zs.clear();
+    /// assert_eq!(zs, "E");
     /// assert!(zs.decoded_is_empty());
     /// # Ok::<(), Error>(())
     /// ```
