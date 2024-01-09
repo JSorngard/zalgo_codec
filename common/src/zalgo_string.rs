@@ -699,4 +699,19 @@ mod test {
         zs.reserve_exact(1);
         assert_eq!(zs.capacity(), c);
     }
+
+    #[test]
+    fn test_truncate() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.truncate(5);
+        assert_eq!(zs, "E\u{33a}\u{341}");
+        assert_eq!(zs.into_decoded_string(), "Za");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_truncate_panic() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.truncate(0)
+    }
 }
