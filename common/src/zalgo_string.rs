@@ -473,7 +473,7 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// zs.truncate(5);
-    /// assert_eq!(zs.into_decoded_string(), "Za");
+    /// assert_eq!(zs, "E\u{33a}\u{341}");
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
