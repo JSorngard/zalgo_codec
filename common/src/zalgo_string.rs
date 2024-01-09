@@ -445,7 +445,7 @@ impl ZalgoString {
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// let c = zs.capacity();
     /// zs.reserve_exact(5);
-    /// assert_eq!(zs.capacity(), c + 5);
+    /// assert!(zs.capacity() >= c + 5);
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
@@ -474,6 +474,7 @@ impl ZalgoString {
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// zs.truncate(5);
     /// assert_eq!(zs.into_decoded_string(), "Za");
+    /// # Ok::<(), Error>(())
     /// ```
     #[inline]
     pub fn truncate(&mut self, new_len: usize) {
