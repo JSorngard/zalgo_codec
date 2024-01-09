@@ -474,6 +474,7 @@ impl ZalgoString {
     /// let mut zs = ZalgoString::new("Zalgo")?;
     /// zs.truncate(5);
     /// assert_eq!(zs, "E\u{33a}\u{341}");
+    /// assert_eq!(zs.into_decoded_string(), "Za");
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
