@@ -490,6 +490,13 @@ impl ZalgoString {
             self.0.truncate(new_len)
         }
     }
+
+    /// Truncates this `ZalgoString`, removing all contents (except the initial "E").
+    ///
+    /// This means the ZalgoString will have a length of one, but it does not affect its capacity
+    pub fn clear(&mut self) {
+        self.truncate(1)
+    }
 }
 
 /// Implements the `+` operator for concaternating two `ZalgoString`s.
@@ -713,5 +720,14 @@ mod test {
     fn test_truncate_panic() {
         let mut zs = ZalgoString::new("Zalgo").unwrap();
         zs.truncate(0)
+    }
+
+    #[test]
+    fn test_clear() {
+        let mut zs = ZalgoString::new("Zalgo").unwrap();
+        zs.clear();
+        assert_eq!(zs.len(), 1);
+        assert_eq!(zs.decoded_len(), 0);
+        assert!(zs.into_decoded_string().is_empty());
     }
 }
