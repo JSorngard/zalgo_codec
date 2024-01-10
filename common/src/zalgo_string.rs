@@ -7,7 +7,11 @@
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
-use core::iter::{ExactSizeIterator, FusedIterator};
+use core::{
+    iter::{ExactSizeIterator, FusedIterator},
+    ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
+    slice::SliceIndex,
+};
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::String, vec::Vec};
@@ -76,6 +80,35 @@ impl ZalgoString {
     #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    /// Returns a subslice of `self`.
+    ///
+    /// Same as [`str::get`].
+    ///
+    /// This is the non-panicking alternative to indexing the `ZalgoString`. Returns [`None`] whenever
+    /// the equivalent indexing operation would panic.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Zalgo")?;
+    /// assert_eq!(zs.get(0..3), Some("E\u{33a}"));
+    ///
+    /// // indices not on UTF-8 sequence boundaries
+    /// assert!(zs.get(0..4).is_none());
+    ///
+    /// // out of bounds
+    /// assert!(zs.get(..42).is_none());
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    pub fn get<I>(&self, index: I) -> Option<&<I as SliceIndex<str>>::Output>
+    where
+        I: SliceIndex<str>,
+    {
+        self.0.get(index)
     }
 
     /// Returns an iterator over the encoded characters of the `ZalgoString`.
@@ -668,6 +701,26 @@ impl fmt::Display for ZalgoString {
     }
 }
 
+// region: impl index
+
+macro_rules! impl_index {
+    ($($range:ty),+) => {
+        $(
+            impl Index<$range> for ZalgoString {
+                type Output = str;
+                #[inline]
+                fn index(&self, index: $range) -> &Self::Output {
+                    &self.0[index]
+                }
+            }
+        )+
+    };
+}
+
+impl_index! {Range<usize>, RangeTo<usize>, RangeFrom<usize>, RangeInclusive<usize>, RangeToInclusive<usize>, RangeFull}
+
+// endregion: impl index
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -781,5 +834,30 @@ mod test {
         assert_eq!(zs.len(), 1);
         assert_eq!(zs.decoded_len(), 0);
         assert!(zs.into_decoded_string().is_empty());
+    }
+
+    #[test]
+    fn test_get() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.get(0..3), Some("E\u{33a}"));
+        assert!(zs.get(0..2).is_none());
+        assert!(zs.get(0..42).is_none());
+    }
+
+    #[test]
+    fn test_indexing() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(&zs[0..3], "E\u{33a}");
+        assert_eq!(&zs[..3], "E\u{33a}");
+        assert_eq!(&zs[0..=2], "E\u{33a}");
+        assert_eq!(&zs[..=2], "E\u{33a}");
+        assert_eq!(zs[..], zs);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_index_panic() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        let _a = &zs[0..2];
     }
 }
