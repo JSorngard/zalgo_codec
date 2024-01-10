@@ -686,6 +686,21 @@ impl<'a> Iterator for DecodedChars<'a> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.0.size_hint()
     }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.0.nth(n).map(char::from)
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.0.count()
+    }
+
+    #[inline]
+    fn last(self) -> Option<Self::Item> {
+        self.0.last().map(char::from)
+    }
 }
 
 impl<'a> DoubleEndedIterator for DecodedChars<'a> {
@@ -939,5 +954,18 @@ mod test {
         let dcb2 = dcb.clone();
         assert_eq!(dcb.count(), 4);
         assert_eq!(dcb2.last(), Some(b'o'));
+    }
+
+    #[test]
+    fn test_decoded_chars() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.decoded_chars().nth(0), Some('Z'));
+        assert_eq!(zs.decoded_chars().nth(2), Some('l'));
+        assert_eq!(zs.decoded_chars().last(), Some('o'));
+        let mut dcc = zs.decoded_chars();
+        assert_eq!(dcc.next(), Some('Z'));
+        let dcc2 = dcc.clone();
+        assert_eq!(dcc.count(), 4);
+        assert_eq!(dcc2.last(), Some('o'));
     }
 }
