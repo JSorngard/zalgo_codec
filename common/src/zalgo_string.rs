@@ -312,7 +312,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
-        DecodedBytes(self.0[1..].bytes())
+        DecodedBytes(self.as_combining_chars().bytes())
     }
 
     /// Converts `self` into a byte vector.
