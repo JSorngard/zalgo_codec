@@ -77,6 +77,8 @@ impl ZalgoString {
 
     /// Returns a subslice of `self`.
     ///
+    /// Same as [`str::get`].
+    ///
     /// This is the non-panicking alternative to indexing the `ZalgoString`. Returns [`None`] whenever
     /// the equivalent indexing operation would panic.
     ///
@@ -85,8 +87,13 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// let zs = ZalgoString::new("Zalgo")?;
-    /// assert_eq!(zs.get(0..1), Some("E"));
-    /// assert_eq!(zs.get(1..=2), Some("\u{33a}"));
+    /// assert_eq!(zs.get(0..3), Some("E\u{33a}"));
+    ///
+    /// // indices not on UTF-8 sequence boundaries
+    /// assert!(zs.get(0..4).is_none());
+    ///
+    /// // out of bounds
+    /// assert!(zs.get(..42).is_none());
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
@@ -787,5 +794,13 @@ mod test {
         assert_eq!(zs.len(), 1);
         assert_eq!(zs.decoded_len(), 0);
         assert!(zs.into_decoded_string().is_empty());
+    }
+
+    #[test]
+    fn test_get() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.get(0..3), Some("E\u{33a}"));
+        assert!(zs.get(0..2).is_none());
+        assert!(zs.get(0..42).is_none());
     }
 }
