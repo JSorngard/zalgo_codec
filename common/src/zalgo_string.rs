@@ -1,4 +1,9 @@
 //! Contains the implementation of [`ZalgoString`] as well as related iterators.
+//!
+//! A `ZalgoString` contains a grapheme cluster that was obtained from [`zalgo_encode`].
+//! It allows for iteration over its characters and bytes in both encoded and decoded form.
+//! It can be decoded in-place and the encoded information in other ZalgoStrings can be pushed
+//! onto it.
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
@@ -49,6 +54,8 @@ impl ZalgoString {
     pub fn new(s: &str) -> Result<Self, Error> {
         zalgo_encode(s).map(Self)
     }
+
+    // region: character access methods
 
     /// Returns the *encoded* contents of `self` as a string slice.
     ///
@@ -213,6 +220,10 @@ impl ZalgoString {
         unsafe { String::from_utf8_unchecked(self.into_decoded_bytes()) }
     }
 
+    // endregion: character access methods
+
+    // region: byte access methods
+
     /// Returns the encoded contents of `self` as a byte slice.
     ///
     /// The first byte is always 69, after that the bytes no longer correspond to ASCII characters.
@@ -319,6 +330,10 @@ impl ZalgoString {
         bytes
     }
 
+    // endregion: byte access methods
+
+    // region: metadata methods
+
     /// Returns the length of `self` in bytes.
     ///
     /// This length is twice the length of the original `String` plus one.
@@ -391,6 +406,27 @@ impl ZalgoString {
         self.decoded_len() == 0
     }
 
+    // endregion: metadata methods
+
+    /// Returns a string slice of just the combining characters of the `ZalgoString` without the inital 'E'.
+    ///
+    /// Note that [`zalgo_decode`](crate::zalgo_decode) assumes that the initial 'E' is present,
+    /// and can not decode the result of this method.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Hi")?;
+    /// assert_eq!(zs.as_combining_chars(), "\u{328}\u{349}");
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
+    pub fn as_combining_chars(&self) -> &str {
+        self.0.split_at(1).1
+    }
+
     /// Appends the combining characters of a different `ZalgoString` to the end of `self`.
     ///
     /// # Example
@@ -412,24 +448,7 @@ impl ZalgoString {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
-    /// Returns a string slice of just the combining characters of the `ZalgoString` without the inital 'E'.
-    ///
-    /// Note that [`zalgo_decode`](crate::zalgo_decode) assumes that the initial 'E' is present,
-    /// and can not decode the result of this method.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use zalgo_codec_common::{Error, ZalgoString};
-    /// let zs = ZalgoString::new("Hi")?;
-    /// assert_eq!(zs.as_combining_chars(), "\u{328}\u{349}");
-    /// # Ok::<(), Error>(())
-    /// ```
-    #[inline]
-    #[must_use = "the method returns a new value and does not modify `self`"]
-    pub fn as_combining_chars(&self) -> &str {
-        self.0.split_at(1).1
-    }
+    // region: capacity manipulation methods
 
     /// Reserves capacity for at least `additional` bytes more than the current length.
     ///
@@ -486,6 +505,10 @@ impl ZalgoString {
         self.0.reserve_exact(additional)
     }
 
+    // endregion: capacity manipulation methods
+
+    // region: length manipulation methods
+
     /// Shortens the `ZalgoString` to the specified length.
     ///
     /// A `ZalgoString` always takes up an odd number of bytes as the first "E" takes up one,
@@ -541,30 +564,11 @@ impl ZalgoString {
     pub fn clear(&mut self) {
         self.truncate(1)
     }
+
+    // endregion: length manipulation methods
 }
 
-/// Implements the `+` operator for concaternating two `ZalgoString`s.
-/// Memorywise it works the same as the `Add` implementation for the normal
-/// `String` type: it consumes the lefthand side, extends its buffer, and
-/// copies the combining characters of the right hand side into it.
-impl core::ops::Add<&ZalgoString> for ZalgoString {
-    type Output = ZalgoString;
-    #[inline]
-    fn add(mut self, rhs: &Self) -> Self::Output {
-        self.push_zalgo_str(rhs);
-        self
-    }
-}
-
-/// Implements the `+=` operator for appending to a `ZalgoString`.
-///
-/// This just calls [`push_zalgo_str`](ZalgoString::push_zalgo_str).
-impl core::ops::AddAssign<&ZalgoString> for ZalgoString {
-    #[inline]
-    fn add_assign(&mut self, rhs: &ZalgoString) {
-        self.push_zalgo_str(rhs);
-    }
-}
+// region: Iterator impls
 
 /// An iterator over the decoded bytes of a [`ZalgoString`].
 ///
@@ -635,6 +639,37 @@ impl<'a> DoubleEndedIterator for DecodedChars<'a> {
 impl<'a> FusedIterator for DecodedChars<'a> {}
 impl<'a> ExactSizeIterator for DecodedChars<'a> {}
 
+// endregion: Iterator impls
+
+// region: Addition impls
+
+/// Implements the `+` operator for concaternating two `ZalgoString`s.
+/// Memorywise it works the same as the `Add` implementation for the normal
+/// `String` type: it consumes the lefthand side, extends its buffer, and
+/// copies the combining characters of the right hand side into it.
+impl core::ops::Add<&ZalgoString> for ZalgoString {
+    type Output = ZalgoString;
+    #[inline]
+    fn add(mut self, rhs: &Self) -> Self::Output {
+        self.push_zalgo_str(rhs);
+        self
+    }
+}
+
+/// Implements the `+=` operator for appending to a `ZalgoString`.
+///
+/// This just calls [`push_zalgo_str`](ZalgoString::push_zalgo_str).
+impl core::ops::AddAssign<&ZalgoString> for ZalgoString {
+    #[inline]
+    fn add_assign(&mut self, rhs: &ZalgoString) {
+        self.push_zalgo_str(rhs);
+    }
+}
+
+// endregion: Addition impls
+
+// region: PartialEq impls
+
 macro_rules! impl_partial_eq {
     ($($rhs:ty),+) => {
         $(
@@ -655,6 +690,8 @@ macro_rules! impl_partial_eq {
     };
 }
 impl_partial_eq! {String, &str, str, Cow<'_, str>}
+
+// endregion: PartialEq impls
 
 /// Displays the encoded form of the `ZalgoString`.
 impl fmt::Display for ZalgoString {
