@@ -111,6 +111,35 @@ impl ZalgoString {
         self.0.get(index)
     }
 
+    /// Returns an unchecked subslice of `self`.
+    ///
+    /// This is the unchecked alternative to indexing a `ZalgoString`.
+    ///
+    /// # Safety
+    ///
+    /// This function has the same safety requirements as [`str::get_unchecked`]:
+    /// - The starting index must not exceed the ending index;
+    /// - Indexes must be within bounds of the original slice;
+    /// - Indexes must lie on UTF-8 sequence boundaries.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Zalgo")?;
+    /// unsafe {
+    ///     assert_eq!(zs.get_unchecked(..3), "E\u{33a}");
+    /// }
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    pub unsafe fn get_unchecked<I>(&self, index: I) -> &<I as SliceIndex<str>>::Output
+    where
+        I: SliceIndex<str>,
+    {
+        self.0.get_unchecked(index)
+    }
+
     /// Returns an iterator over the encoded characters of the `ZalgoString`.
     ///
     /// The first character is an "E", the others are unicode combining characters.
@@ -842,6 +871,14 @@ mod test {
         assert_eq!(zs.get(0..3), Some("E\u{33a}"));
         assert!(zs.get(0..2).is_none());
         assert!(zs.get(0..42).is_none());
+    }
+
+    #[test]
+    fn test_get_unchecked() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        unsafe {
+            assert_eq!(zs.get_unchecked(..3), "E\u{33a}");
+        }
     }
 
     #[test]
