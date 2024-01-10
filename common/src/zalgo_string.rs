@@ -5,6 +5,7 @@ use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 use core::{
     iter::{ExactSizeIterator, FusedIterator},
     ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
+    slice::SliceIndex,
 };
 
 #[cfg(not(feature = "std"))]
@@ -72,6 +73,25 @@ impl ZalgoString {
     #[must_use = "the method returns a reference and does not modify `self`"]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    /// Returns a subslice of `self`.
+    ///
+    /// This is the non-panicking alternative to indexing the `ZalgoString`. Returns [`None`] whenever
+    /// the equivalent indexing operation would panic.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Zalgo")?;
+    /// assert_eq!(zs.get(0..1), Some("E"));
+    /// assert_eq!(zs.get(1..=2), Some("\u{33a}"));
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    pub fn get<I: SliceIndex<str>>(&self, index: I) -> Option<&<I as SliceIndex<str>>::Output> {
+        self.0.get(index)
     }
 
     /// Returns an iterator over the encoded characters of the `ZalgoString`.
