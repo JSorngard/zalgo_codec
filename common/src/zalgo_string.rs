@@ -97,7 +97,10 @@ impl ZalgoString {
     /// # Ok::<(), Error>(())
     /// ```
     #[inline]
-    pub fn get<I: SliceIndex<str>>(&self, index: I) -> Option<&<I as SliceIndex<str>>::Output> {
+    pub fn get<I>(&self, index: I) -> Option<&<I as SliceIndex<str>>::Output>
+    where
+        I: SliceIndex<str>,
+    {
         self.0.get(index)
     }
 
