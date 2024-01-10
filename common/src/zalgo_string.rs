@@ -650,7 +650,7 @@ impl<'a> Iterator for DecodedBytes<'a> {
 
     #[inline]
     fn count(self) -> usize {
-        self.len()
+        self.0.count() / 2
     }
 }
 
