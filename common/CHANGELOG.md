@@ -2,6 +2,11 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.10.4
+
+- Implement the `Index` trait for the different range types for `ZalgoString`.
+- Add the `get` function to `ZalgoString` that works the same as `String::get`.
+
 ## 0.10.3
 
  - Add `truncate` and `clear` to `ZalgoString`.
