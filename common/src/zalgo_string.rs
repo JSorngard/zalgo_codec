@@ -1,4 +1,9 @@
 //! Contains the implementation of [`ZalgoString`] as well as related iterators.
+//!
+//! A `ZalgoString` contains a grapheme cluster that was obtained from [`zalgo_encode`].
+//! It allows for iteration over its characters and bytes in both encoded and decoded form.
+//! It can be decoded in-place and the encoded information in other ZalgoStrings can be pushed
+//! onto it.
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
