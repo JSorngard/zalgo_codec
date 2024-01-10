@@ -803,4 +803,21 @@ mod test {
         assert!(zs.get(0..2).is_none());
         assert!(zs.get(0..42).is_none());
     }
+
+    #[test]
+    fn test_indexing() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(&zs[0..3], "E\u{33a}");
+        assert_eq!(&zs[..3], "E\u{33a}");
+        assert_eq!(&zs[0..=2], "E\u{33a}");
+        assert_eq!(&zs[..=2], "E\u{33a}");
+        assert_eq!(zs[..], zs);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_index_panic() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        let _a = &zs[0..2];
+    }
 }
