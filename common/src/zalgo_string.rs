@@ -637,15 +637,15 @@ impl<'a> Iterator for DecodedBytes<'a> {
             .len()
             // Check if there are at least two bytes left
             .checked_sub(2)
-            .map(|l| {
+            .and_then(|l| {
                 self.0
-                    // Get the first,
+                    // Get the next to last,
                     .nth(l)
-                    // and the second of them
+                    // and the last
                     .zip(self.0.next())
+                    // and decode them
                     .map(|(odd, even)| decode_byte_pair(odd, even))
             })
-            .flatten()
     }
 
     #[inline]
