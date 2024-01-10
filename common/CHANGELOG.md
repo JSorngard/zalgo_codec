@@ -5,7 +5,7 @@ This document contains all changes to the crate since version 0.9.4.
 ## 0.10.4
 
 - Implement the `Index` trait for the different range types for `ZalgoString`.
-- Add the `get` function to `ZalgoString` that works the same as `String::get`.
+- Add the `get` and `get_unchecked` function to `ZalgoString` that works the same as `str::get` and `str::get_unchecked`.
 
 ## 0.10.3
 
