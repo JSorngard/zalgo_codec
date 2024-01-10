@@ -312,7 +312,7 @@ impl ZalgoString {
     /// ```
     #[inline]
     pub fn decoded_bytes(&self) -> DecodedBytes<'_> {
-        DecodedBytes(self.0.bytes().skip(1))
+        DecodedBytes(self.as_combining_chars().bytes())
     }
 
     /// Converts `self` into a byte vector.
@@ -605,7 +605,7 @@ impl ZalgoString {
 /// See its documentation for more.
 #[derive(Debug, Clone)]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct DecodedBytes<'a>(core::iter::Skip<core::str::Bytes<'a>>);
+pub struct DecodedBytes<'a>(core::str::Bytes<'a>);
 
 impl<'a> Iterator for DecodedBytes<'a> {
     type Item = u8;
@@ -621,6 +621,36 @@ impl<'a> Iterator for DecodedBytes<'a> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         let left = self.0.size_hint().0 / 2;
         (left, Some(left))
+    }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.0
+            .nth(2 * n)
+            .zip(self.0.next())
+            .map(|(odd, even)| decode_byte_pair(odd, even))
+    }
+
+    #[inline]
+    fn last(mut self) -> Option<Self::Item> {
+        self.0
+            .len()
+            // Check if there are at least two bytes left
+            .checked_sub(2)
+            .and_then(|l| {
+                self.0
+                    // Get the next to last,
+                    .nth(l)
+                    // and the last
+                    .zip(self.0.next())
+                    // and decode them
+                    .map(|(odd, even)| decode_byte_pair(odd, even))
+            })
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.0.count() / 2
     }
 }
 
@@ -896,5 +926,18 @@ mod test {
     fn test_index_panic() {
         let zs = ZalgoString::new("Zalgo").unwrap();
         let _a = &zs[0..2];
+    }
+
+    #[test]
+    fn test_decoded_bytes() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.decoded_bytes().nth(0), Some(b'Z'));
+        assert_eq!(zs.decoded_bytes().nth(2), Some(b'l'));
+        assert_eq!(zs.decoded_bytes().last(), Some(b'o'));
+        let mut dcb = zs.decoded_bytes();
+        assert_eq!(dcb.next(), Some(b'Z'));
+        let dcb2 = dcb.clone();
+        assert_eq!(dcb.count(), 4);
+        assert_eq!(dcb2.last(), Some(b'o'));
     }
 }
