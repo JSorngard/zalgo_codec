@@ -2,7 +2,10 @@
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 
-use core::iter::{ExactSizeIterator, FusedIterator};
+use core::{
+    iter::{ExactSizeIterator, FusedIterator},
+    ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
+};
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::String, vec::Vec};
@@ -630,6 +633,26 @@ impl fmt::Display for ZalgoString {
         write!(f, "{}", self.0)
     }
 }
+
+// region: impl index
+
+macro_rules! impl_index {
+    ($($range:ty),+) => {
+        $(
+            impl Index<$range> for ZalgoString {
+                type Output = str;
+                #[inline]
+                fn index(&self, index: $range) -> &Self::Output {
+                    &self.0[index]
+                }
+            }
+        )+
+    };
+}
+
+impl_index! {Range<usize>, RangeTo<usize>, RangeFrom<usize>, RangeInclusive<usize>, RangeToInclusive<usize>, RangeFull}
+
+// endregion: impl index
 
 #[cfg(test)]
 mod test {
