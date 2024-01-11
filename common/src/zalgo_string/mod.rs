@@ -8,7 +8,7 @@
 mod iterators;
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
-use iterators::{DecodedBytes, DecodedChars};
+pub use iterators::{DecodedBytes, DecodedChars};
 
 use core::{
     ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
