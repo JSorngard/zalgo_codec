@@ -463,7 +463,7 @@ impl ZalgoString {
     /// This is an `O(n)` operation since after it has removed the initial "E" it needs to copy every byte
     /// of the string down one index.
     ///
-    /// It is the same as calling [`ZalgoString::into_string()`] followed by [`String::remove(0)`].
+    /// It is the same as calling [`ZalgoString::into_string()`] followed by [`String::remove(0)`](String::remove).
     ///
     /// # Example
     ///
