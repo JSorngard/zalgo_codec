@@ -458,6 +458,29 @@ impl ZalgoString {
         self.0.split_at(1).1
     }
 
+    /// Converts `self` into a String that contains only the combining characters of the grapheme cluster.
+    ///
+    /// This is an `O(n)` operation since after it has removed the initial "E" it needs to copy every byte
+    /// of the string down one index.
+    ///
+    /// It is the same as calling [`ZalgoString::into_string()`] followed by [`String::remove(0)`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let zs = ZalgoString::new("Hi")?;
+    /// let s = zs.into_combining_chars();
+    /// assert_eq!(s, "\u{328}\u{349}");
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    #[must_use = "`self` will be dropped if the result is not used"]
+    pub fn into_combining_chars(mut self) -> String {
+        self.0.remove(0);
+        self.0
+    }
+
     /// Appends the combining characters of a different `ZalgoString` to the end of `self`.
     ///
     /// # Example
@@ -851,5 +874,13 @@ mod test {
         let dcc2 = dcc.clone();
         assert_eq!(dcc.count(), 4);
         assert_eq!(dcc2.last(), Some('o'));
+    }
+
+    #[test]
+    fn test_into_combining_chars() {
+        let zs = ZalgoString::new("Hi").unwrap();
+        assert_eq!(zs.into_combining_chars(), "\u{328}\u{349}");
+        let zs = ZalgoString::new("").unwrap();
+        assert_eq!(zs.into_combining_chars(), "");
     }
 }
