@@ -4,6 +4,10 @@ This document contains the changes made to the crate since version 0.9.5. This c
 See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the non-macro parts of the crate,
 and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macro.
 
+## 0.10.4
+
+- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+
 ## 0.10.3
 
 - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
