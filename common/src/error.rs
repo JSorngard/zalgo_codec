@@ -95,14 +95,14 @@ impl Error {
         }
     }
 
-    /// Returns whether the error is the [NotAscii](Error::NotAscii) variant.
+    /// Returns whether the error is the [`NotAscii`](Error::NotAscii) variant.
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn is_not_ascii(&self) -> bool {
         matches!(self, Self::NotAscii(_, _, _))
     }
 
-    /// Returns whether the error is the [UnencodableAscii](Error::UnencodableAscii) variant.
+    /// Returns whether the error is the [`UnencodableAscii`](Error::UnencodableAscii) variant.
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn is_unencodable_ascii(&self) -> bool {
