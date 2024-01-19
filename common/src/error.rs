@@ -55,7 +55,7 @@ impl Error {
         }
     }
 
-    /// Returns the value of the unencodable character.
+    /// Returns the unencodable character.
     ///
     /// # Examples
     ///
