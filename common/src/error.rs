@@ -30,7 +30,7 @@ impl Error {
     /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().map(|e| e.line()), Some(3));
     /// ```
     #[inline]
-    #[must_use = "the method returns a new valus and does not modify `self`"]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
             Self::UnencodableAscii(_, line, _, _) | Self::NotAscii(_, line, _) => *line,
@@ -48,7 +48,7 @@ impl Error {
     /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().map(|e|e.column()), Some(1));
     /// ```
     #[inline]
-    #[must_use = "the method returns a new valus and does not modify `self`"]
+    #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn column(&self) -> usize {
         match self {
             Self::UnencodableAscii(_, _, column, _) | Self::NotAscii(_, _, column) => *column,
