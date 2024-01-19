@@ -26,8 +26,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.line()), Some(1));
-    /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().map(|e| e.line()), Some(3));
+    /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.line()), Err(1));
+    /// assert_eq!(zalgo_encode("a\nb\nc\r\n").map_err(|e| e.line()), Err(3));
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
@@ -44,8 +44,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().map(|e| e.column()), Some(3));
-    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().map(|e|e.column()), Some(1));
+    /// assert_eq!(zalgo_encode("I ❤️ 🎂").map_err(|e| e.column()), Err(3));
+    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").map_err(|e|e.column()), Err(1));
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
@@ -61,11 +61,11 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("CRLF\r\n").err().map(|e| e.char()), Some('\r'));
+    /// assert_eq!(zalgo_encode("CRLF\r\n").map_err(|e| e.char()), Err('\r'));
     ///
     /// // Only the first unicode character is returned. Some emojis consist of
     /// // many unicode characters:
-    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.char()), Some('❤'));
+    /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.char()), Err('❤'));
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
@@ -85,8 +85,8 @@ impl Error {
     ///
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
-    /// assert_eq!(zalgo_encode("\r").err().map(|e| e.representation()).flatten(), Some("Carriage Return"));
-    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.representation()).flatten(), None);
+    /// assert_eq!(zalgo_encode("\r").map_err(|e| e.representation()), Err(Some("Carriage Return")));
+    /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.representation()), Err(None));
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
