@@ -121,7 +121,8 @@ impl fmt::Display for Error {
             ),
             Self::NotAscii(char, line, column) => write!(
                 f,
-                "line {line} at column {column}: '{char}' is not an ASCII character"
+                "line {line} at column {column}: unicode character '{char}' (U+{:x}) is not an ASCII character",
+                u32::from(*char)
             ),
         }
     }
