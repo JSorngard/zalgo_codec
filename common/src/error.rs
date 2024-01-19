@@ -77,7 +77,7 @@ impl Error {
     }
 
     /// If the unencodable character is an ASCII character
-    /// this function returns a represenation of it.
+    /// this function returns a representation of it.
     ///
     /// # Examples
     ///
