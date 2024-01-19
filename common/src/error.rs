@@ -117,11 +117,11 @@ impl fmt::Display for Error {
         match self {
             Self::UnencodableAscii(byte, line, column, repr) => write!(
                 f,
-                "line {line} at column {column}: can not encode ASCII \"{repr}\" character with byte value {byte}"
+                "line {line} at column {column}: can not encode ascii \"{repr}\" character with byte value {byte}"
             ),
             Self::NotAscii(char, line, column) => write!(
                 f,
-                "line {line} at column {column}: unicode character '{char}' (U+{:x}) is not an ASCII character",
+                "line {line} at column {column}: unicode character '{char}' (U+{:x}) is not an ascii character",
                 u32::from(*char)
             ),
         }
