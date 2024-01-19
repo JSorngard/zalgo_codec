@@ -63,7 +63,7 @@ impl Error {
     /// # use zalgo_codec_common::{Error, zalgo_encode};
     /// assert_eq!(zalgo_encode("CRLF\r\n").err().map(|e| e.char()), Some('\r'));
     ///
-    /// // Only the first unicode character is returned. E.g. some emojis consist of
+    /// // Only the first unicode character is returned. Some emojis consist of
     /// // many unicode characters:
     /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.char()), Some('❤'));
     /// ```
