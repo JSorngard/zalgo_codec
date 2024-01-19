@@ -55,17 +55,28 @@ impl Error {
         }
     }
 
-    /// Returns the unencodable character.
+    /// Returns the unencodable character that caused the error.
     ///
     /// # Examples
     ///
     /// ```
-    /// # use zalgo_codec_common::{Error, zalgo_encode};
+    /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("CRLF\r\n").map_err(|e| e.char()), Err('\r'));
     ///
-    /// // Only the first unicode character is returned. Some emojis consist of
-    /// // many unicode characters:
+    /// ```
+    /// This may not match with what you see when you look at the string in a text editor since
+    /// some grapheme clusters consist of many unicode characters:  
+    /// The ❤️ emoji consists of two codepoints, the heart `U+2764` and the color variant selector `U+FE0F`
+    /// Since the heart in not encodable, that is the place where the error is generated:
+    /// ```
+    /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.char()), Err('❤'));
+    /// ```
+    /// The grapheme cluster `á` consists of a normal `a` and a combining acute accent, `U+301`.
+    /// The `a` can be encoded and the combining acute accent can not, so the error points only to the accent:
+    /// ```
+    /// # use zalgo_codec_common::zalgo_encode;
+    /// assert_eq!(zalgo_encode("á").map_err(|e| e.char()), Err('\u{301}'))
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
