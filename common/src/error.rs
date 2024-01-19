@@ -76,10 +76,8 @@ impl Error {
         }
     }
 
-    /// Return a representation of the unencodable byte.
-    /// This exists if the character is an unencodable ASCII character.
-    /// If it is some other unicode character we only know its first byte, so we can not
-    /// accurately represent it.
+    /// If the unencodable character is an ASCII character
+    /// this function returns a represenation of it.
     ///
     /// # Examples
     ///
