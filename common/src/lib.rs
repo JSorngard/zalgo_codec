@@ -170,7 +170,8 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                         // character and that Strings in Rust are valid utf-8.
                         // All of this means that the value that starts at this index is a utf-8 encoded
                         // character, which `chars.next()` will extract.
-                        let char = string.split_at(i*BATCH_SIZE + j).1.chars().next().expect("i + j is within the string, so string.chars().next() should find a char");
+                        let char = string.split_at(i*BATCH_SIZE + j).1.chars().next()
+                            .expect("i + j is within the string and on a char boundary, so string.chars().next() should find a char");
                         return Err(Error::NotAscii(char, line, column));
                     }
                 }
