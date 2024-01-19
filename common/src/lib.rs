@@ -165,6 +165,11 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 match nonprintable_char_repr(*byte) {
                     Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
                     None => {
+                        // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
+                        // has some value and that this value is the first byte of a non-ascii
+                        // character and that Strings in Rust are valid utf-8.
+                        // All of this means that the value that starts at this index is a utf-8 encoded
+                        // character, which `chars.next()` will extract.
                         let char = string.split_at(i*BATCH_SIZE + j).1.chars().next().expect("i + j is within the string, so string.chars().next() should find a char");
                         return Err(Error::NotAscii(char, line, column));
                     }
