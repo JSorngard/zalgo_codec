@@ -165,7 +165,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 match nonprintable_char_repr(*byte) {
                     Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
                     None => {
-                        let char = string[i*BATCH_SIZE + j..].chars().next().expect("i + j is within the string, so string.chars().next() should find a char");
+                        let char = string.split_at(i*BATCH_SIZE + j).1.chars().next().expect("i + j is within the string, so string.chars().next() should find a char");
                         return Err(Error::NotAscii(char, line, column));
                     }
                 }
