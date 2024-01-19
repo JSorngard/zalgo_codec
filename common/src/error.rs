@@ -2,7 +2,7 @@
 
 use core::fmt;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
 /// if they encounter a byte they can not encode.
 ///
@@ -16,8 +16,7 @@ pub enum Error {
     UnencodableAscii(u8, usize, usize, &'static str),
     /// Represents some other character.
     /// The two `usize`s represent the same thing as in the `UnencodableAscii` variant,
-    /// but the `u8` is only the first byte of the character.
-    NotAscii(u8, usize, usize),
+    NotAscii(char, usize, usize),
 }
 
 impl Error {
@@ -30,6 +29,7 @@ impl Error {
     /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.line()), Some(1));
     /// assert_eq!(zalgo_encode("a\nb\nc\r\n").err().map(|e| e.line()), Some(3));
     /// ```
+    #[inline]
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn line(&self) -> usize {
         match self {
@@ -47,6 +47,7 @@ impl Error {
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").err().map(|e| e.column()), Some(3));
     /// assert_eq!(zalgo_encode("I\n❤️\n🎂").err().map(|e|e.column()), Some(1));
     /// ```
+    #[inline]
     #[must_use = "the method returns a new valus and does not modify `self`"]
     pub const fn column(&self) -> usize {
         match self {
@@ -54,26 +55,24 @@ impl Error {
         }
     }
 
-    /// Returns the value of the first byte of the unencodable character.
+    /// Returns the value of the unencodable character.
     ///
     /// # Examples
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("\r").err().map(|e| e.byte()), Some(13));
+    /// assert_eq!(zalgo_encode("CRLF\r\n").err().map(|e| e.char()), Some('\r'));
+    ///
+    /// // Only the first unicode character is returned. E.g. some emojis consist of
+    /// // many unicode characters:
+    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.char()), Some('❤'));
     /// ```
-    /// Note that this might not be the complete representation of
-    /// the character in unicode, just the first byte of it.
-    /// ```
-    /// # use zalgo_codec_common::{Error, zalgo_encode};
-    /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.byte()), Some(226));
-    /// // Even though
-    /// assert_eq!("❤️".as_bytes(), &[226, 157, 164, 239, 184, 143])
-    /// ```
+    #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
-    pub const fn byte(&self) -> u8 {
+    pub const fn char(&self) -> char {
         match self {
-            Self::UnencodableAscii(byte, _, _, _) | Self::NotAscii(byte, _, _) => *byte,
+            Self::UnencodableAscii(byte, _, _, _) => *byte as char,
+            Self::NotAscii(char, _, _) => *char,
         }
     }
 
@@ -89,12 +88,27 @@ impl Error {
     /// assert_eq!(zalgo_encode("\r").err().map(|e| e.representation()).flatten(), Some("Carriage Return"));
     /// assert_eq!(zalgo_encode("❤️").err().map(|e| e.representation()).flatten(), None);
     /// ```
+    #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn representation(&self) -> Option<&'static str> {
         match self {
             Self::UnencodableAscii(_, _, _, repr) => Some(*repr),
             Self::NotAscii(_, _, _) => None,
         }
+    }
+
+    /// Returns whether the error is the [NotAscii](Error::NotAscii) variant.
+    #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
+    pub const fn is_not_ascii(&self) -> bool {
+        matches!(self, Self::NotAscii(_, _, _))
+    }
+
+    /// Returns whether the error is the [UnencodableAscii](Error::UnencodableAscii) variant.
+    #[inline]
+    #[must_use = "the method returns a new value and does not modify `self`"]
+    pub const fn is_unencodable_ascii(&self) -> bool {
+        matches!(self, Self::UnencodableAscii(_, _, _, _))
     }
 }
 
@@ -105,9 +119,9 @@ impl fmt::Display for Error {
                 f,
                 "line {line} at column {column}: can not encode ASCII \"{repr}\" character with byte value {byte}"
             ),
-            Self::NotAscii(byte, line, column) => write!(
+            Self::NotAscii(char, line, column) => write!(
                 f,
-                "line {line} at column {column}: byte value {byte} does not correspond to an ASCII character"
+                "line {line} at column {column}: '{char}' is not an ASCII character"
             ),
         }
     }
@@ -122,14 +136,14 @@ mod test {
 
     #[test]
     fn test_error() {
-        let err = Error::NotAscii(195, 1, 7);
-        assert_eq!(err.byte(), 195);
+        let err = Error::NotAscii('å', 1, 7);
+        assert_eq!(err.char(), 'å');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
         assert_eq!(err.representation(), None);
 
         let err = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
-        assert_eq!(err.byte(), 13);
+        assert_eq!(err.char(), '\r');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 2);
         assert_eq!(err.representation(), Some("Carriage Return"));
