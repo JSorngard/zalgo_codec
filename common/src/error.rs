@@ -57,16 +57,17 @@ impl Error {
 
     /// Returns the unencodable character that caused the error.
     ///
+    /// This may not match with what you see when you look at the unencoded string in a text editor since
+    /// some grapheme clusters consist of many unicode characters.
+    ///
     /// # Examples
     ///
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("CRLF\r\n").map_err(|e| e.char()), Err('\r'));
     ///
-    /// ```
-    /// This may not match with what you see when you look at the string in a text editor since
-    /// some grapheme clusters consist of many unicode characters:  
-    /// The ❤️ emoji consists of two codepoints, the heart `U+2764` and the color variant selector `U+FE0F`
+    /// ```  
+    /// The ❤️ emoji consists of two characters, the heart `U+2764` and the color variant selector `U+FE0F`
     /// Since the heart in not encodable, that is the place where the error is generated:
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
