@@ -337,3 +337,14 @@ const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
         None
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_char() {
+        assert_eq!(zalgo_encode("Zalgo\r").map_err(|e| e.char()), Err('\r'));
+        assert_eq!(zalgo_encode("Zålgo").map_err(|e| e.char()), Err('å'));
+    }
+}
