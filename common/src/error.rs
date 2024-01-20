@@ -127,11 +127,11 @@ impl fmt::Display for Error {
         match self {
             Self::UnencodableAscii(byte, line, column, repr) => write!(
                 f,
-                "line {line} at column {column}: can not encode ascii \"{repr}\" character with byte value {byte}"
+                "line {line} at column {column}: can not encode ascii '{repr}' character with byte value {byte}"
             ),
             Self::NotAscii(char, line, column) => write!(
                 f,
-                "line {line} at column {column}: character '{char}' (U+{:X}) is not an ascii character",
+                "line {line} at column {column}: can not encode non-ascii character '{char}' (U+{:X})",
                 u32::from(*char)
             ),
         }
@@ -148,15 +148,25 @@ mod test {
     #[test]
     fn test_error() {
         let err = Error::NotAscii('å', 1, 7);
+        assert!(err.is_not_ascii());
         assert_eq!(err.char(), 'å');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
         assert_eq!(err.representation(), None);
+        assert_eq!(
+            format!("{err}"),
+            "line 1 at column 7: can not encode non-ascii character 'å' (U+E5)"
+        );
 
         let err = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
+        assert!(err.is_unencodable_ascii());
         assert_eq!(err.char(), '\r');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 2);
         assert_eq!(err.representation(), Some("Carriage Return"));
+        assert_eq!(
+            format!("{err}"),
+            "line 1 at column 2: can not encode ascii 'Carriage Return' character with byte value 13"
+        );
     }
 }
