@@ -158,15 +158,17 @@ mod test {
             "line 1 at column 7: can not encode non-ascii character 'å' (U+E5)"
         );
 
-        let err = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
-        assert!(err.is_unencodable_ascii());
-        assert_eq!(err.char(), '\r');
-        assert_eq!(err.line(), 1);
-        assert_eq!(err.column(), 2);
-        assert_eq!(err.representation(), Some("Carriage Return"));
+        let err2 = Error::UnencodableAscii(13, 1, 2, "Carriage Return");
+        assert!(err2.is_unencodable_ascii());
+        assert_eq!(err2.char(), '\r');
+        assert_eq!(err2.line(), 1);
+        assert_eq!(err2.column(), 2);
+        assert_eq!(err2.representation(), Some("Carriage Return"));
         assert_eq!(
-            format!("{err}"),
+            format!("{err2}"),
             "line 1 at column 2: can not encode ascii 'Carriage Return' character with byte value 13"
         );
+
+        assert_ne!(err, err2);
     }
 }
