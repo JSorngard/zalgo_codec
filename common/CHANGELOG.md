@@ -2,6 +2,18 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.11.0
+
+### Breaking changes
+
+- The `Error::NotAscii` variant now stores the unencodable character instead of just the first byte of it.
+- Removed the `byte` function from `Error`.
+
+### Minor changes
+
+- Add `is_not_ascii` and `is_unencodable_ascii` variant checking functions to `Error`.
+- Add `char` function to `Error`.
+
 ## 0.10.4
 
 - Implement the `Index` trait for the different range types for `ZalgoString`.
