@@ -144,10 +144,10 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
     let mut result = Vec::with_capacity(2 * string.len() + 1);
     result.push(b'E');
 
-    for batch in string.as_bytes().chunks(BATCH_SIZE) {
+    for (i, batch) in string.as_bytes().chunks(BATCH_SIZE).enumerate() {
         let mut buffer = [0; 2 * BATCH_SIZE];
         let mut encoded = 0;
-        for byte in batch {
+        for (j, byte) in batch.iter().enumerate() {
             // Only encode ASCII bytes corresponding to printable characters or newlines.
             if (32..127).contains(byte) || *byte == b'\n' {
                 if *byte == b'\n' {
@@ -164,7 +164,16 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
             } else {
                 match nonprintable_char_repr(*byte) {
                     Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
-                    None => return Err(Error::NotAscii(*byte, line, column)),
+                    None => {
+                        // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
+                        // has some value which is stored in `byte`, and that this value is the first
+                        // byte of a non-ascii character and that Strings in Rust are valid utf-8.
+                        // All of this means that the value that starts at this index is a utf-8 encoded
+                        // character, which `chars.next()` will extract.
+                        let char = string.split_at(i*BATCH_SIZE + j).1.chars().next()
+                            .expect("i + j is within the string and on a char boundary, so string.chars().next() should find a char");
+                        return Err(Error::NotAscii(char, line, column));
+                    }
                 }
             }
         }
@@ -224,7 +233,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, FromUtf8Error> {
 
 #[inline]
 #[must_use = "the function returns a new value and does not modify its inputs"]
-fn decode_byte_pair(odd: u8, even: u8) -> u8 {
+const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
     ((odd << 6 & 64 | even & 63) + 22) % 133 + 10
 }
 
@@ -268,9 +277,7 @@ fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// # use zalgo_codec_common::{Error, zalgo_wrap_python};
 /// assert_eq!(
 ///     zalgo_wrap_python(r#"print("That will be 5€ please")"#),
-///     // € is not an ASCII character, the first byte in its utf-8 representation is 226
-///     // and it is the 22nd character on the first line in the string.
-///     Err(Error::NotAscii(226, 1, 22))
+///     Err(Error::NotAscii('€', 1, 22))
 /// );
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
@@ -328,5 +335,16 @@ const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
         Some("Delete")
     } else {
         None
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_char() {
+        assert_eq!(zalgo_encode("Zalgo\r").map_err(|e| e.char()), Err('\r'));
+        assert_eq!(zalgo_encode("Zålgo").map_err(|e| e.char()), Err('å'));
     }
 }
