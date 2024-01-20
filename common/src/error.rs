@@ -153,6 +153,7 @@ mod test {
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
         assert_eq!(err.representation(), None);
+        assert_eq!(format!("{err:?}"), "NotAscii('å', 1, 7)");
         assert_eq!(
             format!("{err}"),
             "line 1 at column 7: can not encode non-ascii character 'å' (U+E5)"
@@ -164,6 +165,10 @@ mod test {
         assert_eq!(err2.line(), 1);
         assert_eq!(err2.column(), 2);
         assert_eq!(err2.representation(), Some("Carriage Return"));
+        assert_eq!(
+            format!("{err2:?}"),
+            "UnencodableAscii(13, 1, 2, \"Carriage Return\")"
+        );
         assert_eq!(
             format!("{err2}"),
             "line 1 at column 2: can not encode ascii 'Carriage Return' character with byte value 13"
