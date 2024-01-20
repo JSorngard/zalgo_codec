@@ -170,5 +170,7 @@ mod test {
         );
 
         assert_ne!(err, err2);
+        let err3 = err;
+        assert_eq!(err, err3);
     }
 }
