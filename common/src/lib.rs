@@ -112,7 +112,7 @@ pub use zalgo_string::ZalgoString;
 ///
 /// Returns an error if the input contains a byte that does not correspond to a printable
 /// ASCII character or newline.
-/// Notably this means that this function can not encode tab characters or carriage returns.
+/// Notably this means that this function can not encode tab or carriage return characters.
 /// Carriage returns are present in e.g. line endings on Windows.
 ///
 /// # Example
