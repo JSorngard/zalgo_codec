@@ -122,7 +122,7 @@ pub use zalgo_string::ZalgoString;
 /// # Ok::<(), Error>(())
 /// ```
 /// Can not encode ASCII control characters except newlines.
-/// Notably this means that this function can not encode carriage returns,
+/// Notably this means that this function can not encode tab characters or carriage returns,
 /// which are present in e.g. line endings on Windows:
 /// ```
 /// # use zalgo_codec_common::zalgo_encode;

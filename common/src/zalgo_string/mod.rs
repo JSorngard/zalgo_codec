@@ -466,7 +466,7 @@ impl ZalgoString {
     /// It is the same as calling [`ZalgoString::into_string()`] followed by [`String::remove(0)`](String::remove).
     ///
     /// Just like [`as_combining_chars`](ZalgoString::as_combining_chars) the result of this method can not
-    /// be decoded by [`zalgo_decode`].
+    /// be decoded by [`zalgo_decode`](crate::zalgo_decode).
     ///
     /// # Example
     ///
@@ -508,6 +508,11 @@ impl ZalgoString {
     /// Encodes the given string and appends the resulting combining
     /// characters to the end of `self`.
     ///
+    /// # Errors
+    /// 
+    /// Returns an error if the given string could not be decoded.
+    /// Has the same error conditions as [`zalgo_encode`].
+    /// 
     /// # Example
     ///
     /// ```
