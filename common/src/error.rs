@@ -108,6 +108,13 @@ impl Error {
     }
 
     /// Returns whether the error is the [`NotAscii`](Error::NotAscii) variant.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
+    /// assert_eq!(zalgo_encode("Blå").map_err(|e| e.is_not_ascii()), Err(true));
+    /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn is_not_ascii(&self) -> bool {
@@ -115,6 +122,13 @@ impl Error {
     }
 
     /// Returns whether the error is the [`UnencodableAscii`](Error::UnencodableAscii) variant.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, zalgo_encode};
+    /// assert_eq!(zalgo_encode("true\rfalse").map_err(|e| e.is_unencodable_ascii()), Err(true));
+    /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub const fn is_unencodable_ascii(&self) -> bool {
