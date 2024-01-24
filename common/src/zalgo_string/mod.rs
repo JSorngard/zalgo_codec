@@ -505,7 +505,7 @@ impl ZalgoString {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
-    /// Encodes the given string into a `ZalgoString` and appends its combining
+    /// Encodes the given string and appends the resulting combining
     /// characters to the end of `self`.
     ///
     /// # Example
