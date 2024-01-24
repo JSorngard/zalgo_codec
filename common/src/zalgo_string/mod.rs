@@ -505,28 +505,6 @@ impl ZalgoString {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
-    /// Encodes the given string and appends the resulting combining
-    /// characters to the end of `self`.
-    ///
-    /// # Errors
-    /// 
-    /// Returns an error if the given string could not be decoded.
-    /// Has the same error conditions as [`zalgo_encode`].
-    /// 
-    /// # Example
-    ///
-    /// ```
-    /// # use zalgo_codec_common::{Error, ZalgoString};
-    /// let mut zs = ZalgoString::new("Zalgo")?;
-    /// zs.encode_and_push_str(", He comes!")?;
-    /// assert_eq!(zs.into_decoded_string(), "Zalgo, He comes!");
-    /// # Ok::<(), Error>(())
-    /// ```
-    pub fn encode_and_push_str(&mut self, string: &str) -> Result<(), Error> {
-        self.push_zalgo_str(&ZalgoString::new(string)?);
-        Ok(())
-    }
-
     // region: capacity manipulation methods
 
     /// Reserves capacity for at least `additional` bytes more than the current length.
@@ -907,14 +885,5 @@ mod test {
         assert_eq!(zs.into_combining_chars(), "\u{328}\u{349}");
         let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_combining_chars(), "");
-    }
-
-    #[test]
-    fn test_encode_and_push_str() {
-        let s1 = "Zalgo";
-        let s2 = ", He comes!";
-        let mut zs = ZalgoString::new(s1).unwrap();
-        zs.encode_and_push_str(s2).unwrap();
-        assert_eq!(zs.into_decoded_string(), format!("{s1}{s2}"));
     }
 }
