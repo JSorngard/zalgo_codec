@@ -80,7 +80,7 @@
 //! we can simply map 0x7F (DEL) to 0x0A (LF).
 //! This can be represented as `(CHARACTER - 11) % 133 - 21`, and decoded with `(CHARACTER + 22) % 133 + 10`.  
 //!
-//! <details><summary>Full conversion table</summary>
+//! <details><summary><b>Full conversion table</b></summary>
 //!
 //! | ASCII character | Encoded |  
 //! |---|---|  
