@@ -266,7 +266,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                         // All of this means that the value that starts at this index is a utf-8 encoded
                         // character, which `chars.next()` will extract.
                         let char = string[i*BATCH_SIZE + j..].chars().next()
-                            .expect("i + j is within the string and on a char boundary, so string.chars().next() should find a char");
+                            .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
                         return Err(Error::NotAscii(char, line, column));
                     }
                 }
