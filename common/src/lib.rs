@@ -257,7 +257,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 encoded += 2;
                 column += 1;
             } else {
-                match nonprintable_char_repr(*byte) {
+                match nonprintable_ascii_repr(*byte) {
                     Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
                     None => {
                         // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
@@ -384,7 +384,7 @@ pub fn zalgo_wrap_python(python: &str) -> Result<String, Error> {
 /// Returns the representation of the given ASCII byte if it's not printable.
 #[inline]
 #[must_use = "the function returns a new value and does not modify the input"]
-const fn nonprintable_char_repr(byte: u8) -> Option<&'static str> {
+const fn nonprintable_ascii_repr(byte: u8) -> Option<&'static str> {
     if byte < 10 {
         Some(
             [
