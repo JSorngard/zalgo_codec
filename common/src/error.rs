@@ -15,6 +15,8 @@ pub struct Error {
 }
 
 impl Error {
+    #[inline]
+    #[must_use = "this associated method does not modify its inputs and just returns a new value"]
     pub(crate) const fn new(
         unencodable_character: char,
         line: usize,
