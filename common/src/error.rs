@@ -145,6 +145,7 @@ mod test {
         assert_eq!(err.char(), 'å');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
+        assert_eq!(err.index(), 6);
 
         let err2 = Error {
             line: 1,
@@ -152,8 +153,10 @@ mod test {
             unencodable_character: '\r',
             index: 1,
         };
+        assert_eq!(err2.char(), '\r');
         assert_eq!(err2.line(), 1);
         assert_eq!(err2.column(), 2);
+        assert_eq!(err2.index(), 1);
 
         assert_ne!(err, err2);
         let err3 = err;
