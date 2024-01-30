@@ -17,6 +17,8 @@ pub struct Error {
 impl Error {
     /// Creates a new `Error`.
     ///
+    /// # Note
+    ///
     /// This associated method does not check the validity of its inputs,
     /// and just constructs a new `Error` instance.
     #[inline]
