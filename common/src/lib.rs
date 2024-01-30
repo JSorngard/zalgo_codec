@@ -257,14 +257,15 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 encoded += 2;
                 column += 1;
             } else {
+                let index = i * BATCH_SIZE + j;
                 // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
                 // has some value which is stored in `byte`, and that this value is the first
                 // byte of a non-ascii character and that Strings in Rust are valid utf-8.
                 // All of this means that the value that starts at this index is a utf-8 encoded
                 // character, which `chars.next()` will extract.
-                let char = string[i*BATCH_SIZE + j..].chars().next()
+                let unencodable_character = string[index..].chars().next()
                     .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
-                return Err(Error::new(char, line, column, i * BATCH_SIZE + j));
+                return Err(Error::new(unencodable_character, line, column, index));
             }
         }
         result.extend_from_slice(&buffer[..encoded]);
