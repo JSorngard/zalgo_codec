@@ -15,6 +15,10 @@ pub struct Error {
 }
 
 impl Error {
+    /// Creates a new `Error`.
+    ///
+    /// This associated method does not check the validity of its inputs,
+    /// and just constructs a new `Error` instance.
     #[inline]
     #[must_use = "this associated method does not modify its inputs and just returns a new value"]
     pub(crate) const fn new(
