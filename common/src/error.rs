@@ -98,7 +98,7 @@ impl Error {
         self.unencodable_character
     }
 
-    /// Returns the index of the string where the unencodable character occured
+    /// Returns the index of the string where the unencodable character occured.
     ///
     /// # Example
     ///
