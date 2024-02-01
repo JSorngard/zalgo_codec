@@ -257,19 +257,15 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 encoded += 2;
                 column += 1;
             } else {
-                match nonprintable_ascii_repr(*byte) {
-                    Some(repr) => return Err(Error::UnencodableAscii(*byte, line, column, repr)),
-                    None => {
-                        // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
-                        // has some value which is stored in `byte`, and that this value is the first
-                        // byte of a non-ascii character and that Strings in Rust are valid utf-8.
-                        // All of this means that the value that starts at this index is a utf-8 encoded
-                        // character, which `chars.next()` will extract.
-                        let char = string[i*BATCH_SIZE + j..].chars().next()
-                            .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
-                        return Err(Error::NotAscii(char, line, column));
-                    }
-                }
+                let index = i * BATCH_SIZE + j;
+                // The panic should never trigger since we know that string[i*BATCH_SIZE + j]
+                // has some value which is stored in `byte`, and that this value is the first
+                // byte of a non-ascii character and that Strings in Rust are valid utf-8.
+                // All of this means that the value that starts at this index is a utf-8 encoded
+                // character, which `chars.next()` will extract.
+                let unencodable_character = string[index..].chars().next()
+                    .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
+                return Err(Error::new(unencodable_character, line, column, index));
             }
         }
         result.extend_from_slice(&buffer[..encoded]);
@@ -370,67 +366,16 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// ASCII character or newline.
 /// ```
 /// # use zalgo_codec_common::{Error, zalgo_wrap_python};
+/// let res = zalgo_wrap_python(r#"print("That will be 5€ please")"#);
 /// assert_eq!(
-///     zalgo_wrap_python(r#"print("That will be 5€ please")"#),
-///     Err(Error::NotAscii('€', 1, 22))
+///     res.map_err(|e| (e.char(), e.line(), e.column())),
+///     Err(('€', 1, 22)),
 /// );
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_wrap_python(python: &str) -> Result<String, Error> {
     let encoded_string = zalgo_encode(python)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
-}
-
-/// Returns the representation of the given ASCII byte if it's not printable.
-#[inline]
-#[must_use = "the function returns a new value and does not modify the input"]
-const fn nonprintable_ascii_repr(byte: u8) -> Option<&'static str> {
-    if byte < 10 {
-        Some(
-            [
-                "Null",
-                "Start Of Heading",
-                "Start Of Text",
-                "End Of Text",
-                "End Of Transmission",
-                "Enquiry",
-                "Acknowledge",
-                "Bell",
-                "Backspace",
-                "Horizontal Tab",
-            ][byte as usize],
-        )
-    } else if byte >= 11 && byte < 32 {
-        Some(
-            [
-                "Vertical Tab",
-                "Form Feed",
-                "Carriage Return",
-                "Shift Out",
-                "Shift In",
-                "Data Link Escape",
-                "Data Control 1",
-                "Data Control 2",
-                "Data Control 3",
-                "Data Control 4",
-                "Negative Acknowledge",
-                "Synchronous Idle",
-                "End Of Transmission Block",
-                "Cancel",
-                "End Of Medium",
-                "Substitute",
-                "Escape",
-                "File Separator",
-                "Group Separator",
-                "Record Separator",
-                "Unit Separator",
-            ][byte as usize - 11],
-        )
-    } else if byte == 127 {
-        Some("Delete")
-    } else {
-        None
-    }
 }
 
 #[cfg(test)]

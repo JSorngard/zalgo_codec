@@ -131,7 +131,7 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
 ///
 /// ```compile_fail
 /// # use zalgo_codec_macro::zalgofy;
-/// // compile error: "line 2 at column 3: byte value 226 does not correspond to an ASCII character"
+/// // compile error: "can not encode '€' character at string index 4, on line 2 at column 3"
 /// const ZS: &str = zalgofy!(
 /// r"a
 /// ae€"
