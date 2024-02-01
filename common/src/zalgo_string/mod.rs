@@ -59,7 +59,7 @@ impl ZalgoString {
 
     /// Creates a new `ZalgoString` with at least the specified capacity.
     ///
-    /// A ZalgoString always has an allocated buffer with an E in it,
+    /// A ZalgoString always has an allocated buffer with an "E" in it,
     /// so the capacity can not be zero.
     ///
     /// If you want the ZalgoString to have capacity for x encoded characters
