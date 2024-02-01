@@ -547,8 +547,9 @@ impl ZalgoString {
     /// Encodes the given string and pushes it onto `self`.
     ///
     /// This method encodes the input string into an intermediate allocation and then appends
-    /// the combining characters of the result to the end of `self`. This can also reallocate
-    /// if the capacity is not large enough.
+    /// the combining characters of the result to the end of `self`. The append step can
+    /// also reallocate if the capacity is not large enough.
+    /// 
     /// See [push_zalgo_str](ZalgoString::push_zalgo_str) for a method that does not hide the
     /// intermediate allocation.
     ///
