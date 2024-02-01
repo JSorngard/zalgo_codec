@@ -505,6 +505,30 @@ impl ZalgoString {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
+    /// Encodes the given string and pushes it onto `self`.
+    ///
+    /// This method encodes the input string into an intermediate allocation and then appends
+    /// the combining characters of the result to the end of `self`. This can also reallocate.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the given string contains a character that's not a printable ASCII
+    /// or newline character.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let mut zs = ZalgoString::new("Zalgo")?;
+    /// zs.encode_and_push_str(", He comes!")?;
+    /// assert_eq!(zs.into_decoded_string(), "Zalgo, He comes!");
+    /// Ok::<(), Error>(())
+    /// ```
+    pub fn encode_and_push_str(&mut self, string: &str) -> Result<(), Error> {
+        self.push_zalgo_str(&ZalgoString::new(string)?);
+        Ok(())
+    }
+
     // region: capacity manipulation methods
 
     /// Reserves capacity for at least `additional` bytes more than the current length.
