@@ -59,8 +59,8 @@ impl ZalgoString {
 
     /// Creates a new `ZalgoString` with at least the specified capacity.
     ///
-    /// A ZalgoString always has an allocated buffer with an 'E' in it, so
-    /// the capacity can not be zero.
+    /// A ZalgoString always has an allocated buffer with an E in it, so
+    /// this allocates and the capacity can not be zero.
     ///
     /// If you want the ZalgoString to have capacity for x encoded characters
     /// you must reserve a capacity of 2x + 1.
@@ -70,6 +70,8 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
     /// use core::num::NonZeroUsize;
+    ///
+    /// // Reserve capacity for two encoded characters
     /// let capacity = NonZeroUsize::new(5).expect("5 is larger than 0");
     /// let mut zs = ZalgoString::with_capacity(capacity);
     ///
@@ -80,7 +82,9 @@ impl ZalgoString {
     /// let zs2 = ZalgoString::new("Hi")?;
     ///
     /// // but this does not reallocate `zs`
+    /// let cap = zs.capacity();
     /// zs.push_zalgo_str(&zs2);
+    /// assert_eq!(zs.capacity(), cap);
     ///
     /// # Ok::<(), Error>(())
     /// ```
