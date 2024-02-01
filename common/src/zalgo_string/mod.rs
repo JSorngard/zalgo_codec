@@ -31,6 +31,13 @@ use std::borrow::Cow;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ZalgoString(String);
 
+/// Allocates a `String` that contains only the character "E".
+impl Default for ZalgoString {
+    fn default() -> Self {
+        Self(String::from('E'))
+    }
+}
+
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
     ///
