@@ -52,9 +52,44 @@ impl ZalgoString {
     /// assert!(ZalgoString::new("❤️").is_err());
     /// assert!(ZalgoString::new("\r").is_err());
     /// ```
-    #[must_use = "this function returns a new `ZalgoString` and does not modify the input"]
+    #[must_use = "this associated method returns a new `ZalgoString` and does not modify the input"]
     pub fn new(s: &str) -> Result<Self, Error> {
         zalgo_encode(s).map(Self)
+    }
+
+    /// Creates a new `ZalgoString` with at least the specified capacity.
+    ///
+    /// A ZalgoString always has an allocated buffer with an 'E' in it, so
+    /// the capacity can not be zero.
+    ///
+    /// If you want the ZalgoString to have capacity for x encoded characters
+    /// you must reserve a capacity of 2x + 1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// use core::num::NonZeroUsize;
+    /// let capacity = NonZeroUsize::new(5).expect("5 is larger than 0");
+    /// let mut zs = ZalgoString::with_capacity(capacity);
+    ///
+    /// // This ZalgoString would decode into an empty string
+    /// assert_eq!(zs.decoded_len(), 0);
+    ///
+    /// // This allocates,
+    /// let zs2 = ZalgoString::new("Hi")?;
+    ///
+    /// // but this does not reallocate `zs`
+    /// zs.push_zalgo_str(&zs2);
+    ///
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
+    pub fn with_capacity(capacity: core::num::NonZeroUsize) -> Self {
+        let mut s = String::with_capacity(capacity.get());
+        s.push('E');
+        Self(s)
     }
 
     // region: character access methods
