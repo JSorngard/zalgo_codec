@@ -562,9 +562,13 @@ impl ZalgoString {
     ///
     /// ```
     /// # use zalgo_codec_common::{Error, ZalgoString};
-    /// let mut zs = ZalgoString::new("Zalgo")?;
-    /// zs.encode_and_push_str(", He comes!")?;
-    /// assert_eq!(zs.into_decoded_string(), "Zalgo, He comes!");
+    /// let (s1, s2) = ("Zalgo", ", He comes!");
+    ///
+    /// let mut zs = ZalgoString::new(s1)?;
+    ///
+    /// zs.encode_and_push_str(s2)?;
+    ///
+    /// assert_eq!(zs.into_decoded_string(), format!("{s1}{s2}"));
     /// # Ok::<(), Error>(())
     /// ```
     pub fn encode_and_push_str(&mut self, string: &str) -> Result<(), Error> {
