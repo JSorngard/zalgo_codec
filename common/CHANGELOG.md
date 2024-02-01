@@ -36,7 +36,15 @@ This document contains all changes to the crate since version 0.9.4.
 
 ### Breaking changes
 
- - Change the `encode_and_push_str` method to `push_zalgo_str` that takes a reference to an already encoded `ZalgoString` for a more intuitive API that doesn't hide as many allocations.
+ - Changed the `encode_and_push_str` method to `push_zalgo_str`, which takes a reference to an already encoded `ZalgoString` for an API that doesn't hide as many allocations. To port to this version simply change all 
+   ```rust
+   zs.encode_and_push_str(s)?;
+   ```
+   to
+   ```rust
+   zs.push_zalgo_str(&ZalgoString::new(s)?);
+   ```
+   which is what `encode_and_push_str` did under the hood.
 
 ### Minor changes
 
