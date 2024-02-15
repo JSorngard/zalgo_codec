@@ -2,7 +2,7 @@ use cli_clipboard::set_contents;
 use iced::{
     self, executor,
     widget::{button::Button, column, row, text::Text, text_input::TextInput, Space},
-    Application, Command, Element, Length, Theme,
+    Application, Command, Element, Length, Size, Theme,
 };
 use rfd::FileDialog;
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
@@ -228,7 +228,7 @@ impl Application for ZalgoCodecGui {
 pub fn run_gui() -> ! {
     match ZalgoCodecGui::run(iced::Settings {
         window: iced::window::Settings {
-            size: (500, 300),
+            size: Size::new(500.0, 300.0),
             ..Default::default()
         },
         ..Default::default()
