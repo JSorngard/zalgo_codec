@@ -81,7 +81,7 @@ impl Error {
     ///
     /// ```  
     /// The ❤️ emoji consists of two characters, the heart `U+2764` and the color variant selector `U+FE0F`
-    /// Since the heart in not encodable, that is the place where the error is generated:
+    /// Since the heart is not encodable, that is the place where the error is generated:
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.char()), Err('❤'));
