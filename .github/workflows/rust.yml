@@ -43,6 +43,12 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --features binary
+  build-gui:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: BuildGUI
+      run: cargo build --features gui
   coverage:
     runs-on: windows-latest
     steps:
