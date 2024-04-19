@@ -31,6 +31,13 @@ use std::borrow::Cow;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ZalgoString(String);
 
+/// Allocates a `String` that contains only the character "E" and no encoded content.
+impl Default for ZalgoString {
+    fn default() -> Self {
+        Self(String::from('E'))
+    }
+}
+
 impl ZalgoString {
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
     ///
@@ -52,9 +59,48 @@ impl ZalgoString {
     /// assert!(ZalgoString::new("❤️").is_err());
     /// assert!(ZalgoString::new("\r").is_err());
     /// ```
-    #[must_use = "this function returns a new `ZalgoString` and does not modify the input"]
+    #[must_use = "this associated method returns a new `ZalgoString` and does not modify the input"]
     pub fn new(s: &str) -> Result<Self, Error> {
         zalgo_encode(s).map(Self)
+    }
+
+    /// Creates a new `ZalgoString` with at least the specified capacity.
+    ///
+    /// A ZalgoString always has an allocated buffer with an "E" in it,
+    /// so the capacity can not be zero.
+    ///
+    /// If you want the ZalgoString to have capacity for x encoded characters
+    /// you must reserve a capacity of 2x + 1.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// use core::num::NonZeroUsize;
+    ///
+    /// // Reserve capacity for two encoded characters
+    /// let capacity = NonZeroUsize::new(5).expect("5 is larger than 0");
+    /// let mut zs = ZalgoString::with_capacity(capacity);
+    ///
+    /// // This ZalgoString would decode into an empty string
+    /// assert_eq!(zs.decoded_len(), 0);
+    ///
+    /// // This allocates,
+    /// let zs2 = ZalgoString::new("Hi")?;
+    ///
+    /// // but this does not reallocate `zs`
+    /// let cap = zs.capacity();
+    /// zs.push_zalgo_str(&zs2);
+    /// assert_eq!(zs.capacity(), cap);
+    ///
+    /// # Ok::<(), Error>(())
+    /// ```
+    #[inline]
+    #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
+    pub fn with_capacity(capacity: core::num::NonZeroUsize) -> Self {
+        let mut s = String::with_capacity(capacity.get());
+        s.push('E');
+        Self(s)
     }
 
     // region: character access methods
@@ -505,6 +551,38 @@ impl ZalgoString {
         self.0.push_str(zalgo_string.as_combining_chars());
     }
 
+    /// Encodes the given string and pushes it onto `self`.
+    ///
+    /// This method encodes the input string into an intermediate allocation and then appends
+    /// the combining characters of the result to the end of `self`. The append step can
+    /// also reallocate if the capacity is not large enough.
+    ///
+    /// See [`push_zalgo_str`](ZalgoString::push_zalgo_str) for a method that does not hide the
+    /// intermediate allocation.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the given string contains a character that's not a printable ASCII
+    /// or newline character.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use zalgo_codec_common::{Error, ZalgoString};
+    /// let (s1, s2) = ("Zalgo", ", He comes!");
+    ///
+    /// let mut zs = ZalgoString::new(s1)?;
+    ///
+    /// zs.encode_and_push_str(s2)?;
+    ///
+    /// assert_eq!(zs.into_decoded_string(), format!("{s1}{s2}"));
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn encode_and_push_str(&mut self, string: &str) -> Result<(), Error> {
+        self.push_zalgo_str(&ZalgoString::new(string)?);
+        Ok(())
+    }
+
     // region: capacity manipulation methods
 
     /// Reserves capacity for at least `additional` bytes more than the current length.
@@ -807,6 +885,85 @@ mod test {
     fn test_truncate_panic() {
         let mut zs = ZalgoString::new("Zalgo").unwrap();
         zs.truncate(0)
+    }
+
+    #[test]
+    fn test_default() {
+        assert_eq!(ZalgoString::new("").unwrap(), ZalgoString::default());
+    }
+
+    #[test]
+    fn test_with_capacity() {
+        let mut zs = ZalgoString::with_capacity(11.try_into().unwrap());
+        assert_eq!(zs.capacity(), 11);
+        zs.encode_and_push_str("Hi!").unwrap();
+        assert_eq!(zs.capacity(), 11);
+        zs.encode_and_push_str("I am a dinosaur!").unwrap();
+        assert!(zs.capacity() > 11);
+    }
+
+    #[test]
+    fn test_as_str() {
+        fn test_fn(_: &str) {}
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        test_fn(zs.as_str());
+        assert_eq!(zs.as_str(), encd);
+    }
+
+    #[test]
+    fn test_chars() {
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        for (a, b) in zs.chars().zip(encd.chars()) {
+            assert_eq!(a, b);
+        }
+        assert_eq!(zs.chars().next(), Some('E'));
+        assert_eq!(zs.chars().nth(2), Some('\u{341}'));
+    }
+
+    #[test]
+    fn test_char_indices() {
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        for (a, b) in zs.char_indices().zip(encd.char_indices()) {
+            assert_eq!(a, b);
+        }
+        assert_eq!(zs.char_indices().nth(2), Some((3, '\u{341}')));
+    }
+
+    #[test]
+    fn test_as_bytes() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(
+            zs.as_bytes(),
+            &[69, 204, 186, 205, 129, 205, 140, 205, 135, 205, 143]
+        );
+    }
+
+    #[test]
+    fn test_bytes() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.bytes().next(), Some(69));
+        assert_eq!(zs.bytes().nth(2), Some(186));
+    }
+
+    #[test]
+    fn test_decoded_is_empty() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert!(!zs.decoded_is_empty());
+        assert!(ZalgoString::default().decoded_is_empty());
+    }
+
+    #[test]
+    fn test_encode_and_push_str() {
+        let mut zs = ZalgoString::default();
+        assert!(zs.encode_and_push_str("Zalgo").is_ok());
+        assert!(zs.encode_and_push_str("Å").is_err());
+        assert_eq!(zs.into_decoded_string(), "Zalgo");
     }
 
     #[test]
