@@ -7,12 +7,15 @@ This document contains all changes to the crate since version 0.9.4.
 ### Breaking changes
 
 - `Error` is now a struct.
-- Removed the `byte` function from `Error`.
+- Removed the `Error::byte` function.
 
 ### Minor changes
 
-- Add `char` function to `Error`.
-- Add `index` functio to `Error`.
+- Add `Error::char` function.
+- Add `Error::index` function.
+- Implement the `Default` trait for `ZalgoString`. It just allocates a buffer with a single `'E'`.
+- Add `ZalgoString::with_capacity` function.
+- Add `ZalgoString::encode_and_push_str` function.
 
 ## 0.10.4
 

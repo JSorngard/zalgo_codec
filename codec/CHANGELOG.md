@@ -7,6 +7,7 @@ and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macr
 ## 0.11.0
 
 - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Update `iced` dependency used for the optional GUI to version 0.12
 
 ## 0.10.4
 
