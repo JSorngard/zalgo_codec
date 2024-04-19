@@ -2940,7 +2940,7 @@ dependencies = [
  "serde",
  "serde_spanned",
  "toml_datetime",
- "toml_edit 0.22.9",
+ "toml_edit 0.22.11",
 ]
 
 [[package]]
@@ -2965,9 +2965,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.9"
+version = "0.22.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e40bb779c5187258fd7aad0eb68cb8706a0a81fa712fbea808ab43c4b8374c4"
+checksum = "fb686a972ccef8537b39eead3968b0e8616cb5040dbb9bba93007c8e07c9215f"
 dependencies = [
  "indexmap",
  "serde",
@@ -3979,7 +3979,7 @@ checksum = "c94451ac9513335b5e23d7a8a2b61a7102398b8cca5160829d313e84c9d98be1"
 
 [[package]]
 name = "zalgo-codec"
-version = "0.10.4"
+version = "0.11.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -3994,7 +3994,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-common"
-version = "0.10.4"
+version = "0.11.0"
 dependencies = [
  "criterion",
  "rand",
@@ -4003,7 +4003,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-macro"
-version = "0.1.25"
+version = "0.1.26"
 dependencies = [
  "syn 2.0.60",
  "zalgo-codec-common",
