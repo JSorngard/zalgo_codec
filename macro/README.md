@@ -1,6 +1,6 @@
 # zalgo-codec-macro
 
-This crate provides the macro part of the crate [`zalgo-codec`](https://crates.io/crates/zalgo-codec) by defining the procedural macros `zalgo_embed!` and `zalgofy`.
+This crate provides the macro part of the crate [`zalgo-codec`](https://crates.io/crates/zalgo-codec) by defining the procedural macros `zalgo_embed!` and `zalgofy!`.
 
 The first lets you take source code that's been converted into a single grapheme cluster by the
 [`zalgo-codec-common`](https://crates.io/crates/zalgo-codec-common) crate and compile it as if it was never zalgo-ified.  

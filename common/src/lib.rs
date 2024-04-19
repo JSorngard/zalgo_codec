@@ -264,6 +264,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 // All of this means that the value that starts at this index is a utf-8 encoded
                 // character, which `chars.next()` will extract.
                 let unencodable_character = string[index..].chars().next()
+                // TODO: Find a way to get rid of the expect.
                     .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
                 return Err(Error::new(unencodable_character, line, column, index));
             }
