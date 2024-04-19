@@ -888,6 +888,85 @@ mod test {
     }
 
     #[test]
+    fn test_default() {
+        assert_eq!(ZalgoString::new("").unwrap(), ZalgoString::default());
+    }
+
+    #[test]
+    fn test_with_capacity() {
+        let mut zs = ZalgoString::with_capacity(11.try_into().unwrap());
+        assert_eq!(zs.capacity(), 11);
+        zs.encode_and_push_str("Hi!").unwrap();
+        assert_eq!(zs.capacity(), 11);
+        zs.encode_and_push_str("I am a dinosaur!").unwrap();
+        assert!(zs.capacity() > 11);
+    }
+
+    #[test]
+    fn test_as_str() {
+        fn test_fn(_: &str) {}
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        test_fn(zs.as_str());
+        assert_eq!(zs.as_str(), encd);
+    }
+
+    #[test]
+    fn test_chars() {
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        for (a, b) in zs.chars().zip(encd.chars()) {
+            assert_eq!(a, b);
+        }
+        assert_eq!(zs.chars().next(), Some('E'));
+        assert_eq!(zs.chars().nth(2), Some('\u{341}'));
+    }
+
+    #[test]
+    fn test_char_indices() {
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let encd = zalgo_encode(s).unwrap();
+        for (a, b) in zs.char_indices().zip(encd.char_indices()) {
+            assert_eq!(a, b);
+        }
+        assert_eq!(zs.char_indices().nth(2), Some((3, '\u{341}')));
+    }
+
+    #[test]
+    fn test_as_bytes() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(
+            zs.as_bytes(),
+            &[69, 204, 186, 205, 129, 205, 140, 205, 135, 205, 143]
+        );
+    }
+
+    #[test]
+    fn test_bytes() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert_eq!(zs.bytes().next(), Some(69));
+        assert_eq!(zs.bytes().nth(2), Some(186));
+    }
+
+    #[test]
+    fn test_decoded_is_empty() {
+        let zs = ZalgoString::new("Zalgo").unwrap();
+        assert!(!zs.decoded_is_empty());
+        assert!(ZalgoString::default().decoded_is_empty());
+    }
+
+    #[test]
+    fn test_encode_and_push_str() {
+        let mut zs = ZalgoString::default();
+        assert!(zs.encode_and_push_str("Zalgo").is_ok());
+        assert!(zs.encode_and_push_str("Å").is_err());
+        assert_eq!(zs.into_decoded_string(), "Zalgo");
+    }
+
+    #[test]
     fn test_clear() {
         let mut zs = ZalgoString::new("Zalgo").unwrap();
         let c = zs.capacity();
