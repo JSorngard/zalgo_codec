@@ -10,10 +10,7 @@ mod iterators;
 use crate::{decode_byte_pair, fmt, zalgo_encode, Error};
 pub use iterators::{DecodedBytes, DecodedChars};
 
-use core::{
-    ops::{Index, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive},
-    slice::SliceIndex,
-};
+use core::{ops::Index, slice::SliceIndex};
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::String, vec::Vec};
@@ -763,25 +760,13 @@ impl fmt::Display for ZalgoString {
     }
 }
 
-// region: impl index
-
-macro_rules! impl_index {
-    ($($range:ty),+) => {
-        $(
-            impl Index<$range> for ZalgoString {
-                type Output = str;
-                #[inline]
-                fn index(&self, index: $range) -> &Self::Output {
-                    &self.0[index]
-                }
-            }
-        )+
-    };
+impl<I: SliceIndex<str>> Index<I> for ZalgoString {
+    type Output = I::Output;
+    #[inline]
+    fn index(&self, index: I) -> &Self::Output {
+        self.0.index(index)
+    }
 }
-
-impl_index! {Range<usize>, RangeTo<usize>, RangeFrom<usize>, RangeInclusive<usize>, RangeToInclusive<usize>, RangeFull}
-
-// endregion: impl index
 
 #[cfg(test)]
 mod test {
