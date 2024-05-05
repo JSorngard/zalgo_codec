@@ -764,7 +764,7 @@ impl<I: SliceIndex<str>> Index<I> for ZalgoString {
     type Output = I::Output;
     #[inline]
     fn index(&self, index: I) -> &Self::Output {
-        self.0.index(index)
+        self.0.as_str().index(index)
     }
 }
 
