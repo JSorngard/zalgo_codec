@@ -76,7 +76,7 @@ impl ZalgoString {
     /// use core::num::NonZeroUsize;
     ///
     /// // Reserve capacity for two encoded characters
-    /// let capacity = NonZeroUsize::new(5).unwrap();
+    /// let capacity = NonZeroUsize::new(2*2 + 1).unwrap();
     /// let mut zs = ZalgoString::with_capacity(capacity);
     ///
     /// // This ZalgoString would decode into an empty string
