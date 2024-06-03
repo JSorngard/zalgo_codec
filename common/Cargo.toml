@@ -12,14 +12,18 @@ repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = {version = "1.0", default_features = false, features = ["alloc", "derive"], optional = true}
+serde = {version = "1.0", default-features = false, features = ["alloc", "derive"], optional = true}
 
 [dev-dependencies]
 criterion = {version = "0.5", features = ["html_reports"]}
 rand = "0.8"
 
+# docs.rs-specific configuration. Taken from <https://stackoverflow.com/a/61417700/>.
 [package.metadata.docs.rs]
+# Document all features.
 all-features = true
+# Enable the docsrs configuration attribute on docs.rs
+rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 default = ["std"]
