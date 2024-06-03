@@ -4049,7 +4049,7 @@ dependencies = [
  "rand",
  "rfd",
  "unicode-segmentation",
- "zalgo-codec-common",
+ "zalgo-codec-common 0.11.0",
  "zalgo-codec-macro",
 ]
 
@@ -4063,11 +4063,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "zalgo-codec-common"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07706252bd2a99bb4bd08fa6d74f56fc388b9e0b40860155dda9c3419b62d464"
+
+[[package]]
 name = "zalgo-codec-macro"
 version = "0.1.26"
 dependencies = [
  "syn 2.0.65",
- "zalgo-codec-common",
+ "zalgo-codec-common 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
