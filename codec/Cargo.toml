@@ -43,8 +43,12 @@ macro = ["dep:zalgo-codec-macro"]
 # Used to implement the [`std::error::Error`] trait for [`zalgo_codec_common::Error`].
 std = ["zalgo-codec-common/std"]
 
+# docs.rs-specific configuration. Taken from <https://stackoverflow.com/a/61417700/>.
 [package.metadata.docs.rs]
+# Document all features.
 all-features = true
+# Enable the docsrs configuration attribute on docs.rs
+rustdoc-args = ["--cfg", "docsrs"]
 
 [[bin]]
 name = "zalgo_codec"

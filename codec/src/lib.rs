@@ -182,6 +182,7 @@
 //! You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
