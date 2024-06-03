@@ -1,6 +1,6 @@
 [package]
 name = "zalgo-codec-common"
-authors = ["Johanna Sörngård (jsorngard@gmail.com)", "Scott Conner"]
+authors = ["Johanna Sörngård <jsorngard@gmail.com>", "Scott Conner"]
 version = "0.11.0"
 edition = "2021"
 keywords = ["unicode", "obfuscation", "encoding", "zalgo"]
