@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.11.1
+
+ - Add links to local versions of licenses.
+
 ## 0.11.0
 
 ### Breaking changes
