@@ -4297,7 +4297,7 @@ checksum = "c94451ac9513335b5e23d7a8a2b61a7102398b8cca5160829d313e84c9d98be1"
 
 [[package]]
 name = "zalgo-codec"
-version = "0.11.0"
+version = "0.11.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -4306,13 +4306,13 @@ dependencies = [
  "rand",
  "rfd",
  "unicode-segmentation",
- "zalgo-codec-common 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "zalgo-codec-macro 0.1.26 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zalgo-codec-common",
+ "zalgo-codec-macro",
 ]
 
 [[package]]
 name = "zalgo-codec-common"
-version = "0.11.0"
+version = "0.11.1"
 dependencies = [
  "criterion",
  "rand",
@@ -4320,30 +4320,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "zalgo-codec-common"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07706252bd2a99bb4bd08fa6d74f56fc388b9e0b40860155dda9c3419b62d464"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "zalgo-codec-macro"
-version = "0.1.26"
+version = "0.1.27"
 dependencies = [
  "syn 2.0.65",
- "zalgo-codec-common 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "zalgo-codec-macro"
-version = "0.1.26"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2aea97ca733e4bd3fffd2433c6d0923649d0edfc5dedbdadaf02ddfccf7c65fb"
-dependencies = [
- "syn 2.0.65",
- "zalgo-codec-common 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zalgo-codec-common",
 ]
 
 [[package]]
