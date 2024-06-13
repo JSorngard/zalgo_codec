@@ -68,7 +68,7 @@ jobs:
       - name: cargo llvm-cov
         run: cargo llvm-cov --locked -F macro --lcov --output-path lcov.info
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
