@@ -80,7 +80,7 @@ impl Error {
     /// assert_eq!(zalgo_encode("CRLF\r\n").map_err(|e| e.char()), Err('\r'));
     ///
     /// ```  
-    /// The ❤️ emoji consists of two characters, the heart `U+2764` and the color variant selector `U+FE0F`
+    /// The ❤️ emoji consists of two characters, the heart `U+2764` and the color variant selector `U+FE0F`.
     /// Since the heart is not encodable, that is the place where the error is generated:
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
