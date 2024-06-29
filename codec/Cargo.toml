@@ -39,8 +39,9 @@ serde = ["zalgo-codec-common/serde"]
 # Enables the proc-macros [`zalgo_embed`] and [`zalgofy`]
 macro = ["dep:zalgo-codec-macro"]
 
-# Enables the library to link to the standard library.
-# Used to implement the [`std::error::Error`] trait for [`zalgo_codec_common::Error`].
+# Implements the [`std::error::Error`] trait from the standard library for [`zalgo_codec::Error`], 
+# and enables it to capture a [`Backtrace`](std::backtrace::Backtrace). Without this feature the crate is #![no_std],
+# but still uses the `alloc` crate.
 std = ["zalgo-codec-common/std"]
 
 # docs.rs-specific configuration. Taken from <https://stackoverflow.com/a/61417700/>.
