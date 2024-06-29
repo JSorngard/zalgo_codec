@@ -4369,7 +4369,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-macro"
-version = "0.1.27"
+version = "0.1.28"
 dependencies = [
  "syn 2.0.68",
  "zalgo-codec-common",
