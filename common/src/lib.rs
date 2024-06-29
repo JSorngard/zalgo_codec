@@ -53,7 +53,7 @@
 //!
 //! `std` *(enabled by default)*: implements the [`std::error::Error`] trait for the provided [`Error`] type,
 //! and enables it to capture a [`Backtrace`](std::backtrace::Backtrace).
-//! If this feature is not enabled the library is `#[no_std]`, but still uses the `alloc` crate.
+//! If this feature is not enabled the library is `#![no_std]`, but still uses the `alloc` crate.
 //!
 //! `serde`: implements the [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits
 //! from [`serde`](https://crates.io/crates/serde) for [`ZalgoString`].
