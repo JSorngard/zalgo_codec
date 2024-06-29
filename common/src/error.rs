@@ -117,10 +117,16 @@ impl Error {
     }
 
     #[cfg(feature = "std")]
-    /// Returns a [`Backtrace`](std::backtrace::Backtrace) that was captured when the error was created.
+    /// Returns a reference to a [`Backtrace`](std::backtrace::Backtrace) that was captured when the error was created.
     #[inline]
     pub fn backtrace(&self) -> &std::backtrace::Backtrace {
         &self.backtrace
+    }
+
+    #[cfg(feature = "std")]
+    /// Converts the `Error` into a [`Backtrace`](std::backtrace::Backtrace) that was captured when the error was created.
+    pub fn into_backtrace(self) -> std::backtrace::Backtrace {
+        self.backtrace
     }
 }
 
