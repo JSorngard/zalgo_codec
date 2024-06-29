@@ -134,12 +134,11 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "can not encode {:?} character at string index {}, on line {} at column {}: {}",
+            "can not encode {:?} character at string index {}, on line {} at column {}",
             self.char(),
             self.index(),
             self.line(),
             self.column(),
-            self.backtrace(),
         )
     }
 }
