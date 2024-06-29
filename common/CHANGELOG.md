@@ -2,6 +2,12 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.12.0
+
+### Breaking changes
+
+ - Added a backtrace to the `Error` type, and as a result the error type no longer implements `Clone`, `PartialEq`, `Eq`, or `Hash`.
+
 ## 0.11.1
 
  - Add links to local versions of licenses.
