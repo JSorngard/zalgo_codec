@@ -121,7 +121,7 @@ impl Error {
     #[cfg(feature = "std")]
     /// Returns a reference to a [`Backtrace`] that was captured when the error was created.
     ///
-    /// See the documentation of [`Backtrace`] for more information about how to make it
+    /// See the documentation of [`Backtrace::capture`] for more information about how to make it
     /// show more information when displayed.
     #[inline]
     pub fn backtrace(&self) -> &Backtrace {
