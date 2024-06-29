@@ -6,9 +6,7 @@ and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macr
 
 ## 0.12.0
 
-### Breaking changes
-
- - Add a `Backtrace` to the `Error` type when the `std` feature is enabled. As a result the error type no longer implements `Clone`, `PartialEq`, `Eq`, or `Hash`.
+ - Update `zalgo-codec-common` dependency. For more information about breaking changes see its changelog.
 
 ## 0.11.1
 
@@ -19,6 +17,7 @@ and [macro/CHANGELOG.md](../macro/CHANGELOG.md) for the changes made to the macr
 
 - Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 - Update `iced` dependency used for the optional GUI to version 0.12
+- For more information about breaking changes see the changelog of `zalgo-codec-common`.
 
 ## 0.10.4
 
