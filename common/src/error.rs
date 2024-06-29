@@ -1,6 +1,8 @@
 //! Contains the definition of the error type used by the encoding functions in the crate.
 
 use core::fmt;
+#[cfg(feature = "std")]
+use std::backtrace::Backtrace;
 
 #[derive(Debug)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
@@ -13,7 +15,7 @@ pub struct Error {
     column: usize,
     index: usize,
     #[cfg(feature = "std")]
-    backtrace: std::backtrace::Backtrace,
+    backtrace: Backtrace,
 }
 
 impl Error {
@@ -37,7 +39,7 @@ impl Error {
             column,
             index,
             #[cfg(feature = "std")]
-            backtrace: std::backtrace::Backtrace::capture(),
+            backtrace: Backtrace::capture(),
         }
     }
 
@@ -117,9 +119,12 @@ impl Error {
     }
 
     #[cfg(feature = "std")]
-    /// Returns a reference to a [`Backtrace`](std::backtrace::Backtrace) that was captured when the error was created.
+    /// Returns a reference to a [`Backtrace`] that was captured when the error was created.
+    ///
+    /// See the documentation of [`Backtrace`] for more information about how to make it
+    /// show more information when displayed.
     #[inline]
-    pub fn backtrace(&self) -> &std::backtrace::Backtrace {
+    pub fn backtrace(&self) -> &Backtrace {
         &self.backtrace
     }
 }
