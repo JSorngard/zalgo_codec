@@ -1,8 +1,10 @@
 //! Contains the definition of the error type used by the encoding functions in the crate.
 
 use core::fmt;
+#[cfg(feature = "std")]
+use std::backtrace::Backtrace;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
 /// if they encounter a byte they can not encode.
 ///
@@ -12,6 +14,8 @@ pub struct Error {
     line: usize,
     column: usize,
     index: usize,
+    #[cfg(feature = "std")]
+    backtrace: Backtrace,
 }
 
 impl Error {
@@ -23,7 +27,7 @@ impl Error {
     /// and just constructs a new `Error` instance.
     #[inline]
     #[must_use = "this associated method does not modify its inputs and just returns a new value"]
-    pub(crate) const fn new(
+    pub(crate) fn new(
         unencodable_character: char,
         line: usize,
         column: usize,
@@ -34,6 +38,8 @@ impl Error {
             line,
             column,
             index,
+            #[cfg(feature = "std")]
+            backtrace: Backtrace::capture(),
         }
     }
 
@@ -111,13 +117,23 @@ impl Error {
     pub const fn index(&self) -> usize {
         self.index
     }
+
+    #[cfg(feature = "std")]
+    /// Returns a reference to a [`Backtrace`] that was captured when the error was created.
+    ///
+    /// See the documentation of [`Backtrace::capture`] for more information about how to make it
+    /// show more information when displayed.
+    #[inline]
+    pub fn backtrace(&self) -> &Backtrace {
+        &self.backtrace
+    }
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "can not encode {:?} character at string index {}, on line {} at column {}: ",
+            "can not encode {:?} character at string index {}, on line {} at column {}",
             self.char(),
             self.index(),
             self.line(),
@@ -135,30 +151,10 @@ mod test {
 
     #[test]
     fn test_error() {
-        let err = Error {
-            line: 1,
-            column: 7,
-            unencodable_character: 'å',
-            index: 6,
-        };
+        let err = Error::new('å', 1, 7, 6);
         assert_eq!(err.char(), 'å');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
         assert_eq!(err.index(), 6);
-
-        let err2 = Error {
-            line: 1,
-            column: 2,
-            unencodable_character: '\r',
-            index: 1,
-        };
-        assert_eq!(err2.char(), '\r');
-        assert_eq!(err2.line(), 1);
-        assert_eq!(err2.column(), 2);
-        assert_eq!(err2.index(), 1);
-
-        assert_ne!(err, err2);
-        let err3 = err;
-        assert_eq!(err, err3);
     }
 }
