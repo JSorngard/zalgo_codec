@@ -1,10 +1,10 @@
+# zalgo codec 
+
 [![Static Badge](https://img.shields.io/badge/github-JSorngard%2Fzalgo__codec-8da0cb?logo=github)](https://github.com/JSorngard/zalgo_codec)
 [![Latest Version](https://img.shields.io/crates/v/zalgo-codec.svg)](https://crates.io/crates/zalgo-codec)
 [![docs.rs](https://img.shields.io/docsrs/zalgo-codec?logo=docs.rs&label=docs.rs)](https://docs.rs/zalgo-codec/latest/zalgo_codec/)
 [![Build Status](https://github.com/JSorngard/zalgo_codec/actions/workflows/rust.yml/badge.svg)](https://github.com/JSorngard/zalgo_codec/actions/workflows/rust.yml)
 [![codecov](https://codecov.io/gh/JSorngard/zalgo_codec/graph/badge.svg?token=X7TTODVC8I)](https://codecov.io/gh/JSorngard/zalgo_codec)
-
-# zalgo codec
 
 This crate lets you convert an ASCII text string into a single unicode grapheme cluster and back. 
 It also provides a procedural macro that lets you take source code that's been converted into such a grapheme cluster and compile it as if it was never zalgo-ified.
