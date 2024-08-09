@@ -18,12 +18,9 @@ serde = {version = "1.0", default-features = false, features = ["alloc", "derive
 criterion = {version = "0.5", features = ["html_reports"]}
 rand = "0.8"
 
-# docs.rs-specific configuration. Taken from <https://stackoverflow.com/a/61417700/>.
 [package.metadata.docs.rs]
 # Document all features.
 all-features = true
-# Enable the docsrs configuration attribute on docs.rs
-rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 default = ["std"]
