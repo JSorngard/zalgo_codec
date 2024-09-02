@@ -36,7 +36,7 @@ gui = ["binary", "dep:iced", "dep:rfd", "dep:cli-clipboard"]
 # Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`].
 serde = ["zalgo-codec-common/serde"]
 
-# Enables the proc-macros [`zalgo_embed`] and [`zalgofy`]
+# Enables the proc-macros [`zalgo_embed!`] and [`zalgofy!`]
 macro = ["dep:zalgo-codec-macro"]
 
 # Implements the [`std::error::Error`] trait from the standard library for [`zalgo_codec::Error`], 
