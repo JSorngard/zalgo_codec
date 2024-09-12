@@ -9,7 +9,7 @@ for the changes made to the macros.
 
 ## 0.12.1
 
-- Added the `rkyv` feature that derives the serialization tratis from the
+- Added the `rkyv` feature that derives the serialization traits from the
  [`rkyv`](https://crates.io/crates/rkyv) crate.
 - Disabled unused features in dependencies,
  notbly diabled the `std` feature in several dependencies.
