@@ -17,42 +17,42 @@ for the changes made to the macros.
 
 ## 0.12.0
 
-- Update `zalgo-codec-common` dependency. For more information about breaking
+- Updated `zalgo-codec-common` dependency. For more information about breaking
  changes see its changelog.
 
 ## 0.11.1
 
-- Add links to local versions of licenses.  
-- Add docs.rs badge.
+- Added links to local versions of licenses.  
+- Added docs.rs badge.
 
 ## 0.11.0
 
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
-- Update `iced` dependency used for the optional GUI to version 0.12
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Updated `iced` dependency used for the optional GUI to version 0.12
 - For more information about breaking changes see the changelog of `zalgo-codec-common`.
 
 ## 0.10.4
 
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.10.3
 
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.10.2
 
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.10.1
 
-- Change the links to licenses in the readme to be compatible with crates.io.
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Changed the links to licenses in the readme to be compatible with crates.io.
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.10.0
 
-- Make `anyhow` an optional dependency that is only enabled when the binary is built.
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Made `anyhow` an optional dependency that is only enabled when the binary is built.
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
 
 ## 0.9.6
 
-- Update `zalgo-codec-common` and `zalgo-codec-macro` dependencies
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies
