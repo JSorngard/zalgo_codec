@@ -44,7 +44,7 @@ jobs:
     - name: build
       run: cargo build --features binary
   doc:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       RUSTFLAGS: -D warnings
       RUSTDOCFLAGS: --cfg docsrs
@@ -54,7 +54,7 @@ jobs:
     - name: document
       run: cargo +nightly doc --all-features --no-deps
   coverage:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
