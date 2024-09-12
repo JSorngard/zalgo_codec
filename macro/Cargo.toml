@@ -17,4 +17,4 @@ proc-macro = true
 
 [dependencies]
 zalgo-codec-common = { path = "../common", default-features = false }
-syn = "2.0"
+syn = { version = "2.0", default-features = false, features = ["parsing", "printing", "proc-macro"] }
