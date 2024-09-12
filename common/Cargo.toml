@@ -16,7 +16,7 @@ serde = { version = "1.0", default-features = false, features = ["alloc", "deriv
 rkyv = { version = "0.8", default-features = false, features = ["alloc"], optional = true }
 
 [dev-dependencies]
-criterion = {version = "0.5", features = ["html_reports"]}
+criterion = { version = "0.5", features = ["html_reports"] }
 rand = "0.8"
 
 [package.metadata.docs.rs]
