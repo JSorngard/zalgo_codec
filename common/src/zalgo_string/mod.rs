@@ -23,7 +23,10 @@ use std::borrow::Cow;
 /// decoded and encoded form.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "rkyv", derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive))]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive)
+)]
 pub struct ZalgoString(String);
 
 /// Allocates a `String` that contains only the character "E" and no encoded content.

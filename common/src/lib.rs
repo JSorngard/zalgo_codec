@@ -56,7 +56,7 @@
 //!
 //! `serde`: derives the [`serde::Serialize`] and [`serde::Deserialize`] traits
 //! from [`serde`] for [`ZalgoString`].
-//! 
+//!
 //! `rkyv`: derives the [`rkyv::Serialize`], [`rkyv::Deserialize`], and [`rkyv::Archive`] traits from [`rkyv`] for [`ZalgoString`].
 //!
 //! # Explanation

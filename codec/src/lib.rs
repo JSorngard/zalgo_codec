@@ -62,7 +62,7 @@
 //! If this feature is not enabled the library is `no_std` compatible, but still uses the `alloc` crate.
 //!
 //! `serde`: derives the `Serialize` and `Deserialize` traits from [`serde`](https://docs.rs/serde) for [`ZalgoString`].
-//! 
+//!
 //! `rkyv`: derives the `Serialize`, `Deserialize`, and `Archive` traits from [`rkyv`](https://docs.rs/rkyv) for [`ZalgoString`].
 //!
 //! `macro` *(enabled by default)*: exports the procedural macros [`zalgo_embed!`] and [`zalgofy!`].
