@@ -16,7 +16,7 @@ zalgo-codec-common = { path = "../common", default-features = false }
 zalgo-codec-macro = { path = "../macro", optional = true }
 anyhow = { version = "1.0", default-features = false, optional = true }
 iced = { version = "0.12", default-features = false, optional = true }
-rfd = { version = "0.14", default-features = false, features = ["xdg-portal"], optional = true }
+rfd = { version = "0.14", optional = true }
 cli-clipboard = { version = "0.4", default-features = false, optional = true }
 clap = { version = "4.5", default-features = false, features = ["derive"], optional = true }
 
