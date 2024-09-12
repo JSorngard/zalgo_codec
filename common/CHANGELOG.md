@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.12.2
+
+- Documentation improvements.
+
 ## 0.12.1
 
 - Added the `rkyv` feature that derives the serialization traits from the
