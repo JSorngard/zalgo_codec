@@ -13,6 +13,7 @@ for the changes made to the macros.
  [`rkyv`](https://crates.io/crates/rkyv) crate.
 - Disabled unused features in dependencies,
  notbly diabled the `std` feature in several dependencies.
+- Updated the `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
 
 ## 0.12.0
 

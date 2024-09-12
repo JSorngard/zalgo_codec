@@ -4,7 +4,8 @@ This document contains all changes to the crate since 0.1.19
 
 ## 0.1.28
 
-- Disabled the `std` feature of the [`zalgo-codec-common`](https://crates.io/crates/zalgo-codec-common) dependency.
+- Disabled the `std` feature of the `zalgo-codec-common` dependency.
+- Updated the `zalgo-codec-common` dependency.
 
 ## 0.1.27
 
