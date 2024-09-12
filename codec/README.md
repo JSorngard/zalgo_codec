@@ -71,7 +71,7 @@ let z = zalgo_embed!("È͙̋̀͘");
 assert_eq!(z, x + y);
 ```
 
-We can also do the opposite of [obfstr](https://crates.io/crates/obfstr): obfuscate
+We can also do the opposite of [`obfstr`](https://crates.io/crates/obfstr): obfuscate
 a string while coding and deobfuscate it during compile time
 
 ```rust
