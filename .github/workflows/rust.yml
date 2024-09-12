@@ -44,7 +44,7 @@ jobs:
     - name: build
       run: cargo build --features binary
   doc:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       RUSTFLAGS: -D warnings
       RUSTDOCFLAGS: --cfg docsrs
