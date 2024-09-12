@@ -2113,6 +2113,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "munge"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64142d38c84badf60abf06ff9bd80ad2174306a5b11bd4706535090a30a419df"
+dependencies = [
+ "munge_macro",
+]
+
+[[package]]
+name = "munge_macro"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bb5c1d8184f13f7d0ccbeeca0def2f9a181bce2624302793005f5ca8aa62e5e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.77",
+]
+
+[[package]]
 name = "naga"
 version = "0.19.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2714,6 +2734,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43d84d1d7a6ac92673717f9f6d1518374ef257669c24ebc5ac25d5033828be58"
 
 [[package]]
+name = "ptr_meta"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe9e76f66d3f9606f44e45598d155cb13ecf09f4a28199e48daf8c8fc937ea90"
+dependencies = [
+ "ptr_meta_derive",
+]
+
+[[package]]
+name = "ptr_meta_derive"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca414edb151b4c8d125c12566ab0d74dc9cdba36fb80eb7b848c15f495fd32d1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.77",
+]
+
+[[package]]
 name = "quick-xml"
 version = "0.36.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2729,6 +2769,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "rancor"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "caf5f7161924b9d1cea0e4cabc97c372cea92b5f927fc13c6bca67157a0ad947"
+dependencies = [
+ "ptr_meta",
 ]
 
 [[package]]
@@ -2875,6 +2924,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 
 [[package]]
+name = "rend"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc8d57aa48e8477046d7d6296d920a1f50bbbaf45047ec46c52f6d6cccea7ef7"
+
+[[package]]
 name = "renderdoc-sys"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2901,6 +2956,35 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "rkyv"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a1dfb7c03271e31aad881e521cfe25bda0206ee94b1af152957f4f49e25ee23"
+dependencies = [
+ "bytes",
+ "hashbrown",
+ "indexmap",
+ "munge",
+ "ptr_meta",
+ "rancor",
+ "rend",
+ "rkyv_derive",
+ "tinyvec",
+ "uuid",
+]
+
+[[package]]
+name = "rkyv_derive"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa3ca4a30c576aeb76aea84370da286f74d12d32029da8caec3d53b5a36a7539"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.77",
 ]
 
 [[package]]
@@ -3584,6 +3668,12 @@ name = "utf8parse"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
+
+[[package]]
+name = "uuid"
+version = "1.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a183cf7feeba97b4dd1c0d46788634f6221d87fa961b305bed08c851829efcc0"
 
 [[package]]
 name = "version_check"
@@ -4504,8 +4594,8 @@ dependencies = [
  "rand",
  "rfd",
  "unicode-segmentation",
- "zalgo-codec-common 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "zalgo-codec-macro 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zalgo-codec-common 0.12.0",
+ "zalgo-codec-macro",
 ]
 
 [[package]]
@@ -4514,6 +4604,7 @@ version = "0.12.0"
 dependencies = [
  "criterion",
  "rand",
+ "rkyv",
  "serde",
 ]
 
@@ -4522,23 +4613,10 @@ name = "zalgo-codec-common"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4de25b8dc1eda38c2e99d741d3d7c205c7687d42bc2ce86f24ec53967ed86a35"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "zalgo-codec-macro"
 version = "0.1.28"
-dependencies = [
- "syn 2.0.77",
- "zalgo-codec-common 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "zalgo-codec-macro"
-version = "0.1.28"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e961188f0c2e6454dceaf67f66a613c2a93cadedc50815ab8512218c05e23cab"
 dependencies = [
  "syn 2.0.77",
  "zalgo-codec-common 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",

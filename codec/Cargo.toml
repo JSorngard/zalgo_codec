@@ -12,13 +12,13 @@ description = "Convert an ASCII text string into a single unicode grapheme clust
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zalgo-codec-common = "0.12.0"
-zalgo-codec-macro = {version = "0.1.28", optional = true}
-anyhow = {version = "1.0", optional = true}
-iced = {version = "0.12", optional = true}
-rfd = {version = "0.14", optional = true}
-cli-clipboard = {version = "0.4", optional = true}
-clap = {version = "4.5", features = ["derive"], optional = true}
+zalgo-codec-common = {path = "../common"}
+zalgo-codec-macro = { path = "../macro", optional = true }
+anyhow = { version = "1.0", optional = true }
+iced = { version = "0.12", optional = true }
+rfd = { version = "0.14", optional = true }
+cli-clipboard = { version = "0.4", optional = true }
+clap = { version = "4.5", features = ["derive"], optional = true }
 
 [dev-dependencies]
 rand = "0.8"
@@ -33,15 +33,17 @@ binary = ["std", "dep:clap", "dep:anyhow"]
 # Builds an optional GUI into the binary.
 gui = ["binary", "dep:iced", "dep:rfd", "dep:cli-clipboard"]
 
-# Implements the [`Serialize`] and [`Deserialize`] traits from serde for [`ZalgoString`].
+# Derives the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for the `ZalgoString` struct.
 serde = ["zalgo-codec-common/serde"]
 
-# Enables the proc-macros [`zalgo_embed!`] and [`zalgofy!`]
+# Derives the `Serialize`, `Deserialize`, and `Archive` traits from [`rkyv`](https://crates.io/crates/rkyv) for the `ZalgoString` struct.
+rkyv = ["zalgo-codec-common/rkyv"]
+
+# Enables the proc-macros `zalgo_embed!` and `zalgofy!`
 macro = ["dep:zalgo-codec-macro"]
 
-# Implements the [`std::error::Error`] trait from the standard library for [`zalgo_codec::Error`], 
-# and enables it to capture a [`Backtrace`](std::backtrace::Backtrace). Without this feature the crate is #![no_std],
-# but still uses the `alloc` crate.
+# Enables the `Error` type to capture a `Backtrace`.
+# Without this feature the crate is `no_std` compatible, but still uses the `alloc` crate.
 std = ["zalgo-codec-common/std"]
 
 [package.metadata.docs.rs]
