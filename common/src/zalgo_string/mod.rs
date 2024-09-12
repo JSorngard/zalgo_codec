@@ -21,11 +21,9 @@ use std::borrow::Cow;
 /// A [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
 /// decoded and encoded form.
-///
-/// If the `serde` feature is enabled this struct implements the
-/// [`Serialize`](serde::Serialize) and [`Deserialize`](serde::Deserialize) traits.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive))]
 pub struct ZalgoString(String);
 
 /// Allocates a `String` that contains only the character "E" and no encoded content.

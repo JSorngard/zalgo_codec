@@ -7,8 +7,6 @@ use std::backtrace::Backtrace;
 #[derive(Debug)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
 /// if they encounter a byte they can not encode.
-///
-/// Only implements the [`Error`](std::error::Error) trait if the `std` feature is enabled.
 pub struct Error {
     unencodable_character: char,
     line: usize,
@@ -142,8 +140,7 @@ impl fmt::Display for Error {
     }
 }
 
-#[cfg(feature = "std")]
-impl std::error::Error for Error {}
+impl core::error::Error for Error {}
 
 #[cfg(test)]
 mod test {
