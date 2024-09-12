@@ -12,6 +12,7 @@ The second lets you encode a string into a single grapheme cluster at compile ti
 
 If we run [`zalgo-codec-common::zalgo_encode`](https://docs.rs/zalgo-codec-common/latest/zalgo_codec_common/fn.zalgo_encode.html) on the string "fn square(x: i32) -> i32 {x * x}" we can include the `square` function in our program
 by putting the resulting grapheme cluster inside `zalgo_embed!`:
+
 ```rust
 zalgo_embed!("E͎͓͕͉̞͉͆̀͑́͒̈̀̓̒̉̀̍̀̓̒̀͛̀̊̀͘̚͘͘͝ͅ");
 assert_eq!(square(10), 100);
@@ -21,8 +22,8 @@ assert_eq!(square(10), 100);
 
 Licensed under either of
 
- * Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/JSorngard/zalgo_codec/blob/main/macro/LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
- * MIT license ([LICENSE-MIT](https://github.com/JSorngard/zalgo_codec/blob/main/macro/LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/JSorngard/zalgo_codec/blob/main/macro/LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](https://github.com/JSorngard/zalgo_codec/blob/main/macro/LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 

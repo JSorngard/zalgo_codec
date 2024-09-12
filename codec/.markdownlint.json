@@ -1,0 +1,6 @@
+{
+    "no-inline-html": {
+        "allowed_elements": ["br"]
+    }
+    
+}
