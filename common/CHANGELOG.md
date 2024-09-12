@@ -6,6 +6,7 @@ This document contains all changes to the crate since version 0.9.4.
 
 - Added the `rkyv` feature that derives the serialization traits from the
  [`rkyv`](https://crates.io/crates/rkyv) crate for the `ZalgoString` struct.
+- Derive the `Error` trait from `core` instead of `std`.
 
 ## 0.12.0
 
