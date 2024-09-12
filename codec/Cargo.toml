@@ -13,7 +13,7 @@ description = "Convert an ASCII text string into a single unicode grapheme clust
 
 [dependencies]
 zalgo-codec-common = { version = "0.12.1", default-features = false }
-zalgo-codec-macro = { version = "0.1.28", optional = true }
+zalgo-codec-macro = { version = "0.1.29", optional = true }
 anyhow = { version = "1.0", default-features = false, optional = true }
 iced = { version = "0.12", default-features = false, optional = true }
 rfd = { version = "0.14", optional = true }
