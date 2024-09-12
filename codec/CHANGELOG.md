@@ -11,7 +11,7 @@ for the changes made to the macros.
 
 - Added the `rkyv` feature that derives the serialization traits from the
  [`rkyv`](https://crates.io/crates/rkyv) crate for `ZalgoString`.
-- Derive the `Error` trait from `core` instead of `std`.
+- Derived the `Error` trait from `core` instead of `std`.
 - Disabled unused features in dependencies,
  notbly diabled the `std` feature in several dependencies.
 - Updated the `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
