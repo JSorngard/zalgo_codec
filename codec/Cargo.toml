@@ -12,7 +12,7 @@ description = "Convert an ASCII text string into a single unicode grapheme clust
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zalgo-codec-common = {path = "../common"}
+zalgo-codec-common = { path = "../common" }
 zalgo-codec-macro = { path = "../macro", optional = true }
 anyhow = { version = "1.0", optional = true }
 iced = { version = "0.12", optional = true }
