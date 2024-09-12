@@ -2,6 +2,11 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.12.1
+
+- Added the `rkyv` feature that derives the serialization traits from the
+ [`rkyv`](https://crates.io/crates/rkyv) crate for the `ZalgoString` struct.
+
 ## 0.12.0
 
 ### Breaking changes

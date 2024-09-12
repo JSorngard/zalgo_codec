@@ -7,6 +7,13 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.12.1
+
+- Added the `rkyv` feature that derives the serialization tratis from the
+ [`rkyv`](https://crates.io/crates/rkyv) crate.
+- Disabled unused features in dependencies,
+ notbly diabled the `std` feature in several dependencies.
+
 ## 0.12.0
 
 - Update `zalgo-codec-common` dependency. For more information about breaking
