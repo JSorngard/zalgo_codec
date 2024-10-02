@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since 0.1.19
 
+## 0.1.30
+
+- Updated the `zalgo-codec-common` dependency.
+
 ## 0.1.29
 
 - Updated the `zalgo-codec-common` dependency.
