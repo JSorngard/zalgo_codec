@@ -22,7 +22,7 @@ clap = { version = "4.5", default-features = false, features = ["derive"], optio
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false, features = ["alloc", "std", "std_rng"] }
-unicode-segmentation = { version = "1.11", features = ["no_std"] }
+unicode-segmentation = { version = "1.12", features = ["no_std"] }
 
 [features]
 default = ["macro", "std"]
