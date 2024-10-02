@@ -2,6 +2,13 @@
 
 This document contains all changes to the crate since 0.1.19
 
+## 1.0.0
+
+- Updated the `zalgo-codec-common` dependency.
+
+The crate has been stabilized as I have not had a desire to change its API in a long time,
+and all its dependencies are stable.
+
 ## 0.1.28
 
 - Disabled the `std` feature of the `zalgo-codec-common` dependency.
