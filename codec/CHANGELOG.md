@@ -7,6 +7,11 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.12.2
+
+- Update the `rfd` and `iced` dependencies that are used for the optional binary.
+- Update the `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
+
 ## 0.12.1
 
 - Added the `rkyv` feature that derives the serialization traits from the
