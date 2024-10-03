@@ -3,8 +3,6 @@ mod gui;
 
 use std::path::PathBuf;
 
-#[cfg(feature = "gui")]
-use gui::run_gui;
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
 
 use anyhow::{anyhow, Result};
@@ -55,7 +53,7 @@ enum Mode {
 }
 
 #[derive(Debug, Clone, Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None, arg_required_else_help = true)]
 struct Cli {
     #[command(subcommand)]
     mode: Mode,
@@ -90,7 +88,7 @@ fn main() -> Result<()> {
 
     let output = match config.mode {
         #[cfg(feature = "gui")]
-        Mode::Gui => run_gui(),
+        Mode::Gui => gui::run_gui(),
         Mode::Encode { source } => {
             let text = match source {
                 Source::Text { text } => text.join(" "),
