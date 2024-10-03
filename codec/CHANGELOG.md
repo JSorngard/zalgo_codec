@@ -7,10 +7,14 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.12.3
+
+- Re-enabled the help text for the CLI program.
+
 ## 0.12.2
 
-- Update the `rfd` and `iced` dependencies that are used for the optional binary.
-- Update the `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
+- Updated the `rfd` and `iced` dependencies that are used for the optional binary.
+- Updated the `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
 
 ## 0.12.1
 
