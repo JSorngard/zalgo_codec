@@ -18,7 +18,7 @@ anyhow = { version = "1.0", default-features = false, optional = true }
 iced = { version = "0.13", default-features = false, features = ["tiny-skia"], optional = true }
 rfd = { version = "0.15", optional = true }
 cli-clipboard = { version = "0.4", default-features = false, optional = true }
-clap = { version = "4.5", default-features = false, features = ["derive"], optional = true }
+clap = { version = "4.5", default-features = false, features = ["derive", "help", "color", "error-context", "suggestions", "usage"], optional = true }
 
 [dev-dependencies]
 rand = { version = "0.8", default-features = false, features = ["alloc", "std", "std_rng"] }
