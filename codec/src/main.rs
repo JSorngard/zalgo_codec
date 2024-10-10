@@ -53,7 +53,12 @@ enum Mode {
 }
 
 #[derive(Debug, Clone, Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    author,
+    version,
+    about = "Convert an ASCII text string into a single unicode grapheme cluster and back.\nThis program can be used to encode and decode strings from both stdin and files.",
+    long_about = None
+)]
 struct Cli {
     #[command(subcommand)]
     mode: Mode,
