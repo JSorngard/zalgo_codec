@@ -130,19 +130,19 @@ The crate is based on the encoding and decoding functions
 by Scott Conner. They were first presented in [this post](https://www.reddit.com/r/ProgrammerHumor/comments/yqof9f/the_most_upvoted_comment_picks_the_next_line_of/ivrd9ur/?context=3)
 together with the above explanation.
 
-## License
+<br>
 
-Licensed under either of
+### License
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/JSorngard/zalgo_codec/blob/main/codec/LICENSE-APACHE)
- or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](https://github.com/JSorngard/zalgo_codec/blob/main/codec/LICENSE-MIT)
- or <http://opensource.org/licenses/MIT>)
+<sup>
+Licensed under either of <a href="LICENSE-APACHE">Apache License, Version
+2.0</a> or <a href="LICENSE-MIT">MIT license</a> at your option.
+</sup>
 
-at your option.
+<br>
 
-## Contribution
-
+<sub>
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
+</sub>
