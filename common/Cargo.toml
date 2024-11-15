@@ -24,7 +24,7 @@ rand = { version = "0.8", default-features = false }
 all-features = true
 
 [features]
-default = ["std"]
+default = []
 
 # Derives the `Serialize` and `Deserialize` traits from [`serde`](https://crates.io/crates/serde) for the `ZalgoString` struct.
 serde = ["dep:serde"]

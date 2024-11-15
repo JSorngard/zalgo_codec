@@ -25,7 +25,7 @@ rand = { version = "0.8", default-features = false, features = ["alloc", "std", 
 unicode-segmentation = { version = "1.12", features = ["no_std"] }
 
 [features]
-default = ["macro", "std"]
+default = ["macro"]
 
 # Builds a binary that can be used to test out the codec.
 binary = ["std", "dep:clap", "dep:anyhow"]
