@@ -97,6 +97,7 @@ fn update(state: &mut ZalgoCodecGui, message: ToplevelMessage) -> Task<ToplevelM
                 })
             }
             UserAction::Pressed(GuiButton::Unwrap) => {
+                println!("Unwrapping!");
                 let mut chars = state.input_field.chars();
                 for _ in 0..3 {
                     chars.next();
@@ -105,6 +106,7 @@ fn update(state: &mut ZalgoCodecGui, message: ToplevelMessage) -> Task<ToplevelM
                     chars.next_back();
                 }
                 let encoded: String = chars.collect();
+                println!("encoded message: {encoded}");
                 Task::perform(async move { zalgo_decode(&encoded) }, |res| match res {
                     Ok(unwrapped) => ToplevelMessage::CodecFinished(unwrapped),
                     Err(e) => ToplevelMessage::PushNotification(e.to_string()),

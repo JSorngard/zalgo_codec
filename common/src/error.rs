@@ -1,13 +1,18 @@
 //! Contains the definition of the error type used by the encoding functions in the crate.
 
-use core::fmt;
+use core::{fmt, str::Utf8Error};
 #[cfg(feature = "std")]
 use std::backtrace::Backtrace;
+
+#[cfg(not(feature = "std"))]
+use alloc::{string::FromUtf8Error, vec::Vec};
+#[cfg(feature = "std")]
+use std::string::FromUtf8Error;
 
 #[derive(Debug)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
 /// if they encounter a byte they can not encode.
-pub struct Error {
+pub struct EncodeError {
     unencodable_character: char,
     line: usize,
     column: usize,
@@ -16,7 +21,7 @@ pub struct Error {
     backtrace: Backtrace,
 }
 
-impl Error {
+impl EncodeError {
     /// Creates a new `Error`.
     ///
     /// # Note
@@ -46,7 +51,7 @@ impl Error {
     /// # Examples
     ///
     /// ```
-    /// # use zalgo_codec_common::{Error, zalgo_encode};
+    /// # use zalgo_codec_common::{EncodeError, zalgo_encode};
     /// assert_eq!(zalgo_encode("❤️").map_err(|e| e.line()), Err(1));
     /// assert_eq!(zalgo_encode("a\nb\nc\r\n").map_err(|e| e.line()), Err(3));
     /// ```
@@ -62,7 +67,7 @@ impl Error {
     /// # Example
     ///
     /// ```
-    /// # use zalgo_codec_common::{Error, zalgo_encode};
+    /// # use zalgo_codec_common::{EncodeError, zalgo_encode};
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").map_err(|e| e.column()), Err(3));
     /// assert_eq!(zalgo_encode("I\n❤️\n🎂").map_err(|e|e.column()), Err(1));
     /// ```
@@ -127,7 +132,7 @@ impl Error {
     }
 }
 
-impl fmt::Display for Error {
+impl fmt::Display for EncodeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -140,15 +145,112 @@ impl fmt::Display for Error {
     }
 }
 
-impl core::error::Error for Error {}
+impl core::error::Error for EncodeError {}
+
+#[derive(Debug)]
+pub struct DecodeError {
+    kind: DecodeErrorKind,
+    #[cfg(feature = "std")]
+    backtrace: Backtrace,
+}
+
+impl DecodeError {
+    pub(crate) fn new(kind: DecodeErrorKind) -> Self {
+        Self {
+            #[cfg(feature = "std")]
+            backtrace: Backtrace::capture(),
+            kind,
+        }
+    }
+
+    #[cfg(feature = "std")]
+    /// Returns a backtrace to where the error was crated.
+    ///
+    /// The error was captured with [`Backtrace::capture`], see it for more information
+    /// on how to make it show information when printed.
+    pub fn backtrace(&self) -> &Backtrace {
+        &self.backtrace
+    }
+
+    /// Returns the kind of error it was.
+    pub fn kind(&self) -> &DecodeErrorKind {
+        &self.kind
+    }
+}
+
+impl fmt::Display for DecodeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "could not decode the string because {}", self.kind)
+    }
+}
+
+impl core::error::Error for DecodeError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self.kind() {
+            DecodeErrorKind::InvalidUtf8(e) => Some(e),
+            DecodeErrorKind::EmptyInput => None,
+        }
+    }
+}
+
+/// The kind of error the caused the decoding failure.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DecodeErrorKind {
+    /// The given string was empty.
+    EmptyInput,
+    /// Decoding the string resulted in invalid UTF-8.
+    InvalidUtf8(FromUtf8Error),
+}
+
+impl fmt::Display for DecodeErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::EmptyInput => write!(f, "the string was empty"),
+            Self::InvalidUtf8(e) => write!(f, "decoding resulted in invalid utf8: {e}"),
+        }
+    }
+}
+
+impl DecodeErrorKind {
+    /// Returns the bytes that resulted from the decoding
+    /// and were then attempted to be converted into a `String`.
+    ///
+    /// This method is does not allocate.
+    pub fn into_bytes(self) -> Vec<u8> {
+        match self {
+            Self::InvalidUtf8(e) => e.into_bytes(),
+            Self::EmptyInput => Vec::new(),
+        }
+    }
+
+    /// If the error happened because the decoding resulted in invalid UTF-8
+    /// this method returns the [`Utf8Error`] that was created during the failed
+    /// conversion of the bytes into a `String`.
+    pub fn utf8_error(&self) -> Option<Utf8Error> {
+        match self {
+            Self::InvalidUtf8(e) => Some(e.utf8_error()),
+            Self::EmptyInput => None,
+        }
+    }
+
+    /// If the error happened because the decoding resulted in invalid UTF-8,
+    /// this function returns a slice of the bytes that resulted from the decoding and
+    /// which were then attempted to be converted into a `String`.
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self {
+            Self::InvalidUtf8(e) => Some(e.as_bytes()),
+            Self::EmptyInput => None,
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {
-    use super::Error;
+    use super::EncodeError;
 
     #[test]
     fn test_error() {
-        let err = Error::new('å', 1, 7, 6);
+        let err = EncodeError::new('å', 1, 7, 6);
         assert_eq!(err.char(), 'å');
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
