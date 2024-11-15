@@ -57,7 +57,7 @@
 //!
 //! # Feature flags
 //!
-//! `std` *(enabled by default)*: enables [`EncodeError`] and [`DecodeError`] to capture a [`Backtrace`](std::backtrace::Backtrace).
+//! `std`: enables [`EncodeError`] and [`DecodeError`] to capture a [`Backtrace`](std::backtrace::Backtrace).
 //! If this feature is not enabled the library is `no_std` compatible, but still uses the `alloc` crate.
 //!
 //! `serde`: derives the `Serialize` and `Deserialize` traits from [`serde`](https://docs.rs/serde) for [`ZalgoString`].
