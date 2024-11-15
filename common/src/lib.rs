@@ -10,24 +10,23 @@
 //!
 //! Encode a string to a grapheme cluster with [`zalgo_encode`]:
 //! ```
-//! # use zalgo_codec_common::{Error, zalgo_encode};
+//! # use zalgo_codec_common::{EncodeError, zalgo_encode};
 //! let s = "Zalgo";
 //! let encoded = zalgo_encode(s)?;
 //! assert_eq!(encoded, "É̺͇͌͏");
-//! # Ok::<(), Error>(())
+//! # Ok::<(), EncodeError>(())
 //! ```
 //! Decode a grapheme cluster back into a string:
 //! ```
-//! # use zalgo_codec_common::zalgo_decode;
-//! # use std::string::FromUtf8Error;
+//! # use zalgo_codec_common::{zalgo_decode, DecodeError};
 //! let encoded = "É̺͇͌͏";
 //! let s = zalgo_decode(encoded)?;
 //! assert_eq!(s, "Zalgo");
-//! # Ok::<(), FromUtf8Error>(())
+//! # Ok::<(), DecodeError>(())
 //! ```
 //! The [`ZalgoString`] type can be used to encode a string and handle the result in various ways:
 //! ```
-//! # use zalgo_codec_common::{ZalgoString, Error};
+//! # use zalgo_codec_common::{ZalgoString, EncodeError};
 //! let s = "Zalgo";
 //! let zstr = ZalgoString::new(s)?;
 //!
@@ -46,12 +45,12 @@
 //!
 //! // Decode inplace
 //! assert_eq!(zstr.into_decoded_string(), "Zalgo");
-//! # Ok::<(), Error>(())
+//! # Ok::<(), EncodeError>(())
 //! ```
 //!
 //! # Feature flags
 //!
-//! `std` *(enabled by default)*: enables [`Error`] to capture a [`Backtrace`](std::backtrace::Backtrace).
+//! `std` *(enabled by default)*: enables [`EncodeError`] and [`DecodeError`] to capture a [`Backtrace`](std::backtrace::Backtrace).
 //! If this feature is not enabled the library is `no_std` compatible, but still uses the `alloc` crate.
 //!
 //! `serde`: derives the [`serde::Serialize`] and [`serde::Deserialize`] traits
@@ -180,20 +179,13 @@
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 #[cfg(not(feature = "std"))]
-use alloc::{
-    format,
-    string::{FromUtf8Error, String},
-    vec,
-    vec::Vec,
-};
+use alloc::{format, string::String, vec, vec::Vec};
 use core::{fmt, str};
-#[cfg(feature = "std")]
-use std::string::FromUtf8Error;
 
 mod error;
 pub mod zalgo_string;
 
-pub use error::Error;
+pub use error::{DecodeError, EncodeError};
 pub use zalgo_string::ZalgoString;
 
 /// Takes in a string slice that consists of only printable ACII and newline characters
@@ -216,9 +208,9 @@ pub use zalgo_string::ZalgoString;
 ///
 /// Basic usage:
 /// ```
-/// # use zalgo_codec_common::{Error, zalgo_encode};
+/// # use zalgo_codec_common::{EncodeError, zalgo_encode};
 /// assert_eq!(zalgo_encode("Zalgo")?, "É̺͇͌͏");
-/// # Ok::<(), Error>(())
+/// # Ok::<(), EncodeError>(())
 /// ```
 /// Can not encode non-ASCII characters or ASCII control characters except newlines:
 /// ```
@@ -227,7 +219,7 @@ pub use zalgo_string::ZalgoString;
 /// assert!(zalgo_encode("Zålgö").is_err());
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_encode(string: &str) -> Result<String, Error> {
+pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
     // We will encode this many bytes at a time before pushing onto the result vector.
     const BATCH_SIZE: usize = 16;
 
@@ -269,7 +261,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
                 let unencodable_character = string[index..].chars().next()
                 // TODO: Find a way to get rid of the expect.
                     .expect("i*BATCH_SIZE + j is within the string and on a char boundary, so string.chars().next() should find a char");
-                return Err(Error::new(unencodable_character, line, column, index));
+                return Err(EncodeError::new(unencodable_character, line, column, index));
             }
         }
         result.extend_from_slice(&buffer[..encoded]);
@@ -286,7 +278,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
 /// # Errors
 ///
 /// Returns an error if the decoded string is not valid UTF-8.
-/// This can happen if the input is a string that was not encoded by [`zalgo_encode`],
+/// This can happen if the input is empty, or if it is a string that was not encoded by [`zalgo_encode`],
 /// since the byte manipulations that this function does could result in invalid unicode in that case.
 /// Even if no error is returned in such a case the results are not meaningful.
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
@@ -295,10 +287,9 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
 ///
 /// Basic usage:
 /// ```
-/// # use zalgo_codec_common::zalgo_decode;
-/// # use std::string::FromUtf8Error;
+/// # use zalgo_codec_common::{zalgo_decode, DecodeError};
 /// assert_eq!(zalgo_decode("É̺͇͌͏")?, "Zalgo");
-/// # Ok::<(), FromUtf8Error>(())
+/// # Ok::<(), DecodeError>(())
 /// ```
 /// Decoding arbitrary strings that were not produced by [`zalgo_encode`] will most likely lead to errors:
 /// ```
@@ -307,12 +298,15 @@ pub fn zalgo_encode(string: &str) -> Result<String, Error> {
 /// ```
 /// If it doesn't the results are not meaningful:
 /// ```
-/// # use zalgo_codec_common::zalgo_decode;
+/// # use zalgo_codec_common::{zalgo_decode, DecodeError};
 /// assert_eq!(zalgo_decode("awö")?, "c");
-/// # Ok::<(), std::string::FromUtf8Error>(())
+/// # Ok::<(), DecodeError>(())
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_decode(encoded: &str) -> Result<String, FromUtf8Error> {
+pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
+    if encoded.is_empty() {
+        return Err(DecodeError::new(None));
+    }
     let mut res = vec![0; (encoded.len() - 1) / 2];
     let bytes = encoded.as_bytes();
 
@@ -323,7 +317,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, FromUtf8Error> {
         }
     }
 
-    String::from_utf8(res)
+    String::from_utf8(res).map_err(|e| DecodeError::new(Some(e)))
 }
 
 #[inline]
@@ -340,14 +334,14 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 ///
 /// Encode a simple hello world program in Python
 /// ```
-/// # use zalgo_codec_common::{Error, zalgo_wrap_python};
+/// # use zalgo_codec_common::{EncodeError, zalgo_wrap_python};
 /// let py_hello_world = "print(\"Hello, world!\")\n";
 /// let py_hello_world_enc = zalgo_wrap_python(py_hello_world)?;
 /// assert_eq!(
 ///     py_hello_world_enc,
 ///     "b='Ę͉͎͔͐͒̈̂͌͌ͅ͏̌̀͗͏͒͌̈́́̂̉ͯ'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))",
 /// );
-/// # Ok::<(), Error>(())
+/// # Ok::<(), EncodeError>(())
 /// ```
 /// If the contents of the variable `py_hello_world_enc` in
 /// the above code snippet is saved to a file
@@ -369,7 +363,7 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// Returns an error if the input contains a byte that does not correspond to a printable
 /// ASCII character or newline.
 /// ```
-/// # use zalgo_codec_common::{Error, zalgo_wrap_python};
+/// # use zalgo_codec_common::zalgo_wrap_python;
 /// let res = zalgo_wrap_python(r#"print("That will be 5€ please")"#);
 /// assert_eq!(
 ///     res.map_err(|e| (e.char(), e.line(), e.column())),
@@ -377,7 +371,7 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// );
 /// ```
 #[must_use = "the function returns a new value and does not modify the input"]
-pub fn zalgo_wrap_python(python: &str) -> Result<String, Error> {
+pub fn zalgo_wrap_python(python: &str) -> Result<String, EncodeError> {
     let encoded_string = zalgo_encode(python)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
 }
@@ -390,6 +384,11 @@ mod test {
     fn test_char() {
         assert_eq!(zalgo_encode("Zalgo\r").map_err(|e| e.char()), Err('\r'));
         assert_eq!(zalgo_encode("Zålgo").map_err(|e| e.char()), Err('å'));
+    }
+
+    #[test]
+    fn test_empty_decode() {
+        assert!(zalgo_decode("").is_err());
     }
 
     #[test]

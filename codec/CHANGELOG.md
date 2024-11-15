@@ -7,6 +7,12 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.13.0
+
+- Fixed a bug where attempting to decode an empty string would
+ result in a crash because the library would attempt to allocate `usize::MAX/2` bytes.
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
+
 ## 0.12.3
 
 - Re-enabled the help text for the CLI program.

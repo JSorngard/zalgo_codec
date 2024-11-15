@@ -15,25 +15,24 @@
 //!
 //! Encode a string to a grapheme cluster with [`zalgo_encode`]:
 //! ```
-//! # use zalgo_codec::{Error, zalgo_encode};
+//! # use zalgo_codec::{EncodeError, zalgo_encode};
 //! let s = "Zalgo";
 //! let encoded = zalgo_encode(s)?;
 //! assert_eq!(encoded, "É̺͇͌͏");
-//! # Ok::<(), Error>(())
+//! # Ok::<(), EncodeError>(())
 //! ```
 //! Decode the grapheme cluster back into a string with [`zalgo_decode`]:
 //! ```
-//! # use zalgo_codec::zalgo_decode;
+//! # use zalgo_codec::{zalgo_decode, DecodeError};
 //! # extern crate alloc;
-//! # use alloc::string::FromUtf8Error;
 //! let encoded = "É̺͇͌͏";
 //! let s = zalgo_decode(encoded)?;
 //! assert_eq!(s, "Zalgo");
-//! # Ok::<(), FromUtf8Error>(())
+//! # Ok::<(), DecodeError>(())
 //! ```
 //! The [`ZalgoString`] type can be used to encode a string and handle the result in various ways:
 //! ```
-//! # use zalgo_codec::{Error, ZalgoString};
+//! # use zalgo_codec::{EncodeError, ZalgoString};
 //! let s = "Zalgo";
 //! let zstr = ZalgoString::new(s)?;
 //! assert_eq!(zstr, "É̺͇͌͏");
@@ -41,7 +40,7 @@
 //! assert_eq!(zstr.decoded_len(), s.len());
 //! assert_eq!(zstr.bytes().next(), Some(69));
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
-//! # Ok::<(), Error>(())
+//! # Ok::<(), EncodeError>(())
 //! ```
 //! Encode Rust source code and embed it in your program with the [`zalgo_embed!`] proc-macro:
 //! ```
@@ -58,7 +57,7 @@
 //!
 //! # Feature flags
 //!
-//! `std` *(enabled by default)*: enables [`Error`] to capture a [`Backtrace`](std::backtrace::Backtrace).
+//! `std` *(enabled by default)*: enables [`EncodeError`] and [`DecodeError`] to capture a [`Backtrace`](std::backtrace::Backtrace).
 //! If this feature is not enabled the library is `no_std` compatible, but still uses the `alloc` crate.
 //!
 //! `serde`: derives the `Serialize` and `Deserialize` traits from [`serde`](https://docs.rs/serde) for [`ZalgoString`].
@@ -187,7 +186,8 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub use zalgo_codec_common::{
-    zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, Error, ZalgoString,
+    zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, DecodeError, EncodeError,
+    ZalgoString,
 };
 
 #[cfg(feature = "macro")]

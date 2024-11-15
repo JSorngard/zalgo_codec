@@ -3959,7 +3959,7 @@ checksum = "c94451ac9513335b5e23d7a8a2b61a7102398b8cca5160829d313e84c9d98be1"
 
 [[package]]
 name = "zalgo-codec"
-version = "0.12.4"
+version = "0.13.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -3974,7 +3974,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-common"
-version = "0.12.2"
+version = "0.13.0"
 dependencies = [
  "criterion",
  "rand",
@@ -3984,7 +3984,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-macro"
-version = "0.1.30"
+version = "0.1.31"
 dependencies = [
  "syn 2.0.87",
  "zalgo-codec-common",
