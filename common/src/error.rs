@@ -237,6 +237,8 @@ impl fmt::Display for DecodeErrorKind {
 #[cfg(test)]
 mod test {
     use super::{DecodeError, EncodeError};
+    #[cfg(not(feature = "std"))]
+    use alloc::{string::String, vec};
 
     #[test]
     fn test_error() {

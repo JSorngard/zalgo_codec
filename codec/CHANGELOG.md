@@ -13,6 +13,10 @@ for the changes made to the macros.
  result in a crash because the library would attempt to allocate `usize::MAX/2` bytes.
 - Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
 
+### Breaking changes
+
+- `std` is no longer enabled by default.
+
 ## 0.12.3
 
 - Re-enabled the help text for the CLI program.

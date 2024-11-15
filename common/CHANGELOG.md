@@ -12,6 +12,7 @@ This document contains all changes to the crate since version 0.9.4.
 
 - Renamed `Error` to `EncodeError`.
 - Made `zalgo_decode` return a `DecodeError` instead of a `FromUtf8Error`.
+- `std` is no longer enabled by default.
 
 ## 0.12.2
 

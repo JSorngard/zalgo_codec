@@ -1,6 +1,6 @@
 {
     "no-inline-html": {
-        "allowed_elements": ["br"]
+        "allowed_elements": ["br", "sup", "sub", "a"]
     }
     
 }
