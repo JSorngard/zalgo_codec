@@ -387,6 +387,12 @@ mod test {
     }
 
     #[test]
+    fn test_decode() {
+        assert!(zalgo_decode("").is_err());
+        assert!(zalgo_decode("Zalgo").is_err());
+    }
+
+    #[test]
     fn verify_conversion_table() {
         assert_eq!(zalgo_encode("A").unwrap(), "E\u{321}");
         assert_eq!(zalgo_decode("E\u{321}").unwrap(), "A");

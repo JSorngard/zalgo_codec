@@ -246,7 +246,7 @@ impl DecodeErrorKind {
 
 #[cfg(test)]
 mod test {
-    use super::EncodeError;
+    use super::{DecodeError, DecodeErrorKind, EncodeError};
 
     #[test]
     fn test_error() {
@@ -255,5 +255,15 @@ mod test {
         assert_eq!(err.line(), 1);
         assert_eq!(err.column(), 7);
         assert_eq!(err.index(), 6);
+    }
+
+    #[test]
+    fn test_decode_error() {
+        let err = DecodeError::new(DecodeErrorKind::EmptyInput);
+        matches!(err.kind(), DecodeErrorKind::EmptyInput);
+        let err = DecodeError::new(DecodeErrorKind::InvalidUtf8(
+            String::from_utf8(vec![255, 255, 255, 255, 255, 255]).unwrap_err(),
+        ));
+        matches!(err.kind(), DecodeErrorKind::InvalidUtf8(_));
     }
 }
