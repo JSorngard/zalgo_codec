@@ -278,7 +278,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
 /// # Errors
 ///
 /// Returns an error if the decoded string is not valid UTF-8.
-/// This can happen if the input is a string that was not encoded by [`zalgo_encode`],
+/// This can happen if the input is empty, or if it is a string that was not encoded by [`zalgo_encode`],
 /// since the byte manipulations that this function does could result in invalid unicode in that case.
 /// Even if no error is returned in such a case the results are not meaningful.
 /// If you want to be able to decode without this check, consider using a [`ZalgoString`].
