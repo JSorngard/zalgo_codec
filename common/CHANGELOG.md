@@ -12,7 +12,7 @@ This document contains all changes to the crate since version 0.9.4.
 ### Other changes
 
 - Added the `DecodeError` error type.
-- Fixed bug in `zalgo_decode` that made the program attempt to allocate
+- Fixed bug in `zalgo_decode` that made it attempt to allocate
  `usize::MAX/2` bytes if the input string was empty.
 
 ## 0.12.2
