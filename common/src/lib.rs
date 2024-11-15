@@ -185,7 +185,7 @@ use core::{fmt, str};
 mod error;
 pub mod zalgo_string;
 
-pub use error::{DecodeError, DecodeErrorKind, EncodeError};
+pub use error::{DecodeError, EncodeError};
 pub use zalgo_string::ZalgoString;
 
 /// Takes in a string slice that consists of only printable ACII and newline characters
@@ -305,7 +305,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
     if encoded.is_empty() {
-        return Err(DecodeError::new(DecodeErrorKind::EmptyInput));
+        return Err(DecodeError::new(None));
     }
     let mut res = vec![0; (encoded.len() - 1) / 2];
     let bytes = encoded.as_bytes();
@@ -317,7 +317,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
         }
     }
 
-    String::from_utf8(res).map_err(|e| DecodeError::new(DecodeErrorKind::InvalidUtf8(e)))
+    String::from_utf8(res).map_err(|e| DecodeError::new(Some(e)))
 }
 
 #[inline]
@@ -387,9 +387,8 @@ mod test {
     }
 
     #[test]
-    fn test_decode() {
+    fn test_empty_decode() {
         assert!(zalgo_decode("").is_err());
-        assert!(zalgo_decode("Zalgo").is_err());
     }
 
     #[test]

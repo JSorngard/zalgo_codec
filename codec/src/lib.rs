@@ -186,8 +186,8 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub use zalgo_codec_common::{
-    zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, DecodeError, DecodeErrorKind,
-    EncodeError, ZalgoString,
+    zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, DecodeError, EncodeError,
+    ZalgoString,
 };
 
 #[cfg(feature = "macro")]

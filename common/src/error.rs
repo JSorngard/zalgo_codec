@@ -155,11 +155,14 @@ pub struct DecodeError {
 }
 
 impl DecodeError {
-    pub(crate) fn new(kind: DecodeErrorKind) -> Self {
+    pub(crate) fn new(possible_error: Option<FromUtf8Error>) -> Self {
         Self {
             #[cfg(feature = "std")]
             backtrace: Backtrace::capture(),
-            kind,
+            kind: match possible_error {
+                Some(e) => DecodeErrorKind::InvalidUtf8(e),
+                None => DecodeErrorKind::EmptyInput,
+            },
         }
     }
 
@@ -172,9 +175,36 @@ impl DecodeError {
         &self.backtrace
     }
 
-    /// Returns the kind of error it was.
-    pub fn kind(&self) -> &DecodeErrorKind {
-        &self.kind
+    /// If the error happened because the decoding resulted in invalid UTF-8
+    /// this method returns the [`Utf8Error`] that was created during the failed
+    /// conversion of the bytes into a `String`.
+    pub fn utf8_error(&self) -> Option<Utf8Error> {
+        match self.kind {
+            DecodeErrorKind::InvalidUtf8(ref e) => Some(e.utf8_error()),
+            DecodeErrorKind::EmptyInput => None,
+        }
+    }
+
+    /// If the input wasn't empty this function returns
+    /// the bytes that resulted from the decoding
+    /// and were then attempted to be converted into a `String`.
+    ///
+    /// This method does not allocate.
+    pub fn into_bytes(self) -> Option<Vec<u8>> {
+        match self.kind {
+            DecodeErrorKind::InvalidUtf8(e) => Some(e.into_bytes()),
+            DecodeErrorKind::EmptyInput => None,
+        }
+    }
+
+    /// If the error happened because the decoding resulted in invalid UTF-8,
+    /// this function returns a slice of the bytes that resulted from the decoding and
+    /// which were then attempted to be converted into a `String`.
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self.kind {
+            DecodeErrorKind::InvalidUtf8(ref e) => Some(e.as_bytes()),
+            DecodeErrorKind::EmptyInput => None,
+        }
     }
 }
 
@@ -186,8 +216,8 @@ impl fmt::Display for DecodeError {
 
 impl core::error::Error for DecodeError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
-        match self.kind() {
-            DecodeErrorKind::InvalidUtf8(e) => Some(e),
+        match self.kind {
+            DecodeErrorKind::InvalidUtf8(ref e) => Some(e),
             DecodeErrorKind::EmptyInput => None,
         }
     }
@@ -195,7 +225,7 @@ impl core::error::Error for DecodeError {
 
 /// The kind of error the caused the decoding failure.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DecodeErrorKind {
+enum DecodeErrorKind {
     /// The given string was empty.
     EmptyInput,
     /// Decoding the string resulted in invalid UTF-8.
@@ -211,42 +241,9 @@ impl fmt::Display for DecodeErrorKind {
     }
 }
 
-impl DecodeErrorKind {
-    /// Returns the bytes that resulted from the decoding
-    /// and were then attempted to be converted into a `String`.
-    ///
-    /// This method is does not allocate.
-    pub fn into_bytes(self) -> Vec<u8> {
-        match self {
-            Self::InvalidUtf8(e) => e.into_bytes(),
-            Self::EmptyInput => Vec::new(),
-        }
-    }
-
-    /// If the error happened because the decoding resulted in invalid UTF-8
-    /// this method returns the [`Utf8Error`] that was created during the failed
-    /// conversion of the bytes into a `String`.
-    pub fn utf8_error(&self) -> Option<Utf8Error> {
-        match self {
-            Self::InvalidUtf8(e) => Some(e.utf8_error()),
-            Self::EmptyInput => None,
-        }
-    }
-
-    /// If the error happened because the decoding resulted in invalid UTF-8,
-    /// this function returns a slice of the bytes that resulted from the decoding and
-    /// which were then attempted to be converted into a `String`.
-    pub fn as_bytes(&self) -> Option<&[u8]> {
-        match self {
-            Self::InvalidUtf8(e) => Some(e.as_bytes()),
-            Self::EmptyInput => None,
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use super::{DecodeError, DecodeErrorKind, EncodeError};
+    use super::{DecodeError, EncodeError};
 
     #[test]
     fn test_error() {
@@ -259,11 +256,12 @@ mod test {
 
     #[test]
     fn test_decode_error() {
-        let err = DecodeError::new(DecodeErrorKind::EmptyInput);
-        matches!(err.kind(), DecodeErrorKind::EmptyInput);
-        let err = DecodeError::new(DecodeErrorKind::InvalidUtf8(
-            String::from_utf8(vec![255, 255, 255, 255, 255, 255]).unwrap_err(),
-        ));
-        matches!(err.kind(), DecodeErrorKind::InvalidUtf8(_));
+        let err = DecodeError::new(None);
+        assert_eq!(err.as_bytes(), None);
+        assert_eq!(err.utf8_error(), None);
+        assert_eq!(err.into_bytes(), None);
+        let err = DecodeError::new(String::from_utf8(vec![255, 255, 255, 255, 255, 255]).err());
+        assert_eq!(err.as_bytes(), Some([255; 6].as_slice()));
+        assert_eq!(err.into_bytes(), Some(vec![255; 6]));
     }
 }
