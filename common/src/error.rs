@@ -5,7 +5,7 @@ use core::{fmt, str::Utf8Error};
 use std::backtrace::Backtrace;
 
 #[cfg(not(feature = "std"))]
-use alloc::{string::FromUtf8Error, vec::Vec};
+use alloc::string::FromUtf8Error;
 #[cfg(feature = "std")]
 use std::string::FromUtf8Error;
 
@@ -147,6 +147,7 @@ impl fmt::Display for EncodeError {
 
 impl core::error::Error for EncodeError {}
 
+/// The error returned by [`zalgo_decode`](super::zalgo_decode) if a string can not be decoded.
 #[derive(Debug)]
 pub struct DecodeError {
     kind: DecodeErrorKind,
@@ -166,43 +167,35 @@ impl DecodeError {
         }
     }
 
+    /// Returns whether the error happened because the given string was empty,
+    /// and not because the decoding resulted in invalid UTF-8.
+    pub fn cause_was_empty_string(&self) -> bool {
+        matches!(self.kind, DecodeErrorKind::EmptyInput)
+    }
+
     #[cfg(feature = "std")]
-    /// Returns a backtrace to where the error was crated.
+    /// Returns a backtrace to where the error was created.
     ///
-    /// The error was captured with [`Backtrace::capture`], see it for more information
+    /// The backtrace was captured with [`Backtrace::capture`], see it for more information
     /// on how to make it show information when printed.
     pub fn backtrace(&self) -> &Backtrace {
         &self.backtrace
     }
 
-    /// If the error happened because the decoding resulted in invalid UTF-8
-    /// this method returns the [`Utf8Error`] that was created during the failed
-    /// conversion of the bytes into a `String`.
-    pub fn utf8_error(&self) -> Option<Utf8Error> {
-        match self.kind {
-            DecodeErrorKind::InvalidUtf8(ref e) => Some(e.utf8_error()),
-            DecodeErrorKind::EmptyInput => None,
-        }
-    }
-
-    /// If the input wasn't empty this function returns
-    /// the bytes that resulted from the decoding
-    /// and were then attempted to be converted into a `String`.
-    ///
-    /// This method does not allocate.
-    pub fn into_bytes(self) -> Option<Vec<u8>> {
-        match self.kind {
-            DecodeErrorKind::InvalidUtf8(e) => Some(e.into_bytes()),
+    /// If the error happened because the decoding resulted in invalid UTF-8,
+    /// this function returns the [`Utf8Error`] that was created in the process.
+    pub fn to_utf8_error(&self) -> Option<Utf8Error> {
+        match &self.kind {
+            DecodeErrorKind::InvalidUtf8(e) => Some(e.utf8_error()),
             DecodeErrorKind::EmptyInput => None,
         }
     }
 
     /// If the error happened because the decoding resulted in invalid UTF-8,
-    /// this function returns a slice of the bytes that resulted from the decoding and
-    /// which were then attempted to be converted into a `String`.
-    pub fn as_bytes(&self) -> Option<&[u8]> {
+    /// this function converts this error into the [`FromUtf8Error`] that was created in the process.
+    pub fn into_from_utf8_error(self) -> Option<FromUtf8Error> {
         match self.kind {
-            DecodeErrorKind::InvalidUtf8(ref e) => Some(e.as_bytes()),
+            DecodeErrorKind::InvalidUtf8(e) => Some(e),
             DecodeErrorKind::EmptyInput => None,
         }
     }
@@ -257,11 +250,16 @@ mod test {
     #[test]
     fn test_decode_error() {
         let err = DecodeError::new(None);
-        assert_eq!(err.as_bytes(), None);
-        assert_eq!(err.utf8_error(), None);
-        assert_eq!(err.into_bytes(), None);
+        assert_eq!(err.to_utf8_error(), None);
+        assert!(err.cause_was_empty_string());
+        assert_eq!(err.into_from_utf8_error(), None);
         let err = DecodeError::new(String::from_utf8(vec![255, 255, 255, 255, 255, 255]).err());
-        assert_eq!(err.as_bytes(), Some([255; 6].as_slice()));
-        assert_eq!(err.into_bytes(), Some(vec![255; 6]));
+        assert_eq!(err.to_utf8_error().unwrap().error_len(), Some(1));
+        assert_eq!(err.to_utf8_error().unwrap().valid_up_to(), 0);
+        assert!(!err.cause_was_empty_string());
+        assert_eq!(
+            err.into_from_utf8_error().unwrap().into_bytes(),
+            vec![255; 6]
+        );
     }
 }

@@ -50,7 +50,7 @@
 //!
 //! # Feature flags
 //!
-//! `std` *(enabled by default)*: enables [`Error`] to capture a [`Backtrace`](std::backtrace::Backtrace).
+//! `std` *(enabled by default)*: enables [`EncodeError`] and [`DecodeError`] to capture a [`Backtrace`](std::backtrace::Backtrace).
 //! If this feature is not enabled the library is `no_std` compatible, but still uses the `alloc` crate.
 //!
 //! `serde`: derives the [`serde::Serialize`] and [`serde::Deserialize`] traits
