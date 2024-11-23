@@ -8,6 +8,7 @@ categories = ["encoding", "text-processing"]
 license = "MIT OR Apache-2.0"
 description = "Convert an ASCII text string into a single unicode grapheme cluster and back."
 repository = "https://github.com/JSorngard/zalgo_codec/tree/main/common"
+rust-version = "1.81.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

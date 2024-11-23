@@ -5,6 +5,8 @@ This document contains all changes to the crate since version 0.9.4.
 ## 0.13.1
 
 - Corrected formatting error in doc examples of `EncodeError`.
+- Set the `rust-version` field to 1.81.0 since if we don't
+ crates.io will set it to 1.56.0 which is too old to compile the crate.
 
 ## 0.13.0
 
