@@ -69,7 +69,7 @@ impl EncodeError {
     /// ```
     /// # use zalgo_codec_common::{EncodeError, zalgo_encode};
     /// assert_eq!(zalgo_encode("I ❤️ 🎂").map_err(|e| e.column()), Err(3));
-    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").map_err(|e|e.column()), Err(1));
+    /// assert_eq!(zalgo_encode("I\n❤️\n🎂").map_err(|e| e.column()), Err(1));
     /// ```
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
@@ -87,7 +87,6 @@ impl EncodeError {
     /// ```
     /// # use zalgo_codec_common::zalgo_encode;
     /// assert_eq!(zalgo_encode("CRLF\r\n").map_err(|e| e.char()), Err('\r'));
-    ///
     /// ```  
     /// The ❤️ emoji consists of two characters, the heart `U+2764` and the color variant selector `U+FE0F`.
     /// Since the heart is not encodable, that is the place where the error is generated:
