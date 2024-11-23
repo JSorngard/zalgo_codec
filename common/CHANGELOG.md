@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.13.1
+
+- Corrected formatting error in doc examples of `EncodeError`.
+
 ## 0.13.0
 
 - Added the `DecodeError` error type.
