@@ -5,6 +5,8 @@ This document contains all changes to the crate since 0.1.19
 ## 0.1.32
 
 - Updated the `zalgo-codec-common` dependency.
+- Set `rust-version` to 1.81.0 since if we don't crates.io sets it to 1.56.0,
+ which is too old to compile the crate.
 
 ## 0.1.31
 

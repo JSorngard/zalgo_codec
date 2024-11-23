@@ -8,6 +8,7 @@ authors = ["Alex Keizer <alex@keizer.dev>", "Johanna Sörngård <jsorngard@gmail
 description = "Provides the zalgo_embed! macro for compiling source code that's been converted into a single grapheme cluster by the zalgo-codec-common crate"
 repository = "https://github.com/JSorngard/zalgo_codec/tree/main/macro"
 license = "MIT OR Apache-2.0"
+rust-version = "1.81.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
