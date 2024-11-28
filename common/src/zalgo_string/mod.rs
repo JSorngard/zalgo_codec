@@ -999,7 +999,7 @@ mod test {
     #[test]
     fn test_decoded_bytes() {
         let zs = ZalgoString::new("Zalgo").unwrap();
-        assert_eq!(zs.decoded_bytes().nth(0), Some(b'Z'));
+        assert_eq!(zs.decoded_bytes().next(), Some(b'Z'));
         assert_eq!(zs.decoded_bytes().nth(2), Some(b'l'));
         assert_eq!(zs.decoded_bytes().last(), Some(b'o'));
         let mut dcb = zs.decoded_bytes();
@@ -1012,7 +1012,7 @@ mod test {
     #[test]
     fn test_decoded_chars() {
         let zs = ZalgoString::new("Zalgo").unwrap();
-        assert_eq!(zs.decoded_chars().nth(0), Some('Z'));
+        assert_eq!(zs.decoded_chars().next(), Some('Z'));
         assert_eq!(zs.decoded_chars().nth(2), Some('l'));
         assert_eq!(zs.decoded_chars().last(), Some('o'));
         let mut dcc = zs.decoded_chars();

@@ -16,7 +16,7 @@ impl<'a> DecodedBytes<'a> {
     }
 }
 
-impl<'a> Iterator for DecodedBytes<'a> {
+impl Iterator for DecodedBytes<'_> {
     type Item = u8;
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -63,7 +63,7 @@ impl<'a> Iterator for DecodedBytes<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
+impl DoubleEndedIterator for DecodedBytes<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0
@@ -73,8 +73,8 @@ impl<'a> DoubleEndedIterator for DecodedBytes<'a> {
     }
 }
 
-impl<'a> FusedIterator for DecodedBytes<'a> {}
-impl<'a> ExactSizeIterator for DecodedBytes<'a> {}
+impl FusedIterator for DecodedBytes<'_> {}
+impl ExactSizeIterator for DecodedBytes<'_> {}
 
 /// An iterator over the decoded characters of a [`ZalgoString`].
 ///
@@ -90,7 +90,7 @@ impl<'a> DecodedChars<'a> {
     }
 }
 
-impl<'a> Iterator for DecodedChars<'a> {
+impl Iterator for DecodedChars<'_> {
     type Item = char;
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -118,12 +118,12 @@ impl<'a> Iterator for DecodedChars<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for DecodedChars<'a> {
+impl DoubleEndedIterator for DecodedChars<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.0.next_back().map(char::from)
     }
 }
 
-impl<'a> FusedIterator for DecodedChars<'a> {}
-impl<'a> ExactSizeIterator for DecodedChars<'a> {}
+impl FusedIterator for DecodedChars<'_> {}
+impl ExactSizeIterator for DecodedChars<'_> {}
