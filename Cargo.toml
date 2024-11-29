@@ -12,3 +12,6 @@ strip = "symbols"
 lto = "fat"
 panic = "abort"
 codegen-units = 1
+
+[package.metadata.cargo-all-features]
+denylist = ["binary", "gui"]
