@@ -39,7 +39,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: test
-      run: cargo test --verbose
+      run: cargo install cargo-all-features && cargo test-all-features
       
   build:
     runs-on: ubuntu-latest
