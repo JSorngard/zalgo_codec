@@ -17,13 +17,15 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - name: format
       run: cargo fmt --check
+      
   check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - name: check
-      run: cargo check --verbose
+      run: cargo install cargo-all-features && cargo check-all-features
+      
   clippy:
     runs-on: ubuntu-latest
     steps:
@@ -31,18 +33,21 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - name: clippy
       run: cargo clippy -- -D warnings
+      
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: test
-      run: cargo test --verbose
+      run: cargo install cargo-all-features && cargo test-all-features
+      
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: build
       run: cargo build --features binary
+      
   doc:
     runs-on: ubuntu-latest
     env:
@@ -53,6 +58,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@nightly
     - name: document
       run: cargo +nightly doc --features macro,std,serde,rkyv --no-deps
+      
   coverage:
     runs-on: ubuntu-latest
     steps:
