@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
-    - name: format
+    - name: Format
       run: cargo fmt --check
       
   check:
@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
-    - name: clippy
+    - name: Clippy
       run: cargo clippy -- -D warnings
       
   test:
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: build
+    - name: Build
       run: cargo build --features binary
       
   doc:
@@ -62,7 +62,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@nightly
-    - name: document
+    - name: Document
       run: cargo +nightly doc --features macro,std,serde,rkyv --no-deps
       
   coverage:
