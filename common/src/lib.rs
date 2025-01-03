@@ -173,12 +173,13 @@
 //! It can be installed with `cargo install zalgo-codec --features binary`.
 //! You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "std")]
+extern crate std;
+
 extern crate alloc;
-#[cfg(not(feature = "std"))]
 use alloc::{format, string::String, vec, vec::Vec};
 use core::{fmt, str};
 
