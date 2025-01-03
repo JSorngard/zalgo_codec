@@ -1,6 +1,6 @@
 [package]
 name = "zalgo-codec-macro"
-version = "0.1.32"
+version = "0.1.33"
 edition = "2021"
 keywords = ["unicode", "obfuscation", "encoding", "zalgo"]
 categories = ["encoding", "text-processing"]

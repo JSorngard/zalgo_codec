@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.13.2
+
+- The crate now activates the `std` feature such that the implicit prelude is unchanged.
+
 ## 0.13.1
 
 - Corrected formatting error in doc examples of `EncodeError`.

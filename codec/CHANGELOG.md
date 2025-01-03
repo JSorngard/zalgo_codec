@@ -7,6 +7,10 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.13.2
+
+- Updated `zalgo-codec-common` and `zalgo-codec-macro` dependencies.
+
 ## 0.13.1
 
 - Set `rust-version` to 1.81.0 since if we don't crates.io sets it to 1.56.0 by default,
