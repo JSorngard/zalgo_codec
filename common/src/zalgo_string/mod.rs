@@ -12,11 +12,7 @@ pub use iterators::{DecodedBytes, DecodedChars};
 
 use core::{ops::Index, slice::SliceIndex};
 
-#[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::String, vec::Vec};
-
-#[cfg(feature = "std")]
-use std::borrow::Cow;
 
 /// A [`String`] that has been encoded with [`zalgo_encode`].
 /// This struct can be decoded in-place and also allows iteration over its characters and bytes, both in
@@ -772,8 +768,10 @@ impl<I: SliceIndex<str>> Index<I> for ZalgoString {
 #[cfg(test)]
 mod test {
     use super::*;
-    #[cfg(not(feature = "std"))]
-    use alloc::{format, string::ToString};
+    use alloc::{
+        format,
+        string::{String, ToString},
+    };
 
     #[test]
     fn check_into_decoded_string() {

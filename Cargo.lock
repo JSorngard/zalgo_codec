@@ -4100,7 +4100,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec"
-version = "0.13.1"
+version = "0.13.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -4115,7 +4115,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-common"
-version = "0.13.1"
+version = "0.13.2"
 dependencies = [
  "criterion",
  "rand",
@@ -4125,7 +4125,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec-macro"
-version = "0.1.32"
+version = "0.1.33"
 dependencies = [
  "syn 2.0.93",
  "zalgo-codec-common",

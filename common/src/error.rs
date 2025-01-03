@@ -1,13 +1,11 @@
 //! Contains the definition of the error type used by the encoding functions in the crate.
 
 use core::{fmt, str::Utf8Error};
+
 #[cfg(feature = "std")]
 use std::backtrace::Backtrace;
 
-#[cfg(not(feature = "std"))]
 use alloc::string::FromUtf8Error;
-#[cfg(feature = "std")]
-use std::string::FromUtf8Error;
 
 #[derive(Debug)]
 /// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
@@ -236,7 +234,6 @@ impl fmt::Display for DecodeErrorKind {
 #[cfg(test)]
 mod test {
     use super::{DecodeError, EncodeError};
-    #[cfg(not(feature = "std"))]
     use alloc::{string::String, vec};
 
     #[test]
