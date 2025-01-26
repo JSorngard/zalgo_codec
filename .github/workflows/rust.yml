@@ -37,7 +37,7 @@ jobs:
     - name: Clippy
       run: cargo clippy -- -D warnings
       
-  test1:
+  test_codec:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
     - name: Test all feature combinations
       run: cargo test-all-features --n-chunks 3 --chunk 1
 
-  test2:
+  test_common:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
     - name: Test all feature combinations
       run: cargo test-all-features --n-chunks 3 --chunk 2
 
-  test3:
+  test_macro:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
