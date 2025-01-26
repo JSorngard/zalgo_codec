@@ -37,7 +37,7 @@ jobs:
     - name: Clippy
       run: cargo clippy -- -D warnings
       
-  test:
+  test1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -45,7 +45,27 @@ jobs:
       with:
         tool: cargo-all-features
     - name: Test all feature combinations
-      run: cargo test-all-features
+      run: cargo test-all-features --n-chunks 3 --chunk 1
+
+  test2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features
+    - name: Test all feature combinations
+      run: cargo test-all-features --n-chunks 3 --chunk 2
+
+  test3:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features
+    - name: Test all feature combinations
+      run: cargo test-all-features --n-chunks 3 --chunk 3
       
   build:
     runs-on: ubuntu-latest
