@@ -51,9 +51,6 @@ std = ["zalgo-codec-common/std", "anyhow?/std", "clap?/std"]
 # Document all features.
 all-features = true
 
-[package.metadata.cargo-all-features]
-denylist = ["binary", "gui"]
-
 [[bin]]
 name = "zalgo_codec"
 path = "src/main.rs"
