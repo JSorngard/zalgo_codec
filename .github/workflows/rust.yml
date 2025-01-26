@@ -71,8 +71,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features
+    - name: Build normal feature combinations
+      run: cargo-build-all-features
+    - name: Build binary
       run: cargo build --features binary
+    - name: Build binary with GUI
+      run: cargo build --features gui
       
   doc:
     runs-on: ubuntu-latest
