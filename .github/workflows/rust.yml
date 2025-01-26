@@ -75,7 +75,7 @@ jobs:
       with:
         tool: cargo-all-features
     - name: Build normal feature combinations
-      run: cargo-build-all-features
+      run: cargo build-all-features
     - name: Build binary
       run: cargo build --features binary
     - name: Build binary with GUI
