@@ -82,7 +82,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@nightly
-    - name: Document
+    - name: Generate documentation
       run: cargo +nightly doc --features macro,std,serde,rkyv --no-deps
       
   coverage:
@@ -92,12 +92,12 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools
-      - name: cargo install cargo-llvm-cov
+      - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
-      - name: cargo generate-lockfile
+      - name: Generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
-      - name: cargo llvm-cov
+      - name: Generate coverage reports
         run: cargo llvm-cov --locked -F macro --lcov --output-path lcov.info
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
@@ -105,6 +105,21 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           fail_ci_if_error: true
+
+  verify_rust_version:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-msrv
+    - name: Verify MSRV of common
+      run: cd common && cargo msrv --output-format minimal verify --all-features
+    - name: Verify MSRV of macro
+      run: cd ..\macro && cargo msrv --output-format minimal verify --all-features
+    - name: Verify SMRV of codec
+      run: cd ..\codec && cargo msrv --output-format minimal verify --all-features
           
   semver-checks:
     runs-on: ubuntu-latest
