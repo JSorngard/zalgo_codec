@@ -22,7 +22,7 @@ cli-clipboard = { version = "0.4", default-features = false, optional = true }
 clap = { version = "4.5", default-features = false, features = ["derive", "help", "color", "error-context", "suggestions", "usage"], optional = true }
 
 [dev-dependencies]
-rand = { version = "0.8", default-features = false, features = ["alloc", "std", "std_rng"] }
+rand = { version = "0.9", default-features = false, features = ["alloc", "std", "std_rng"] }
 unicode-segmentation = { version = "1.12", features = ["no_std"] }
 
 [features]
