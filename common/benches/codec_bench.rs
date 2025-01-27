@@ -2,9 +2,10 @@ use std::hint::black_box;
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::{
-    distributions::{DistString, Distribution},
-    seq::SliceRandom,
-    thread_rng, Rng,
+    distr::{Distribution, SampleString},
+    rng,
+    seq::IndexedRandom,
+    Rng,
 };
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, ZalgoString};
 
@@ -16,7 +17,7 @@ impl Distribution<char> for PrintableAsciiAndNewline {
     }
 }
 
-impl DistString for PrintableAsciiAndNewline {
+impl SampleString for PrintableAsciiAndNewline {
     fn append_string<R: Rng + ?Sized>(&self, rng: &mut R, string: &mut String, len: usize) {
         string.reserve(len);
         for _ in 0..len {
@@ -26,7 +27,7 @@ impl DistString for PrintableAsciiAndNewline {
 }
 
 fn bench_codec(c: &mut Criterion) {
-    let string = PrintableAsciiAndNewline.sample_string(&mut thread_rng(), 100_000);
+    let string = PrintableAsciiAndNewline.sample_string(&mut rng(), 100_000);
 
     let mut group = c.benchmark_group("codec");
     group.bench_function("encode", |b| {
