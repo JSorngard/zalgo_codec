@@ -201,8 +201,8 @@ mod tests {
     use alloc::string::String;
     use core::str;
     use rand::{
-        distributions::{DistString, Distribution},
-        seq::SliceRandom,
+        distr::{Distribution, SampleString},
+        seq::IndexedRandom,
         Rng,
     };
     use unicode_segmentation::UnicodeSegmentation;
@@ -215,7 +215,7 @@ mod tests {
         }
     }
 
-    impl DistString for PrintableAsciiAndNewline {
+    impl SampleString for PrintableAsciiAndNewline {
         fn append_string<R: Rng + ?Sized>(&self, rng: &mut R, string: &mut String, len: usize) {
             string.reserve(len);
             for _ in 0..len {
@@ -276,7 +276,7 @@ mod tests {
 
         // Checking that randomly generated alphanumeric strings are encoded in a lossless fashion, and that they contain a single grapheme cluster
         for _ in 0..100 {
-            let s = PrintableAsciiAndNewline.sample_string(&mut rand::thread_rng(), 100);
+            let s = PrintableAsciiAndNewline.sample_string(&mut rand::rng(), 100);
             let encoded = zalgo_encode(&s).unwrap();
             assert_eq!(zalgo_decode(&encoded).unwrap(), s);
             assert_eq!(encoded.as_str().graphemes(true).count(), 1)
