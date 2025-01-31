@@ -119,3 +119,36 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check semver
         uses: obi1kenobi/cargo-semver-checks-action@v2
+
+  beta_test_codec:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@beta
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features 
+    - name: Test the codec crate on rust beta
+      run: cargo test-all-features --n-chunks 3 --chunk 1
+
+  beta_test_common:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@beta
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features 
+    - name: Test the common crate on rust beta
+      run: cargo test-all-features --n-chunks 3 --chunk 2
+
+  beta_test_macro:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@beta
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-all-features 
+    - name: Test the macro crate on rust beta
+      run: cargo test-all-features --n-chunks 3 --chunk 3
