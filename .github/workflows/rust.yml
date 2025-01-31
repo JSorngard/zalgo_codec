@@ -125,8 +125,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@beta
-    - name: Install libfontconfig1-dev
-      run: sudo apt-get -y install libfontconfig1-dev jq
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features 
@@ -138,8 +136,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@beta
-    - name: Install libfontconfig1-dev
-      run: sudo apt-get -y install libfontconfig1-dev jq
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features 
@@ -151,8 +147,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@beta
-    - name: Install libfontconfig1-dev
-      run: sudo apt-get -y install libfontconfig1-dev jq
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features 
