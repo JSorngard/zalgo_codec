@@ -117,8 +117,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check semver
-        uses: obi1kenobi/cargo-semver-checks-action@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-semver-checks
+      - name: Verify semver compatibility
+        run: cargo semver-checks
 
   beta_test_codec:
     runs-on: ubuntu-latest
