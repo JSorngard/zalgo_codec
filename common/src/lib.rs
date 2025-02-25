@@ -324,7 +324,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
 #[inline]
 #[must_use = "the function returns a new value and does not modify its inputs"]
 const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
-    ((odd << 6 & 64 | even & 63) + 22) % 133 + 10
+    (((odd << 6) & 64 | even & 63) + 22) % 133 + 10
 }
 
 /// zalgo-encodes an ASCII string containing Python code and
