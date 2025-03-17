@@ -87,14 +87,9 @@ jobs:
       
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain: [stable, beta]
     steps:
     - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: ${{ matrix.toolchain }}
+    - uses: dtolnay/rust-toolchain@stable
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
