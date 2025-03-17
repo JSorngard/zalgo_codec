@@ -38,9 +38,15 @@ jobs:
       run: cargo clippy -- -D warnings
       
   test_codec:
+    strategy:
+      matrix:
+        channel: ["stable", "beta"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        channel {{ $matrix.channel }}
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -123,17 +129,6 @@ jobs:
           tool: cargo-semver-checks
       - name: Verify semver compatibility
         run: cargo semver-checks
-
-  beta_test_codec:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@beta
-    - uses: taiki-e/install-action@v2
-      with:
-        tool: cargo-all-features 
-    - name: Test the codec crate on rust beta
-      run: cargo test-all-features --n-chunks 3 --chunk 1
 
   beta_test_common:
     runs-on: ubuntu-latest
