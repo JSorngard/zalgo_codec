@@ -55,8 +55,14 @@ jobs:
 
   test_common:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [stable, beta]
     steps:
     - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ matrix.toolchain }}
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -129,17 +135,6 @@ jobs:
           tool: cargo-semver-checks
       - name: Verify semver compatibility
         run: cargo semver-checks
-
-  beta_test_common:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@beta
-    - uses: taiki-e/install-action@v2
-      with:
-        tool: cargo-all-features 
-    - name: Test the common crate on rust beta
-      run: cargo test-all-features --n-chunks 3 --chunk 2
 
   beta_test_macro:
     runs-on: ubuntu-latest
