@@ -46,7 +46,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ matrix.channel }}
+        toolchain: ${{ matrix.toolchain }}
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
