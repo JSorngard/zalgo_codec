@@ -38,15 +38,15 @@ jobs:
       run: cargo clippy -- -D warnings
       
   test_codec:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        channel: ["stable", "beta"]
-    runs-on: ubuntu-latest
+        toolchain: [stable, beta]
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@master
       with:
-        channel {{ $matrix.channel }}
+        toolchain: ${{ matrix.channel }}
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
