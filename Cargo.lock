@@ -4346,7 +4346,7 @@ dependencies = [
 
 [[package]]
 name = "zalgo-codec"
-version = "0.13.3"
+version = "0.13.4"
 dependencies = [
  "anyhow",
  "clap",
