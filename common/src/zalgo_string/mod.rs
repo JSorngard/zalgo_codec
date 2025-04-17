@@ -8,6 +8,8 @@
 mod iterators;
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, EncodeError};
+#[cfg(feature = "serde")]
+use crate::{zalgo_decode, DecodeError};
 pub use iterators::{DecodedBytes, DecodedChars};
 
 use core::{ops::Index, slice::SliceIndex};
@@ -19,11 +21,29 @@ use alloc::{borrow::Cow, string::String, vec::Vec};
 /// decoded and encoded form.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(try_from = "MaybeZalgoString"))]
 #[cfg_attr(
     feature = "rkyv",
     derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive)
 )]
 pub struct ZalgoString(String);
+
+#[cfg(feature = "serde")]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+struct MaybeZalgoString(String);
+
+#[cfg(feature = "serde")]
+impl TryFrom<MaybeZalgoString> for ZalgoString {
+    type Error = DecodeError;
+
+    fn try_from(MaybeZalgoString(encoded_string): MaybeZalgoString) -> Result<Self, Self::Error> {
+        if let Err(e) = zalgo_decode(&encoded_string) {
+            Err(e)
+        } else {
+            Ok(ZalgoString(encoded_string))
+        }
+    }
+}
 
 /// Allocates a `String` that contains only the character "E" and no encoded content.
 impl Default for ZalgoString {
