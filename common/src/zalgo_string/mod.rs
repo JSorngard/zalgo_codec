@@ -8,9 +8,13 @@
 mod iterators;
 
 use crate::{decode_byte_pair, fmt, zalgo_encode, EncodeError};
-pub use iterators::{DecodedBytes, DecodedChars};
-
 use core::{ops::Index, slice::SliceIndex};
+pub use iterators::{DecodedBytes, DecodedChars};
+#[cfg(feature = "rkyv")]
+use rkyv::bytecheck::{
+    rancor::{fail, Fallible, Source},
+    CheckBytes, Verify,
+};
 
 use alloc::{borrow::Cow, string::String, vec::Vec};
 
@@ -19,11 +23,45 @@ use alloc::{borrow::Cow, string::String, vec::Vec};
 /// decoded and encoded form.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(try_from = "MaybeZalgoString"))]
 #[cfg_attr(
     feature = "rkyv",
-    derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive)
+    derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive, CheckBytes)
 )]
+#[cfg_attr(feature = "rkyv", bytecheck(verify))]
 pub struct ZalgoString(String);
+
+#[cfg(feature = "rkyv")]
+unsafe impl<C> Verify<C> for ZalgoString
+where
+    C: Fallible + ?Sized,
+    C::Error: Source,
+{
+    #[inline]
+    fn verify(&self, _context: &mut C) -> Result<(), C::Error> {
+        if let Err(e) = crate::zalgo_decode(&self.0) {
+            fail!(e);
+        }
+        Ok(())
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+struct MaybeZalgoString(String);
+
+#[cfg(feature = "serde")]
+impl TryFrom<MaybeZalgoString> for ZalgoString {
+    type Error = crate::DecodeError;
+
+    fn try_from(MaybeZalgoString(encoded_string): MaybeZalgoString) -> Result<Self, Self::Error> {
+        if let Err(e) = crate::zalgo_decode(&encoded_string) {
+            Err(e)
+        } else {
+            Ok(ZalgoString(encoded_string))
+        }
+    }
+}
 
 /// Allocates a `String` that contains only the character "E" and no encoded content.
 impl Default for ZalgoString {
@@ -1026,5 +1064,17 @@ mod test {
         assert_eq!(zs.into_combining_chars(), "\u{328}\u{349}");
         let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_combining_chars(), "");
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serde_deserialize_zalgo_string() {
+        use serde_json::from_str;
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let json = format!(r#""{}""#, zs);
+        let deserialized: ZalgoString = from_str(&json).unwrap();
+        assert_eq!(deserialized, zs);
+        assert!(from_str::<ZalgoString>("Horse").is_err());
     }
 }
