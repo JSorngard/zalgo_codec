@@ -29,6 +29,8 @@ use alloc::{borrow::Cow, string::String, vec::Vec};
     derive(rkyv::Serialize, rkyv::Deserialize, rkyv::Archive, CheckBytes)
 )]
 #[cfg_attr(feature = "rkyv", bytecheck(verify))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(invariants = "zalgo_string_invariants"))]
 pub struct ZalgoString(String);
 
 #[cfg(feature = "rkyv")]
@@ -71,6 +73,17 @@ impl Default for ZalgoString {
 }
 
 impl ZalgoString {
+    #[cfg(feature = "facet")]
+    /// Checks the invariants of the `ZalgoString` type
+    /// for use with reflection with `facet`.
+    fn zalgo_string_invariants(&self) -> bool {
+        !self.0.is_empty()
+            && core::str::from_utf8(self.0.as_bytes()).is_ok()
+            && self.0.as_bytes()[0] == b'E'
+            && self.0.len() % 2 == 1
+            && crate::zalgo_decode(&self.0).is_ok()
+    }
+
     /// Encodes the given string slice with [`zalgo_encode`] and stores the result in a new allocation.
     ///
     /// # Errors

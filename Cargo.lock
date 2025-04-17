@@ -1044,6 +1044,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "facet"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5cb0473ea3fd965b34eafafc9ea7a4d6b1cfb762485a1af3e3a39d63ee680042"
+dependencies = [
+ "facet-core",
+ "facet-derive",
+]
+
+[[package]]
+name = "facet-core"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58773a4abf3bde68d05fbb4ccde72042f7ded6c459645d7cf94403f21457df54"
+dependencies = [
+ "bitflags 2.9.0",
+ "impls",
+]
+
+[[package]]
+name = "facet-derive"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b887a8b8e75ccb668bc7afa8a224938978f77218f0a27680c87929cb429da24"
+dependencies = [
+ "facet-core",
+ "facet-derive-emit",
+]
+
+[[package]]
+name = "facet-derive-emit"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c58a8ef3d0e32d95792177a79e256181d1c9b49bcbca0cb11cd8a9f55782c797"
+dependencies = [
+ "facet-derive-parse",
+]
+
+[[package]]
+name = "facet-derive-parse"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b47ad512f896f47b17bf95128540526f42520ac2596047f6867ef00cd02946cd"
+dependencies = [
+ "unsynn",
+]
+
+[[package]]
 name = "fast-srgb8"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1635,6 +1683,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "impls"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a46645bbd70538861a90d0f26c31537cdf1e44aae99a794fb75a664b70951bc"
+
+[[package]]
 name = "indexmap"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1887,6 +1941,12 @@ dependencies = [
  "quote",
  "syn 2.0.100",
 ]
+
+[[package]]
+name = "mutants"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc0287524726960e07b119cebd01678f852f147742ae0d925e6a520dca956126"
 
 [[package]]
 name = "ndk"
@@ -2956,6 +3016,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "shadow_counted"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65da48d447333cebe1aadbdd3662f3ba56e76e67f53bc46f3dd5f67c74629d6b"
+
+[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3426,6 +3492,17 @@ name = "unicode-segmentation"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
+
+[[package]]
+name = "unsynn"
+version = "0.0.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14013db4ac11f92d4df4b56edb431eab9c1d9f7aee4791f3205b6a1119b83f54"
+dependencies = [
+ "mutants",
+ "proc-macro2",
+ "shadow_counted",
+]
 
 [[package]]
 name = "url"
@@ -4288,6 +4365,7 @@ version = "0.13.3"
 dependencies = [
  "bytecheck",
  "criterion",
+ "facet",
  "rand 0.9.0",
  "rkyv",
  "serde",

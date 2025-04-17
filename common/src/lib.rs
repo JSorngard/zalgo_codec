@@ -58,6 +58,8 @@
 //!
 //! `rkyv`: derives the [`rkyv::Serialize`], [`rkyv::Deserialize`], and [`rkyv::Archive`] traits from [`rkyv`] for [`ZalgoString`].
 //!
+//! `facet`: derives the [`Facet`](facet::Facet) trait from [`facet`] for [`ZalgoString`].
+//!
 //! # Explanation
 //!
 //! Characters U+0300–U+036F are the combining characters for unicode Latin.
