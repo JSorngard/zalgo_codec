@@ -142,3 +142,13 @@ jobs:
           tool: cargo-semver-checks
       - name: Verify semver compatibility
         run: cargo semver-checks
+
+  miri:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: miri,rust-src
+    - name: Run miri
+      run: cargo +nightly miri test --all-features
