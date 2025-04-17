@@ -185,6 +185,9 @@
 #![no_std]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+#[cfg(feature = "std")]
+extern crate std;
+
 pub use zalgo_codec_common::{
     zalgo_decode, zalgo_encode, zalgo_string, zalgo_wrap_python, DecodeError, EncodeError,
     ZalgoString,
