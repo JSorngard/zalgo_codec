@@ -1065,4 +1065,16 @@ mod test {
         let zs = ZalgoString::new("").unwrap();
         assert_eq!(zs.into_combining_chars(), "");
     }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serde_deserialize_zalgo_string() {
+        use serde_json::from_str;
+        let s = "Zalgo";
+        let zs = ZalgoString::new(s).unwrap();
+        let json = format!(r#""{}""#, zs);
+        let deserialized: ZalgoString = from_str(&json).unwrap();
+        assert_eq!(deserialized, zs);
+        assert!(from_str::<ZalgoString>("Horse").is_err());
+    }
 }
