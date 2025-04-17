@@ -151,4 +151,4 @@ jobs:
       with:
         components: miri,rust-src
     - name: Run miri
-      run: cargo +nightly miri test
+      run: cargo +nightly miri test --all-features
