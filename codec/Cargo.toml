@@ -9,6 +9,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/JSorngard/zalgo_codec/tree/main/codec"
 description = "Convert an ASCII text string into a single unicode grapheme cluster and back. Provides a macro for embedding Rust source code that has been encoded in this way."
 rust-version = "1.81.0"
+documentation = "https://docs.rs/zalgo_codec/"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
