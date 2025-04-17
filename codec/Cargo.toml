@@ -1,7 +1,7 @@
 [package]
 name = "zalgo-codec"
 authors = ["Johanna Sörngård <jsorngard@gmail.com>", "Scott Conner", "Alex Keizer <alex@keizer.dev>"]
-version = "0.13.4"
+version = "0.13.5"
 edition = "2021"
 keywords = ["unicode", "obfuscation", "encoding", "zalgo"]
 categories = ["encoding", "text-processing"]
@@ -9,12 +9,13 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/JSorngard/zalgo_codec/tree/main/codec"
 description = "Convert an ASCII text string into a single unicode grapheme cluster and back. Provides a macro for embedding Rust source code that has been encoded in this way."
 rust-version = "1.81.0"
+documentation = "https://docs.rs/zalgo_codec/"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zalgo-codec-common = { path = "../common", default-features = false }
-zalgo-codec-macro = { path = "../macro", optional = true }
+zalgo-codec-common = { version = "0.13.3", default-features = false }
+zalgo-codec-macro = { version = "0.1.34", optional = true }
 anyhow = { version = "1.0", default-features = false, optional = true }
 iced = { version = "0.13", default-features = false, features = ["tiny-skia"], optional = true }
 rfd = { version = "0.15", optional = true }
