@@ -7,6 +7,10 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.13.5
+
+- Add the `documentation` field to the Cargo.toml.
+
 ## 0.13.4
 
 - Fix a broken doclink to the `Backtrace` type.
