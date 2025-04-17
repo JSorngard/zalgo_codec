@@ -4,7 +4,8 @@ This document contains all changes to the crate since version 0.9.4.
 
 ## 0.13.3
 
-- Verify that the necessary invariants of `ZalgoString` are upheld during deserialization.
+- The crate now verifies that the necessary invariants of `ZalgoString` are
+ upheld during deserialization.
 
 ## 0.13.2
 
