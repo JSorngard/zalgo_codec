@@ -16,6 +16,7 @@ rust-version = "1.81.0"
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"], optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["alloc", "bytecheck"], optional = true }
 bytecheck = { version = "0.8", default-features = false, optional = true }
+facet = { version = "0.8", default-features = false, features = ["alloc"], optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["html_reports"] }
@@ -33,9 +34,12 @@ serde = ["dep:serde"]
 # Derives the `Serialize`, `Deserialize`, and `Archive` traits from [`rkyv`](https://crates.io/crates/rkyv) for the `ZalgoString` struct.
 rkyv = ["dep:rkyv", "dep:bytecheck"]
 
+#Derives the `Facet` trait from the [`facet`](https://crates.io/crates/facet) crate for the `ZalgoString` struct.
+facet = ["dep:facet"]
+
 # Enables the `Error` type to capture a `Backtrace`.
 # Without this feature the crate is `no_std` compatible, but still uses the `alloc` crate.
-std = ["serde?/std", "rkyv?/std", "bytecheck?/simdutf8"]
+std = ["serde?/std", "rkyv?/std", "bytecheck?/simdutf8", "facet?/std"]
 
 [[bench]]
 name = "codec_bench"

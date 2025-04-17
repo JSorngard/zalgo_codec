@@ -40,6 +40,9 @@ serde = ["zalgo-codec-common/serde"]
 # Derives the `Serialize`, `Deserialize`, and `Archive` traits from [`rkyv`](https://crates.io/crates/rkyv) for the `ZalgoString` struct.
 rkyv = ["zalgo-codec-common/rkyv"]
 
+# Derives the `Facet` trait from [`facet`](https://crates.io/crates/facet) for the `ZalgoString` struct.
+facet = ["zalgo-codec-common/facet"]
+
 # Enables the proc-macros `zalgo_embed!` and `zalgofy!`
 macro = ["dep:zalgo-codec-macro"]
 
