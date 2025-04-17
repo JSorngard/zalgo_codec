@@ -34,7 +34,7 @@ serde = ["dep:serde"]
 # Derives the `Serialize`, `Deserialize`, and `Archive` traits from [`rkyv`](https://crates.io/crates/rkyv) for the `ZalgoString` struct.
 rkyv = ["dep:rkyv", "dep:bytecheck"]
 
-#Derives the `Facet` trait from the [`facet`](https://crates.io/crates/facet) crate for the `ZalgoString` struct.
+# Derives the `Facet` trait from the [`facet`](https://crates.io/crates/facet) crate for the `ZalgoString` struct.
 facet = ["dep:facet"]
 
 # Enables the `Error` type to capture a `Backtrace`.
