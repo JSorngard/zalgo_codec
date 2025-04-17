@@ -152,3 +152,22 @@ jobs:
         components: miri,rust-src
     - name: Run miri
       run: cargo +nightly miri test --all-features
+
+  no_std:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [thumbv7m-none-eabi, aarch64-unknown-none]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        target: ${{ matrix.target }}
+    - name: Check
+      run: cargo check --target ${{ matrix.target }}
+    - name: Check with rkyv
+      run: cargo check --target ${{ matrix.target }} --features rkyv
+    - name: Check with serde
+      run: cargo check --target ${{ matrix.target }} --features serde
+    - name: Check with both
+      run: cargo check --target ${{ matrix.target }} --features rkyv,serde
