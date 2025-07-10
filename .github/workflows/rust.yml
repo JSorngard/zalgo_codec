@@ -19,6 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - name: Format
       run: cargo fmt --check
       
@@ -27,6 +29,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -38,6 +42,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - name: Clippy
       run: cargo clippy -- -D warnings
       
@@ -52,6 +58,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ matrix.toolchain }}
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -69,6 +77,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ matrix.toolchain }}
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -86,6 +96,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ matrix.toolchain }}
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -100,6 +112,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-all-features
@@ -128,6 +142,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools
+      - name: Cache
+        uses: Swatinem/rust-cache@v2.8.0
       - name: cargo install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: cargo generate-lockfile
@@ -147,6 +163,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Cache
+        uses: Swatinem/rust-cache@v2.8.0
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-semver-checks
@@ -173,6 +191,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         target: ${{ matrix.target }}
+    - name: Cache
+      uses: Swatinem/rust-cache@v2.8.0
     - name: Check
       run: cargo check --target ${{ matrix.target }}
     - name: Check with rkyv
