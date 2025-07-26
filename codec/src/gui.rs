@@ -134,7 +134,7 @@ fn update(state: &mut ZalgoCodecGui, message: ToplevelMessage) -> Task<ToplevelM
     }
 }
 
-fn view(state: &ZalgoCodecGui) -> Element<ToplevelMessage> {
+fn view(state: &ZalgoCodecGui) -> Element<'_, ToplevelMessage> {
     const BUTTON_WIDTH: f32 = 80.0;
     const SPACE_HEIGHT: f32 = 10.0;
     column![
