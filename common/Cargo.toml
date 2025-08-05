@@ -18,7 +18,7 @@ rkyv = { version = "0.8", default-features = false, features = ["alloc", "bytech
 bytecheck = { version = "0.8", default-features = false, optional = true }
 
 [dev-dependencies]
-criterion = { version = "0.6", default-features = false, features = ["html_reports"] }
+criterion = { version = "0.7", default-features = false, features = ["html_reports"] }
 rand = { version = "0.9", default-features = false, features = ["thread_rng"]}
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
