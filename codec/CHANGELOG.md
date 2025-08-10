@@ -11,23 +11,23 @@ for the changes made to the macros.
 
 ### Breaking changes
 
-- Remove the GUI feature.
+- Removed the GUI feature.
  Something in its dependency tree has started introducing undefined behaviour,
  but `miri` can not find out where.
  If I manage to find the issue I will reintroduce the gui.
 
 ### Other chagnes
 
-- Use caching to speed up CI.
-- Update dependencies.
+- Used caching to speed up CI.
+- Updated dependencies.
 
 ## 0.13.5
 
-- Add the `documentation` field to the Cargo.toml.
+- Added the `documentation` field to the Cargo.toml.
 
 ## 0.13.4
 
-- Fix a broken doclink to the `Backtrace` type.
+- Fixed a broken doclink to the `Backtrace` type.
 - Improvements to CI.
 
 ## 0.13.3
