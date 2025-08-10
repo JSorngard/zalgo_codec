@@ -7,23 +7,27 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
-## 0.14.0 (unreleased)
+## 0.14.0
 
 ### Breaking changes
 
-- Remove the GUI feature.
+- Removed the GUI feature.
+ Something in its dependency tree has started introducing undefined behaviour,
+ but `miri` can not find out where.
+ If I manage to find the issue I will reintroduce the gui.
 
 ### Other chagnes
 
-- Use caching to speed up CI.
+- Used caching to speed up CI.
+- Updated dependencies.
 
 ## 0.13.5
 
-- Add the `documentation` field to the Cargo.toml.
+- Added the `documentation` field to the Cargo.toml.
 
 ## 0.13.4
 
-- Fix a broken doclink to the `Backtrace` type.
+- Fixed a broken doclink to the `Backtrace` type.
 - Improvements to CI.
 
 ## 0.13.3

@@ -47,7 +47,7 @@ std = ["zalgo-codec-common/std", "anyhow?/std", "clap?/std"]
 all-features = true
 
 [package.metadata.cargo-all-features]
-denylist = ["binary", "gui"]
+denylist = ["binary"]
 
 [[bin]]
 name = "zalgo_codec"
