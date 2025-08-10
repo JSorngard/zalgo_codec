@@ -7,7 +7,7 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
-## 0.14.0 (unreleased)
+## 0.14.0
 
 ### Breaking changes
 
