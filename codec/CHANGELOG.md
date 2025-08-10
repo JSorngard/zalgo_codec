@@ -16,6 +16,7 @@ for the changes made to the macros.
 ### Other chagnes
 
 - Use caching to speed up CI.
+- Update dependencies.
 
 ## 0.13.5
 
