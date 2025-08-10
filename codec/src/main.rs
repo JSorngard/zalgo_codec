@@ -1,6 +1,3 @@
-#[cfg(feature = "gui")]
-mod gui;
-
 use std::path::PathBuf;
 
 use zalgo_codec_common::{zalgo_decode, zalgo_encode, zalgo_wrap_python};
@@ -20,13 +17,6 @@ enum Source {
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
-    #[cfg(feature = "gui")]
-    /// Opens up a rudimentary GUI application where you can apply the functions of the codec to text
-    /// entered through a text box as well as copy the results or save them to a file.
-    /// It is currently not possible to enter newlines into the text box.
-    /// Overrides all other options.
-    Gui,
-
     /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
     Encode {
         #[command(subcommand)]
@@ -83,17 +73,11 @@ fn main() -> Result<()> {
 
     if let Some(ref destination) = config.out_path {
         if destination.exists() && !config.force {
-            match config.mode {
-                #[cfg(feature = "gui")]
-                Mode::Gui => (),
-                _ => return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy())),
-            }
+            return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()));
         }
     }
 
     let output = match config.mode {
-        #[cfg(feature = "gui")]
-        Mode::Gui => gui::run_gui(),
         Mode::Encode { source } => {
             let text = match source {
                 Source::Text { text } => text.join(" "),
