@@ -17,7 +17,6 @@ enum Source {
 
 #[derive(Debug, Clone, Subcommand)]
 enum Mode {
-
     /// Turn normal (printable ascii + newline) text into a single grapheme cluster.
     Encode {
         #[command(subcommand)]
@@ -74,7 +73,7 @@ fn main() -> Result<()> {
 
     if let Some(ref destination) = config.out_path {
         if destination.exists() && !config.force {
-            return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()))
+            return Err(anyhow!("the file \"{}\" already exists, to overwrite its contents you can supply the -f or --force arguments", destination.to_string_lossy()));
         }
     }
 
