@@ -12,6 +12,9 @@ for the changes made to the macros.
 ### Breaking changes
 
 - Remove the GUI feature.
+ Something in its dependency tree has started introducing undefined behaviour,
+ but `miri` can not find out where.
+ If I manage to find the issue I will reintroduce the gui.
 
 ### Other chagnes
 
