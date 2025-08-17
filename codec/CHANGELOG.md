@@ -16,7 +16,7 @@ for the changes made to the macros.
  but `miri` can not find out where.
  If I manage to find the issue I will reintroduce the gui.
 
-### Other chagnes
+### Other changes
 
 - Used caching to speed up CI.
 - Updated dependencies.
