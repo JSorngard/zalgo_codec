@@ -48,6 +48,7 @@ jobs:
       run: cargo clippy -- -D warnings
       
   test:
+    needs: format
     strategy:
       matrix:
         toolchain: [stable, beta]
@@ -68,6 +69,7 @@ jobs:
       run: cargo test-all-features --n-chunks 3 --chunk ${{ matrix.chunk }}
       
   build:
+    needs: format
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -97,6 +99,7 @@ jobs:
       run: cargo +nightly doc --features macro,std,serde,rkyv
       
   coverage:
+    needs: format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -120,6 +123,7 @@ jobs:
           fail_ci_if_error: true
           
   semver-checks:
+    needs: format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,6 +137,7 @@ jobs:
         run: cargo semver-checks
 
   miri:
+    needs: format
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -143,6 +148,7 @@ jobs:
       run: cargo +nightly miri test --all-features
 
   no_std:
+    needs: format
     runs-on: ubuntu-latest
     strategy:
       matrix:
