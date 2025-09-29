@@ -10,6 +10,7 @@ for the changes made to the macros.
 ## 0.14.1
 
 - Update dependencies
+- Don't use the `doc_auto_cfg` feature, switch to the `doc_cfg` feature.
 
 ## 0.14.0
 
