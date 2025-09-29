@@ -182,7 +182,7 @@
 //! It can be installed with `cargo install zalgo-codec --features binary`.
 
 #![no_std]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "std")]
 extern crate std;
