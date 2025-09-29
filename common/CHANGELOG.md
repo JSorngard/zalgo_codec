@@ -2,6 +2,11 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.13.4
+
+- Update dependencies.
+- Don't use the `doc_auto_cfg` feature, switch to the `doc_cfg` feature.
+
 ## 0.13.3
 
 - The crate now verifies that the necessary invariants of `ZalgoString` are
