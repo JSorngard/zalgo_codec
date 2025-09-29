@@ -174,7 +174,7 @@
 //! You can optionally enable the `gui` feature during installation to include a rudimentary GUI mode for the program.
 
 #![no_std]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "std")]
 extern crate std;
