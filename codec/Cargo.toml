@@ -17,7 +17,7 @@ documentation = "https://docs.rs/zalgo_codec/"
 zalgo-codec-common = { path = "../common", default-features = false }
 zalgo-codec-macro = { path = "../macro", optional = true }
 anyhow = { version = "1.0", default-features = false, optional = true }
-clap = { version = "4.5", default-features = false, features = ["derive", "help", "color", "error-context", "suggestions", "usage"], optional = true }
+clap = { version = "4.6", default-features = false, features = ["derive", "help", "color", "error-context", "suggestions", "usage"], optional = true }
 
 [dev-dependencies]
 rand = { version = "0.10", default-features = false, features = ["alloc", "std", "std_rng", "thread_rng"] }
