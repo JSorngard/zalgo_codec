@@ -319,7 +319,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
         }
     }
 
-    String::from_utf8(res).map_err(|e| DecodeError::new(e))
+    String::from_utf8(res).map_err(DecodeError::new)
 }
 
 #[inline]
