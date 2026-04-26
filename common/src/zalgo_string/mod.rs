@@ -631,7 +631,7 @@ impl ZalgoString {
         }
     }
 
-    /// Truncates this `ZalgoString`, removing all contents.
+    /// Clears this `ZalgoString`, removing all contents.
     ///
     /// This means the ZalgoString will have a length of zero, but it does not affect its capacity.
     ///
