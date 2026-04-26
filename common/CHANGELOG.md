@@ -2,6 +2,14 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.14.0
+
+- Change the format of the encoded string to remove the initial "E".
+ This lets the `new` function be `const` as it no longer has to allocate anything,
+ and the format becomes more straightforward.
+ This removes the functions that previously worked with only the combining characters,
+ like `as_combining_chars()` which now has its functionality subsumed by `as_str()`.
+
 ## 0.13.4
 
 - Update dependencies.

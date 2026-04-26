@@ -2,6 +2,12 @@
 
 This document contains all changes to the crate since 0.1.19
 
+## 0.2.0
+
+- Updated the `zalgo-codec-common` dependency.
+ This changes the encoded format to no longer have the initial "E",
+ see the changelog of `zalgo-codec-common` for more information.  
+
 ## 0.1.34
 
 - Updated the `zalgo-codec-common` dependency.

@@ -12,7 +12,7 @@ pub struct DecodedBytes<'a>(core::str::Bytes<'a>);
 impl<'a> DecodedBytes<'a> {
     #[inline]
     pub(crate) fn new(zs: &'a ZalgoString) -> Self {
-        Self(zs.as_combining_chars().bytes())
+        Self(zs.as_str().bytes())
     }
 }
 

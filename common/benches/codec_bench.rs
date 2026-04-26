@@ -42,7 +42,7 @@ fn bench_codec(c: &mut Criterion) {
 
     c.bench_function("ZalgoString", |b| {
         b.iter(|| {
-            let zs = black_box(ZalgoString::new(&string)).unwrap();
+            let zs = black_box(ZalgoString::try_from(string.as_str())).unwrap();
             black_box(zs.into_decoded_string())
         })
     });

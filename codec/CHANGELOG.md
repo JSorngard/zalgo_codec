@@ -7,6 +7,11 @@ See [common/CHANGELOG.md](../common/CHANGELOG.md) for the changes made to the
 non-macro parts of the crate, and [macro/CHANGELOG.md](../macro/CHANGELOG.md)
 for the changes made to the macros.
 
+## 0.15.0
+
+- Update dependencies. This changes to format to no longer have an initial "E",
+ see the changelog of `zalgo_codec_common` for more information.
+
 ## 0.14.1
 
 - Update dependencies
