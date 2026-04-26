@@ -25,13 +25,13 @@ Encode a string to a grapheme cluster with `zalgo_encode`:
 ```rust
 let s = "Zalgo";
 let encoded = zalgo_encode(s)?;
-assert_eq!(encoded, "É̺͇͌͏");
+assert_eq!(encoded, "̺͇́͌͏");
 ```
 
 Decode a grapheme cluster back into a string with `zalgo_decode`:
 
 ```rust
-let encoded = "É̺͇͌͏";
+let encoded = "̺͇́͌͏";
 let s = zalgo_decode(encoded)?;
 assert_eq!(s, "Zalgo");
 ```
@@ -42,10 +42,10 @@ various ways:
 ```rust
 let s = "Zalgo";
 let zstr = ZalgoString::new(s)?;
-assert_eq!(zstr, "É̺͇͌͏");
-assert_eq!(zstr.len(), 2 * s.len() + 1);
+assert_eq!(zstr, "̺͇́͌͏");
+assert_eq!(zstr.len(), 2 * s.len());
 assert_eq!(zstr.decoded_len(), s.len());
-assert_eq!(zstr.bytes().next(), Some(69));
+assert_eq!(zstr.bytes().next(), Some(204));
 assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 ```
 
@@ -54,7 +54,7 @@ We can execute zalgo encoded rust code with the macro `zalgo_embed!`:
 ```rust
 // This expands to the code
 // `fn add(x: i32, y: i32) -> i32 {x + y}`
-zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+zalgo_embed!("͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 
 // The `add` function is now available
 assert_eq!(add(10, 20), 30);
@@ -67,7 +67,7 @@ let x = 20;
 let y = -10;
 // This expands to the code 
 // `x + y`
-let z = zalgo_embed!("È͙̋̀͘");
+let z = zalgo_embed!("͙̀̋̀͘");
 assert_eq!(z, x + y);
 ```
 
@@ -75,7 +75,7 @@ We can also do the opposite of [`obfstr`](https://crates.io/crates/obfstr): obfu
 a string while coding and deobfuscate it during compile time
 
 ```rust
-let secret_string = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
+let secret_string = zalgo_embed!("̤̂͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
 assert_eq!(secret_string, "Don't read this mom!");
 ```
 
@@ -89,7 +89,7 @@ encoded with the encoding function in this crate.
 <br>
 <br>
 <br>
-E̬͏͍͉͓͕͍͒̀͐̀̈́ͅ͏͌͏͓͉͔͍͔͒̀̀́̌̀̓ͅ͏͎͓͔͔͕͉͉͓͉͎͇͉͔͓̓͒̀́̈́͐̓̀͌̌̀̈́̀̈́ͅͅͅͅ͏͉͕͓͍̀ͅ͏͔͍̈́̀͐ͅ͏͉͎͉͉͕͎͔͕͔͒̀̓̈́̈́̀̀͌́͂͏͔͒̀̀̈́ͅͅ͏͌͏͍͇͎͉͒̀́́̀́͌ͅ<br>
+̬͏͍͉͓͕͍͒̀͐̀̈́ͅ͏͌͏͓͉͔͍͔͒̀̀́̌̀̓ͅ͏͎͓͔͔͕͉͉͓͉͎͇͉͔͓̓͒̀́̈́͐̓̀͌̌̀̈́̀̈́ͅͅͅͅ͏͉͕͓͍̀ͅ͏͔͍̈́̀͐ͅ͏͉͎͉͉͕͎͔͕͔͒̀̓̈́̈́̀̀͌́͂͏͔͒̀̀̈́ͅͅ͏͌͏͍͇͎͉͒̀́́̀́͌ͅ<br>
 <br>
 <br>
 <br>

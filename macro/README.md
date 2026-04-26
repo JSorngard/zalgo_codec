@@ -17,7 +17,7 @@ on the string "fn square(x: i32) -> i32 {x * x}" we can include the `square`
 function in our program by putting the resulting grapheme cluster inside `zalgo_embed!`:
 
 ```rust
-zalgo_embed!("E͎͓͕͉̞͉͆̀͑́͒̈̀̓̒̉̀̍̀̓̒̀͛̀̊̀͘̚͘͘͝ͅ");
+zalgo_embed!("͎͓͕͉̞͉͆̀͑́͒̈̀̓̒̉̀̍̀̓̒̀͛̀̊̀͘̚͘͘͝ͅ");
 assert_eq!(square(10), 100);
 ```
 
