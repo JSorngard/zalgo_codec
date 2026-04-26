@@ -87,11 +87,9 @@ impl ZalgoString {
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
-    /// use core::num::NonZeroUsize;
     ///
     /// // Reserve capacity for two encoded characters
-    /// let capacity = NonZeroUsize::new(2*2).unwrap();
-    /// let mut zs = ZalgoString::with_capacity(capacity);
+    /// let mut zs = ZalgoString::with_capacity(2*2);
     ///
     /// // This ZalgoString would decode into an empty string
     /// assert_eq!(zs.decoded_len(), 0);
@@ -108,8 +106,8 @@ impl ZalgoString {
     /// ```
     #[inline]
     #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
-    pub fn with_capacity(capacity: core::num::NonZeroUsize) -> Self {
-        Self(String::with_capacity(capacity.get()))
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self(String::with_capacity(capacity))
     }
 
     // region: character access methods
