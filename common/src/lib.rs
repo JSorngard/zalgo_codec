@@ -372,7 +372,6 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 ///     Err(('€', 1, 22)),
 /// );
 /// ```
-#[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_wrap_python(python: &str) -> Result<String, EncodeError> {
     let encoded_string = zalgo_encode(python)?;
     Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[0::2],b[1::2])))"))
