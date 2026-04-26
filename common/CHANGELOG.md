@@ -2,6 +2,10 @@
 
 This document contains all changes to the crate since version 0.9.4.
 
+## 0.14.1
+
+- Documentation improvements.
+
 ## 0.14.0
 
 - Change the format of the encoded string to remove the initial "E".
