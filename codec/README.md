@@ -12,7 +12,7 @@ It also provides a procedural macro that lets you take source code that's been
 converted into such a grapheme cluster and compile it as if it was never zalgo-ified.
 This lets you reach new lows in the field of self-documenting code.
 
-The encoded string will be ~2 times larger than the original in terms of bytes.
+The encoded string will be twice as large as the original in terms of bytes.
 
 Additionally the crate provides a function to encode Python code and wrap the
 result in a decoder that decodes and executes it such that the result retains the
