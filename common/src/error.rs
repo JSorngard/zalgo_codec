@@ -8,7 +8,7 @@ use std::backtrace::Backtrace;
 use alloc::string::FromUtf8Error;
 
 #[derive(Debug)]
-/// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::new`](crate::ZalgoString::new), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
+/// The error returned by [`zalgo_encode`](crate::zalgo_encode), [`ZalgoString::try_from`](crate::ZalgoString::try_from), and [`zalgo_wrap_python`](crate::zalgo_wrap_python)
 /// if they encounter a byte they can not encode.
 pub struct EncodeError {
     unencodable_character: char,
