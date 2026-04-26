@@ -640,8 +640,12 @@ impl ZalgoString {
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
+    /// let cap = zs.capacity();
+    ///
     /// zs.clear();
+    ///
     /// assert!(zs.is_empty());
+    /// assert_eq!(zs.capacity(), cap);
     /// # Ok::<(), EncodeError>(())
     /// ```
     pub fn clear(&mut self) {
