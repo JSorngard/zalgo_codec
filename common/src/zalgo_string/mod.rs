@@ -223,9 +223,9 @@ impl ZalgoString {
     /// let zs = ZalgoString::try_from("Zalgo")?;
     /// let mut ci = zs.char_indices();
     /// assert_eq!(ci.next(), Some((0,'\u{33a}')));
-    /// // Note the 3 here, the combining characters take up two bytes.
+    /// // Note the 2 here, the combining characters take up two bytes.
     /// assert_eq!(ci.next(), Some((2, '\u{341}')));
-    /// // The final character begins at position 9
+    /// // The final character begins at position 8
     /// assert_eq!(ci.next_back(), Some((8, '\u{34f}')));
     /// // even though the length in bytes is 10
     /// assert_eq!(zs.len(), 10);
