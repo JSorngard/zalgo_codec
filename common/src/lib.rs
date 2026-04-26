@@ -307,7 +307,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
 /// ```
 pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
     if encoded.is_empty() {
-        return Err(DecodeError::new(None));
+        return Ok(String::new());
     }
     let mut res = vec![0; encoded.len() / 2];
     let bytes = encoded.as_bytes();
@@ -319,7 +319,7 @@ pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
         }
     }
 
-    String::from_utf8(res).map_err(|e| DecodeError::new(Some(e)))
+    String::from_utf8(res).map_err(|e| DecodeError::new(e))
 }
 
 #[inline]
@@ -390,7 +390,7 @@ mod test {
 
     #[test]
     fn test_empty_decode() {
-        assert!(zalgo_decode("").is_err());
+        assert_eq!(zalgo_decode("").ok(), Some(String::new()));
     }
 
     #[test]

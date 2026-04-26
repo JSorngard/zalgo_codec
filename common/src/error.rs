@@ -1,6 +1,6 @@
 //! Contains the definition of the error type used by the encoding functions in the crate.
 
-use core::{fmt, str::Utf8Error};
+use core::fmt;
 
 #[cfg(feature = "std")]
 use std::backtrace::Backtrace;
@@ -147,27 +147,18 @@ impl core::error::Error for EncodeError {}
 /// The error returned by [`zalgo_decode`](super::zalgo_decode) if a string can not be decoded.
 #[derive(Debug)]
 pub struct DecodeError {
-    kind: DecodeErrorKind,
+    source_error: FromUtf8Error,
     #[cfg(feature = "std")]
     backtrace: Backtrace,
 }
 
 impl DecodeError {
-    pub(crate) fn new(possible_error: Option<FromUtf8Error>) -> Self {
+    pub(crate) fn new(source_error: FromUtf8Error) -> Self {
         Self {
             #[cfg(feature = "std")]
             backtrace: Backtrace::capture(),
-            kind: match possible_error {
-                Some(e) => DecodeErrorKind::InvalidUtf8(e),
-                None => DecodeErrorKind::EmptyInput,
-            },
+            source_error,
         }
-    }
-
-    /// Returns whether the error happened because the given string was empty,
-    /// and not because the decoding resulted in invalid UTF-8.
-    pub fn cause_was_empty_string(&self) -> bool {
-        matches!(self.kind, DecodeErrorKind::EmptyInput)
     }
 
     #[cfg(feature = "std")]
@@ -179,55 +170,25 @@ impl DecodeError {
         &self.backtrace
     }
 
-    /// If the error happened because the decoding resulted in invalid UTF-8,
-    /// this function returns the [`Utf8Error`] that was created in the process.
-    pub fn to_utf8_error(&self) -> Option<Utf8Error> {
-        match &self.kind {
-            DecodeErrorKind::InvalidUtf8(e) => Some(e.utf8_error()),
-            DecodeErrorKind::EmptyInput => None,
-        }
-    }
-
-    /// If the error happened because the decoding resulted in invalid UTF-8,
-    /// this function converts this error into the [`FromUtf8Error`] that was created in the process.
-    pub fn into_from_utf8_error(self) -> Option<FromUtf8Error> {
-        match self.kind {
-            DecodeErrorKind::InvalidUtf8(e) => Some(e),
-            DecodeErrorKind::EmptyInput => None,
-        }
+    /// This function converts this error into the [`FromUtf8Error`] that caused this decoding error.
+    pub fn into_from_utf8_error(self) -> FromUtf8Error {
+        self.source_error
     }
 }
 
 impl fmt::Display for DecodeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "could not decode the string because {}", self.kind)
+        write!(
+            f,
+            "could not decode the string because {}",
+            self.source_error
+        )
     }
 }
 
 impl core::error::Error for DecodeError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
-        match self.kind {
-            DecodeErrorKind::InvalidUtf8(ref e) => Some(e),
-            DecodeErrorKind::EmptyInput => None,
-        }
-    }
-}
-
-/// The kind of error the caused the decoding failure.
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum DecodeErrorKind {
-    /// The given string was empty.
-    EmptyInput,
-    /// Decoding the string resulted in invalid UTF-8.
-    InvalidUtf8(FromUtf8Error),
-}
-
-impl fmt::Display for DecodeErrorKind {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::EmptyInput => write!(f, "the string was empty"),
-            Self::InvalidUtf8(e) => write!(f, "decoding resulted in invalid utf8: {e}"),
-        }
+        Some(&self.source_error)
     }
 }
 
@@ -247,17 +208,8 @@ mod test {
 
     #[test]
     fn test_decode_error() {
-        let err = DecodeError::new(None);
-        assert_eq!(err.to_utf8_error(), None);
-        assert!(err.cause_was_empty_string());
-        assert_eq!(err.into_from_utf8_error(), None);
-        let err = DecodeError::new(String::from_utf8(vec![255, 255, 255, 255, 255, 255]).err());
-        assert_eq!(err.to_utf8_error().unwrap().error_len(), Some(1));
-        assert_eq!(err.to_utf8_error().unwrap().valid_up_to(), 0);
-        assert!(!err.cause_was_empty_string());
-        assert_eq!(
-            err.into_from_utf8_error().unwrap().into_bytes(),
-            vec![255; 6]
-        );
+        let err =
+            DecodeError::new(String::from_utf8(vec![255, 255, 255, 255, 255, 255]).unwrap_err());
+        assert_eq!(err.into_from_utf8_error().into_bytes(), vec![255; 6]);
     }
 }
