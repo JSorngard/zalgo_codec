@@ -18,14 +18,14 @@
 //! # use zalgo_codec::{EncodeError, zalgo_encode};
 //! let s = "Zalgo";
 //! let encoded = zalgo_encode(s)?;
-//! assert_eq!(encoded, "É̺͇͌͏");
+//! assert_eq!(encoded, "̺͇́͌͏");
 //! # Ok::<(), EncodeError>(())
 //! ```
 //! Decode the grapheme cluster back into a string with [`zalgo_decode`]:
 //! ```
 //! # use zalgo_codec::{zalgo_decode, DecodeError};
 //! # extern crate alloc;
-//! let encoded = "É̺͇͌͏";
+//! let encoded = "̺͇́͌͏";
 //! let s = zalgo_decode(encoded)?;
 //! assert_eq!(s, "Zalgo");
 //! # Ok::<(), DecodeError>(())
@@ -34,11 +34,11 @@
 //! ```
 //! # use zalgo_codec::{EncodeError, ZalgoString};
 //! let s = "Zalgo";
-//! let zstr = ZalgoString::new(s)?;
-//! assert_eq!(zstr, "É̺͇͌͏");
-//! assert_eq!(zstr.len(), 2 * s.len() + 1);
+//! let zstr = ZalgoString::try_from(s)?;
+//! assert_eq!(zstr, "̺͇́͌͏");
+//! assert_eq!(zstr.len(), 2 * s.len());
 //! assert_eq!(zstr.decoded_len(), s.len());
-//! assert_eq!(zstr.bytes().next(), Some(69));
+//! assert_eq!(zstr.bytes().next(), Some(204));
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 //! # Ok::<(), EncodeError>(())
 //! ```
@@ -48,7 +48,7 @@
 //! # {
 //! # use zalgo_codec::zalgo_embed;
 //! // This grapheme cluster was made by encoding "add(x: i32, y: i32) -> i32 {x + y}"
-//! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+//! zalgo_embed!("͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //!
 //! // The `add` function is now available
 //! assert_eq!(add(10, 20), 30);
@@ -232,9 +232,9 @@ mod tests {
         let code = "fn add(x: i32, y: i32) -> i32 {x + y}";
 
         let encoded = zalgo_encode(code).unwrap();
-        assert_eq!(encoded, "E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+        assert_eq!(encoded, "͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 
-        zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+        zalgo_embed!("͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 
         // Now the `add` function is available
         assert_eq!(add(10, 20), 30)
@@ -250,17 +250,17 @@ mod tests {
 
         let encoded = zalgo_encode(expr).unwrap();
 
-        assert_eq!(encoded, "È͙̋̀͘");
+        assert_eq!(encoded, "͙̀̋̀͘");
 
         // It works on expressions, too!
-        let z = zalgo_embed!("È͙̋̀͘");
+        let z = zalgo_embed!("͙̀̋̀͘");
         assert_eq!(z, x + y);
     }
 
     #[test]
     fn verify() {
         const TEST_STRING_1: &str = "the greatest adventure is going to bed";
-        let out_string = str::from_utf8(b"E\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
+        let out_string = str::from_utf8(b"\xcd\x94\xcd\x88\xcd\x85\xcc\x80\xcd\x87\xcd\x92\xcd\x85\xcd\x81\xcd\x94\xcd\x85\xcd\x93\xcd\x94\xcc\x80\xcd\x81\xcd\x84\xcd\x96\xcd\x85\xcd\x8e\xcd\x94\xcd\x95\xcd\x92\xcd\x85\xcc\x80\xcd\x89\xcd\x93\xcc\x80\xcd\x87\xcd\x8f\xcd\x89\xcd\x8e\xcd\x87\xcc\x80\xcd\x94\xcd\x8f\xcc\x80\xcd\x82\xcd\x85\xcd\x84").unwrap();
         assert_eq!(zalgo_encode(TEST_STRING_1).unwrap(), out_string);
 
         const TEST_STRING_2: &str =
@@ -287,7 +287,7 @@ mod tests {
 
     #[test]
     fn newlines() {
-        assert_eq!(&zalgo_encode("\n").unwrap(), "Eͯ",);
+        assert_eq!(&zalgo_encode("\n").unwrap(), "ͯ",);
         const TEST_STRING: &str = "The next sentence is true.\nThe previous sentence is false.";
         assert_eq!(
             zalgo_decode(&zalgo_encode(TEST_STRING).unwrap()).unwrap(),

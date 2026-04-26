@@ -12,7 +12,7 @@
 //! by putting the resulting grapheme cluster inside [`zalgo_embed!`]:
 //! ```
 //! # use zalgo_codec_macro::zalgo_embed;
-//! zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+//! zalgo_embed!("͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 //! assert_eq!(add(10, 20), 30);
 //! ```
 
@@ -40,7 +40,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 /// # use zalgo_codec_macro::zalgo_embed;
 /// // This line expands to the code
 /// // `fn add(x: i32, y: i32) -> i32 {x + y}`
-/// zalgo_embed!("E͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
+/// zalgo_embed!("͎͉͙͉̞͉͙͆̀́̈́̈́̈̀̓̒̌̀̀̓̒̉̀̍̀̓̒̀͛̀̋̀͘̚̚͘͝");
 ///
 /// // Now the `add` function is available
 /// assert_eq!(add(10, 20), 30);
@@ -55,7 +55,7 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 ///
 /// // This macro is expanded to the code
 /// // `x + y`
-/// let z = zalgo_embed!("È͙̋̀͘");
+/// let z = zalgo_embed!("͙̀̋̀͘");
 /// assert_eq!(z, x + y);
 /// ```
 ///
@@ -70,14 +70,14 @@ use zalgo_codec_common::{zalgo_decode, zalgo_encode};
 ///     // let input = std::env::args().collect::<Vec<_>>()[1..].join(" ");
 ///     // let output = zalgo_encode(&input)?;
 ///     // println!("{}", output);
-///     zalgo_embed!("E͔͉͎͕͔̝͓͔͎͖͇͓͌̀͐̀̀̈́́͒̈̉̎̓̚̚̚̚ͅͅ͏̶͔̜̜̞̞̻͌͌̓̓̿̈̉̑̎̎̽̎͊̚̚ͅͅ͏̛͉͎͔̈̂̀̂̉ͯ͌̀ͅ͏͕͔͕͔̝͚͇͐̀̀́͌͏͎̿̓ͅ͏̛͉͎͕͔̟͉͎͔͎̼͎̼͎̈́̈̆͐̉ͯ͐͒͌́̈̂͛̂̌̀͝ͅ͏̛͕͔͕͔͐̉");
+///     zalgo_embed!("͔͉͎͕͔̝͓͔͎͖͇͓͌̀͐̀̀̈́́͒̈̉̎̓̚̚̚̚ͅͅ͏̶͔̜̜̞̞̻͌͌̓̓̿̈̉̑̎̎̽̎͊̚̚ͅͅ͏̛͉͎͔̈̂̀̂̉ͯ͌̀ͅ͏͕͔͕͔̝͚͇͐̀̀́͌͏͎̿̓ͅ͏̛͉͎͕͔̟͉͎͔͎̼͎̼͎̈́̈̆͐̉ͯ͐͒͌́̈̂͛̂̌̀͝ͅ͏̛͕͔͕͔͐̉");
 ///     Ok(())
 /// }
 /// ```
 /// Do the opposite of [`obfstr`](https://docs.rs/obfstr/latest/obfstr/): obfuscate a string while coding and deobfuscate it during compile time
 /// ```
 /// # use zalgo_codec_macro::zalgo_embed;
-/// const SECRET: &str = zalgo_embed!("Ê̤͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
+/// const SECRET: &str = zalgo_embed!("̤̂͏͎͔͔͈͉͓͍̇̀͒́̈́̀̀ͅ͏͍́̂");
 ///
 /// assert_eq!(SECRET, "Don't read this mom!");
 /// ```
@@ -120,7 +120,7 @@ pub fn zalgo_embed(encoded: TokenStream) -> TokenStream {
 /// ```
 /// # use zalgo_codec_macro::zalgofy;
 /// const ZS: &str = zalgofy!("Zalgo");
-/// assert_eq!(ZS, "É̺͇͌͏");
+/// assert_eq!(ZS, "̺͇́͌͏");
 /// ```
 ///
 /// # Errors

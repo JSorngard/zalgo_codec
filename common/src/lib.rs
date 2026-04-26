@@ -13,39 +13,43 @@
 //! # use zalgo_codec_common::{EncodeError, zalgo_encode};
 //! let s = "Zalgo";
 //! let encoded = zalgo_encode(s)?;
-//! assert_eq!(encoded, "É̺͇͌͏");
+//! assert_eq!(encoded, "̺͇́͌͏");
 //! # Ok::<(), EncodeError>(())
 //! ```
 //! Decode a grapheme cluster back into a string:
 //! ```
 //! # use zalgo_codec_common::{zalgo_decode, DecodeError};
-//! let encoded = "É̺͇͌͏";
+//! let encoded = "̺͇́͌͏";
 //! let s = zalgo_decode(encoded)?;
 //! assert_eq!(s, "Zalgo");
 //! # Ok::<(), DecodeError>(())
 //! ```
+//!
 //! The [`ZalgoString`] type can be used to encode a string and handle the result in various ways:
+//!
 //! ```
 //! # use zalgo_codec_common::{ZalgoString, EncodeError};
+//! # fn main() -> Result<(), EncodeError> {
 //! let s = "Zalgo";
-//! let zstr = ZalgoString::new(s)?;
+//! let zstr = ZalgoString::try_from(s)?;
 //!
 //! // Implements PartialEq with common string types
-//! assert_eq!(zstr, "É̺͇͌͏");
+//! assert_eq!(zstr, "̺͇́͌͏");
 //!
 //! // Utility functions
-//! assert_eq!(zstr.len(), 2 * s.len() + 1);
+//! assert_eq!(zstr.len(), 2 * s.len());
 //! assert_eq!(zstr.decoded_len(), s.len());
 //!
 //! // Iterate over bytes and chars, in both encoded and decoded form
-//! assert_eq!(zstr.bytes().next(), Some(69));
+//! assert_eq!(zstr.bytes().next(), Some(204));
 //! assert_eq!(zstr.decoded_bytes().nth_back(2), Some(b'l'));
-//! assert_eq!(zstr.chars().nth(1), Some('\u{33a}'));
+//! assert_eq!(zstr.chars().nth(1), Some('\u{341}'));
 //! assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 //!
 //! // Decode inplace
 //! assert_eq!(zstr.into_decoded_string(), "Zalgo");
-//! # Ok::<(), EncodeError>(())
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! # Feature flags
@@ -210,7 +214,7 @@ pub use zalgo_string::ZalgoString;
 /// Basic usage:
 /// ```
 /// # use zalgo_codec_common::{EncodeError, zalgo_encode};
-/// assert_eq!(zalgo_encode("Zalgo")?, "É̺͇͌͏");
+/// assert_eq!(zalgo_encode("Zalgo")?, "̺͇́͌͏");
 /// # Ok::<(), EncodeError>(())
 /// ```
 /// Can not encode non-ASCII characters or ASCII control characters except newlines:
@@ -232,8 +236,7 @@ pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
 
     // Every byte in the input will encode to two bytes. The extra byte is for the initial letter
     // which is there in order for the output to be displayable in an intuitive way.
-    let mut result = Vec::with_capacity(2 * string.len() + 1);
-    result.push(b'E');
+    let mut result = Vec::with_capacity(2 * string.len());
 
     for (i, batch) in string.as_bytes().chunks(BATCH_SIZE).enumerate() {
         let mut buffer = [0; 2 * BATCH_SIZE];
@@ -289,29 +292,28 @@ pub fn zalgo_encode(string: &str) -> Result<String, EncodeError> {
 /// Basic usage:
 /// ```
 /// # use zalgo_codec_common::{zalgo_decode, DecodeError};
-/// assert_eq!(zalgo_decode("É̺͇͌͏")?, "Zalgo");
+/// assert_eq!(zalgo_decode("̺͇́͌͏")?, "Zalgo");
 /// # Ok::<(), DecodeError>(())
 /// ```
 /// Decoding arbitrary strings that were not produced by [`zalgo_encode`] will most likely lead to errors:
 /// ```
 /// # use zalgo_codec_common::zalgo_decode;
-/// assert!(zalgo_decode("Zalgo").is_err());
+/// assert!(zalgo_decode("Blorbo goes to space").is_err());
 /// ```
 /// If it doesn't the results are not meaningful:
 /// ```
 /// # use zalgo_codec_common::{zalgo_decode, DecodeError};
-/// assert_eq!(zalgo_decode("awö")?, "c");
+/// assert_eq!(zalgo_decode("awö")?, "\u{12}\u{11}");
 /// # Ok::<(), DecodeError>(())
 /// ```
-#[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_decode(encoded: &str) -> Result<String, DecodeError> {
     if encoded.is_empty() {
         return Err(DecodeError::new(None));
     }
-    let mut res = vec![0; (encoded.len() - 1) / 2];
+    let mut res = vec![0; encoded.len() / 2];
     let bytes = encoded.as_bytes();
 
-    for (write, read) in (1..encoded.len()).step_by(2).enumerate() {
+    for (write, read) in (0..encoded.len()).step_by(2).enumerate() {
         match bytes.get(read + 1) {
             Some(next) => res[write] = decode_byte_pair(bytes[read], *next),
             None => break,
@@ -340,7 +342,7 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 /// let py_hello_world_enc = zalgo_wrap_python(py_hello_world)?;
 /// assert_eq!(
 ///     py_hello_world_enc,
-///     "b='Ę͉͎͔͐͒̈̂͌͌ͅ͏̌̀͗͏͒͌̈́́̂̉ͯ'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))",
+///     "b='̨͉͎͔͐͒̈̂͌͌ͅ͏̌̀͗͏͒͌̈́́̂̉ͯ'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[0::2],b[1::2])))",
 /// );
 /// # Ok::<(), EncodeError>(())
 /// ```
@@ -374,7 +376,7 @@ const fn decode_byte_pair(odd: u8, even: u8) -> u8 {
 #[must_use = "the function returns a new value and does not modify the input"]
 pub fn zalgo_wrap_python(python: &str) -> Result<String, EncodeError> {
     let encoded_string = zalgo_encode(python)?;
-    Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[1::2],b[2::2])))"))
+    Ok(format!("b='{encoded_string}'.encode();exec(''.join(chr(((h<<6&64|c&63)+22)%133+10)for h,c in zip(b[0::2],b[1::2])))"))
 }
 
 #[cfg(test)]
@@ -394,179 +396,179 @@ mod test {
 
     #[test]
     fn verify_conversion_table() {
-        assert_eq!(zalgo_encode("A").unwrap(), "E\u{321}");
-        assert_eq!(zalgo_decode("E\u{321}").unwrap(), "A");
-        assert_eq!(zalgo_encode("B").unwrap(), "E\u{322}");
-        assert_eq!(zalgo_decode("E\u{322}").unwrap(), "B");
-        assert_eq!(zalgo_encode("C").unwrap(), "E\u{323}");
-        assert_eq!(zalgo_decode("E\u{323}").unwrap(), "C");
-        assert_eq!(zalgo_encode("D").unwrap(), "E\u{324}");
-        assert_eq!(zalgo_decode("E\u{324}").unwrap(), "D");
-        assert_eq!(zalgo_encode("E").unwrap(), "E\u{325}");
-        assert_eq!(zalgo_decode("E\u{325}").unwrap(), "E");
-        assert_eq!(zalgo_encode("F").unwrap(), "E\u{326}");
-        assert_eq!(zalgo_decode("E\u{326}").unwrap(), "F");
-        assert_eq!(zalgo_encode("G").unwrap(), "E\u{327}");
-        assert_eq!(zalgo_decode("E\u{327}").unwrap(), "G");
-        assert_eq!(zalgo_encode("H").unwrap(), "E\u{328}");
-        assert_eq!(zalgo_decode("E\u{328}").unwrap(), "H");
-        assert_eq!(zalgo_encode("I").unwrap(), "E\u{329}");
-        assert_eq!(zalgo_decode("E\u{329}").unwrap(), "I");
-        assert_eq!(zalgo_encode("J").unwrap(), "E\u{32a}");
-        assert_eq!(zalgo_decode("E\u{32a}").unwrap(), "J");
-        assert_eq!(zalgo_encode("K").unwrap(), "E\u{32b}");
-        assert_eq!(zalgo_decode("E\u{32b}").unwrap(), "K");
-        assert_eq!(zalgo_encode("L").unwrap(), "E\u{32c}");
-        assert_eq!(zalgo_decode("E\u{32c}").unwrap(), "L");
-        assert_eq!(zalgo_encode("M").unwrap(), "E\u{32d}");
-        assert_eq!(zalgo_decode("E\u{32d}").unwrap(), "M");
-        assert_eq!(zalgo_encode("N").unwrap(), "E\u{32e}");
-        assert_eq!(zalgo_decode("E\u{32e}").unwrap(), "N");
-        assert_eq!(zalgo_encode("O").unwrap(), "E\u{32f}");
-        assert_eq!(zalgo_decode("E\u{32f}").unwrap(), "O");
-        assert_eq!(zalgo_encode("P").unwrap(), "E\u{330}");
-        assert_eq!(zalgo_decode("E\u{330}").unwrap(), "P");
-        assert_eq!(zalgo_encode("Q").unwrap(), "E\u{331}");
-        assert_eq!(zalgo_decode("E\u{331}").unwrap(), "Q");
-        assert_eq!(zalgo_encode("R").unwrap(), "E\u{332}");
-        assert_eq!(zalgo_decode("E\u{332}").unwrap(), "R");
-        assert_eq!(zalgo_encode("S").unwrap(), "E\u{333}");
-        assert_eq!(zalgo_decode("E\u{333}").unwrap(), "S");
-        assert_eq!(zalgo_encode("T").unwrap(), "E\u{334}");
-        assert_eq!(zalgo_decode("E\u{334}").unwrap(), "T");
-        assert_eq!(zalgo_encode("U").unwrap(), "E\u{335}");
-        assert_eq!(zalgo_decode("E\u{335}").unwrap(), "U");
-        assert_eq!(zalgo_encode("V").unwrap(), "E\u{336}");
-        assert_eq!(zalgo_decode("E\u{336}").unwrap(), "V");
-        assert_eq!(zalgo_encode("W").unwrap(), "E\u{337}");
-        assert_eq!(zalgo_decode("E\u{337}").unwrap(), "W");
-        assert_eq!(zalgo_encode("X").unwrap(), "E\u{338}");
-        assert_eq!(zalgo_decode("E\u{338}").unwrap(), "X");
-        assert_eq!(zalgo_encode("Y").unwrap(), "E\u{339}");
-        assert_eq!(zalgo_decode("E\u{339}").unwrap(), "Y");
-        assert_eq!(zalgo_encode("Z").unwrap(), "E\u{33a}");
-        assert_eq!(zalgo_decode("E\u{33a}").unwrap(), "Z");
-        assert_eq!(zalgo_encode("a").unwrap(), "E\u{341}");
-        assert_eq!(zalgo_decode("E\u{341}").unwrap(), "a");
-        assert_eq!(zalgo_encode("b").unwrap(), "E\u{342}");
-        assert_eq!(zalgo_decode("E\u{342}").unwrap(), "b");
-        assert_eq!(zalgo_encode("c").unwrap(), "E\u{343}");
-        assert_eq!(zalgo_decode("E\u{343}").unwrap(), "c");
-        assert_eq!(zalgo_encode("d").unwrap(), "E\u{344}");
-        assert_eq!(zalgo_decode("E\u{344}").unwrap(), "d");
-        assert_eq!(zalgo_encode("e").unwrap(), "E\u{345}");
-        assert_eq!(zalgo_decode("E\u{345}").unwrap(), "e");
-        assert_eq!(zalgo_encode("f").unwrap(), "E\u{346}");
-        assert_eq!(zalgo_decode("E\u{346}").unwrap(), "f");
-        assert_eq!(zalgo_encode("g").unwrap(), "E\u{347}");
-        assert_eq!(zalgo_decode("E\u{347}").unwrap(), "g");
-        assert_eq!(zalgo_encode("h").unwrap(), "E\u{348}");
-        assert_eq!(zalgo_decode("E\u{348}").unwrap(), "h");
-        assert_eq!(zalgo_encode("i").unwrap(), "E\u{349}");
-        assert_eq!(zalgo_decode("E\u{349}").unwrap(), "i");
-        assert_eq!(zalgo_encode("j").unwrap(), "E\u{34a}");
-        assert_eq!(zalgo_decode("E\u{34a}").unwrap(), "j");
-        assert_eq!(zalgo_encode("k").unwrap(), "E\u{34b}");
-        assert_eq!(zalgo_decode("E\u{34b}").unwrap(), "k");
-        assert_eq!(zalgo_encode("l").unwrap(), "E\u{34c}");
-        assert_eq!(zalgo_decode("E\u{34c}").unwrap(), "l");
-        assert_eq!(zalgo_encode("m").unwrap(), "E\u{34d}");
-        assert_eq!(zalgo_decode("E\u{34d}").unwrap(), "m");
-        assert_eq!(zalgo_encode("n").unwrap(), "E\u{34e}");
-        assert_eq!(zalgo_decode("E\u{34e}").unwrap(), "n");
-        assert_eq!(zalgo_encode("o").unwrap(), "E\u{34f}");
-        assert_eq!(zalgo_decode("E\u{34f}").unwrap(), "o");
-        assert_eq!(zalgo_encode("p").unwrap(), "E\u{350}");
-        assert_eq!(zalgo_decode("E\u{350}").unwrap(), "p");
-        assert_eq!(zalgo_encode("q").unwrap(), "E\u{351}");
-        assert_eq!(zalgo_decode("E\u{351}").unwrap(), "q");
-        assert_eq!(zalgo_encode("r").unwrap(), "E\u{352}");
-        assert_eq!(zalgo_decode("E\u{352}").unwrap(), "r");
-        assert_eq!(zalgo_encode("s").unwrap(), "E\u{353}");
-        assert_eq!(zalgo_decode("E\u{353}").unwrap(), "s");
-        assert_eq!(zalgo_encode("t").unwrap(), "E\u{354}");
-        assert_eq!(zalgo_decode("E\u{354}").unwrap(), "t");
-        assert_eq!(zalgo_encode("u").unwrap(), "E\u{355}");
-        assert_eq!(zalgo_decode("E\u{355}").unwrap(), "u");
-        assert_eq!(zalgo_encode("v").unwrap(), "E\u{356}");
-        assert_eq!(zalgo_decode("E\u{356}").unwrap(), "v");
-        assert_eq!(zalgo_encode("w").unwrap(), "E\u{357}");
-        assert_eq!(zalgo_decode("E\u{357}").unwrap(), "w");
-        assert_eq!(zalgo_encode("x").unwrap(), "E\u{358}");
-        assert_eq!(zalgo_decode("E\u{358}").unwrap(), "x");
-        assert_eq!(zalgo_encode("y").unwrap(), "E\u{359}");
-        assert_eq!(zalgo_decode("E\u{359}").unwrap(), "y");
-        assert_eq!(zalgo_encode("z").unwrap(), "E\u{35a}");
-        assert_eq!(zalgo_decode("E\u{35a}").unwrap(), "z");
-        assert_eq!(zalgo_encode("1").unwrap(), "E\u{311}");
-        assert_eq!(zalgo_decode("E\u{311}").unwrap(), "1");
-        assert_eq!(zalgo_encode("2").unwrap(), "E\u{312}");
-        assert_eq!(zalgo_decode("E\u{312}").unwrap(), "2");
-        assert_eq!(zalgo_encode("3").unwrap(), "E\u{313}");
-        assert_eq!(zalgo_decode("E\u{313}").unwrap(), "3");
-        assert_eq!(zalgo_encode("4").unwrap(), "E\u{314}");
-        assert_eq!(zalgo_decode("E\u{314}").unwrap(), "4");
-        assert_eq!(zalgo_encode("5").unwrap(), "E\u{315}");
-        assert_eq!(zalgo_decode("E\u{315}").unwrap(), "5");
-        assert_eq!(zalgo_encode("6").unwrap(), "E\u{316}");
-        assert_eq!(zalgo_decode("E\u{316}").unwrap(), "6");
-        assert_eq!(zalgo_encode("7").unwrap(), "E\u{317}");
-        assert_eq!(zalgo_decode("E\u{317}").unwrap(), "7");
-        assert_eq!(zalgo_encode("8").unwrap(), "E\u{318}");
-        assert_eq!(zalgo_decode("E\u{318}").unwrap(), "8");
-        assert_eq!(zalgo_encode("9").unwrap(), "E\u{319}");
-        assert_eq!(zalgo_decode("E\u{319}").unwrap(), "9");
-        assert_eq!(zalgo_encode("0").unwrap(), "E\u{310}");
-        assert_eq!(zalgo_decode("E\u{310}").unwrap(), "0");
-        assert_eq!(zalgo_encode(" ").unwrap(), "E\u{300}");
-        assert_eq!(zalgo_decode("E\u{300}").unwrap(), " ");
-        assert_eq!(zalgo_encode("!").unwrap(), "E\u{301}");
-        assert_eq!(zalgo_decode("E\u{301}").unwrap(), "!");
-        assert_eq!(zalgo_encode("\"").unwrap(), "E\u{302}");
-        assert_eq!(zalgo_decode("E\u{302}").unwrap(), "\"");
-        assert_eq!(zalgo_encode("#").unwrap(), "E\u{303}");
-        assert_eq!(zalgo_decode("E\u{303}").unwrap(), "#");
-        assert_eq!(zalgo_encode("$").unwrap(), "E\u{304}");
-        assert_eq!(zalgo_decode("E\u{304}").unwrap(), "$");
-        assert_eq!(zalgo_encode("%").unwrap(), "E\u{305}");
-        assert_eq!(zalgo_decode("E\u{305}").unwrap(), "%");
-        assert_eq!(zalgo_encode("&").unwrap(), "E\u{306}");
-        assert_eq!(zalgo_decode("E\u{306}").unwrap(), "&");
-        assert_eq!(zalgo_encode("'").unwrap(), "E\u{307}");
-        assert_eq!(zalgo_decode("E\u{307}").unwrap(), "'");
-        assert_eq!(zalgo_encode("(").unwrap(), "E\u{308}");
-        assert_eq!(zalgo_decode("E\u{308}").unwrap(), "(");
-        assert_eq!(zalgo_encode(")").unwrap(), "E\u{309}");
-        assert_eq!(zalgo_decode("E\u{309}").unwrap(), ")");
-        assert_eq!(zalgo_encode("*").unwrap(), "E\u{30a}");
-        assert_eq!(zalgo_decode("E\u{30a}").unwrap(), "*");
-        assert_eq!(zalgo_encode("+").unwrap(), "E\u{30b}");
-        assert_eq!(zalgo_decode("E\u{30b}").unwrap(), "+");
-        assert_eq!(zalgo_encode(",").unwrap(), "E\u{30c}");
-        assert_eq!(zalgo_decode("E\u{30c}").unwrap(), ",");
-        assert_eq!(zalgo_encode("-").unwrap(), "E\u{30d}");
-        assert_eq!(zalgo_decode("E\u{30d}").unwrap(), "-");
-        assert_eq!(zalgo_encode("\\").unwrap(), "E\u{33c}");
-        assert_eq!(zalgo_decode("E\u{33c}").unwrap(), "\\");
-        assert_eq!(zalgo_encode(".").unwrap(), "E\u{30e}");
-        assert_eq!(zalgo_decode("E\u{30e}").unwrap(), ".");
-        assert_eq!(zalgo_encode("/").unwrap(), "E\u{30f}");
-        assert_eq!(zalgo_decode("E\u{30f}").unwrap(), "/");
-        assert_eq!(zalgo_encode(":").unwrap(), "E\u{31a}");
-        assert_eq!(zalgo_decode("E\u{31a}").unwrap(), ":");
-        assert_eq!(zalgo_encode(";").unwrap(), "E\u{31b}");
-        assert_eq!(zalgo_decode("E\u{31b}").unwrap(), ";");
-        assert_eq!(zalgo_encode("<").unwrap(), "E\u{31c}");
-        assert_eq!(zalgo_decode("E\u{31c}").unwrap(), "<");
-        assert_eq!(zalgo_encode("=").unwrap(), "E\u{31d}");
-        assert_eq!(zalgo_decode("E\u{31d}").unwrap(), "=");
-        assert_eq!(zalgo_encode(">").unwrap(), "E\u{31e}");
-        assert_eq!(zalgo_decode("E\u{31e}").unwrap(), ">");
-        assert_eq!(zalgo_encode("?").unwrap(), "E\u{31f}");
-        assert_eq!(zalgo_decode("E\u{31f}").unwrap(), "?");
-        assert_eq!(zalgo_encode("@").unwrap(), "E\u{320}");
-        assert_eq!(zalgo_decode("E\u{320}").unwrap(), "@");
-        assert_eq!(zalgo_encode("\n").unwrap(), "E\u{36f}");
-        assert_eq!(zalgo_decode("E\u{36f}").unwrap(), "\n");
+        assert_eq!(zalgo_encode("A").unwrap(), "\u{321}");
+        assert_eq!(zalgo_decode("\u{321}").unwrap(), "A");
+        assert_eq!(zalgo_encode("B").unwrap(), "\u{322}");
+        assert_eq!(zalgo_decode("\u{322}").unwrap(), "B");
+        assert_eq!(zalgo_encode("C").unwrap(), "\u{323}");
+        assert_eq!(zalgo_decode("\u{323}").unwrap(), "C");
+        assert_eq!(zalgo_encode("D").unwrap(), "\u{324}");
+        assert_eq!(zalgo_decode("\u{324}").unwrap(), "D");
+        assert_eq!(zalgo_encode("E").unwrap(), "\u{325}");
+        assert_eq!(zalgo_decode("\u{325}").unwrap(), "E");
+        assert_eq!(zalgo_encode("F").unwrap(), "\u{326}");
+        assert_eq!(zalgo_decode("\u{326}").unwrap(), "F");
+        assert_eq!(zalgo_encode("G").unwrap(), "\u{327}");
+        assert_eq!(zalgo_decode("\u{327}").unwrap(), "G");
+        assert_eq!(zalgo_encode("H").unwrap(), "\u{328}");
+        assert_eq!(zalgo_decode("\u{328}").unwrap(), "H");
+        assert_eq!(zalgo_encode("I").unwrap(), "\u{329}");
+        assert_eq!(zalgo_decode("\u{329}").unwrap(), "I");
+        assert_eq!(zalgo_encode("J").unwrap(), "\u{32a}");
+        assert_eq!(zalgo_decode("\u{32a}").unwrap(), "J");
+        assert_eq!(zalgo_encode("K").unwrap(), "\u{32b}");
+        assert_eq!(zalgo_decode("\u{32b}").unwrap(), "K");
+        assert_eq!(zalgo_encode("L").unwrap(), "\u{32c}");
+        assert_eq!(zalgo_decode("\u{32c}").unwrap(), "L");
+        assert_eq!(zalgo_encode("M").unwrap(), "\u{32d}");
+        assert_eq!(zalgo_decode("\u{32d}").unwrap(), "M");
+        assert_eq!(zalgo_encode("N").unwrap(), "\u{32e}");
+        assert_eq!(zalgo_decode("\u{32e}").unwrap(), "N");
+        assert_eq!(zalgo_encode("O").unwrap(), "\u{32f}");
+        assert_eq!(zalgo_decode("\u{32f}").unwrap(), "O");
+        assert_eq!(zalgo_encode("P").unwrap(), "\u{330}");
+        assert_eq!(zalgo_decode("\u{330}").unwrap(), "P");
+        assert_eq!(zalgo_encode("Q").unwrap(), "\u{331}");
+        assert_eq!(zalgo_decode("\u{331}").unwrap(), "Q");
+        assert_eq!(zalgo_encode("R").unwrap(), "\u{332}");
+        assert_eq!(zalgo_decode("\u{332}").unwrap(), "R");
+        assert_eq!(zalgo_encode("S").unwrap(), "\u{333}");
+        assert_eq!(zalgo_decode("\u{333}").unwrap(), "S");
+        assert_eq!(zalgo_encode("T").unwrap(), "\u{334}");
+        assert_eq!(zalgo_decode("\u{334}").unwrap(), "T");
+        assert_eq!(zalgo_encode("U").unwrap(), "\u{335}");
+        assert_eq!(zalgo_decode("\u{335}").unwrap(), "U");
+        assert_eq!(zalgo_encode("V").unwrap(), "\u{336}");
+        assert_eq!(zalgo_decode("\u{336}").unwrap(), "V");
+        assert_eq!(zalgo_encode("W").unwrap(), "\u{337}");
+        assert_eq!(zalgo_decode("\u{337}").unwrap(), "W");
+        assert_eq!(zalgo_encode("X").unwrap(), "\u{338}");
+        assert_eq!(zalgo_decode("\u{338}").unwrap(), "X");
+        assert_eq!(zalgo_encode("Y").unwrap(), "\u{339}");
+        assert_eq!(zalgo_decode("\u{339}").unwrap(), "Y");
+        assert_eq!(zalgo_encode("Z").unwrap(), "\u{33a}");
+        assert_eq!(zalgo_decode("\u{33a}").unwrap(), "Z");
+        assert_eq!(zalgo_encode("a").unwrap(), "\u{341}");
+        assert_eq!(zalgo_decode("\u{341}").unwrap(), "a");
+        assert_eq!(zalgo_encode("b").unwrap(), "\u{342}");
+        assert_eq!(zalgo_decode("\u{342}").unwrap(), "b");
+        assert_eq!(zalgo_encode("c").unwrap(), "\u{343}");
+        assert_eq!(zalgo_decode("\u{343}").unwrap(), "c");
+        assert_eq!(zalgo_encode("d").unwrap(), "\u{344}");
+        assert_eq!(zalgo_decode("\u{344}").unwrap(), "d");
+        assert_eq!(zalgo_encode("e").unwrap(), "\u{345}");
+        assert_eq!(zalgo_decode("\u{345}").unwrap(), "e");
+        assert_eq!(zalgo_encode("f").unwrap(), "\u{346}");
+        assert_eq!(zalgo_decode("\u{346}").unwrap(), "f");
+        assert_eq!(zalgo_encode("g").unwrap(), "\u{347}");
+        assert_eq!(zalgo_decode("\u{347}").unwrap(), "g");
+        assert_eq!(zalgo_encode("h").unwrap(), "\u{348}");
+        assert_eq!(zalgo_decode("\u{348}").unwrap(), "h");
+        assert_eq!(zalgo_encode("i").unwrap(), "\u{349}");
+        assert_eq!(zalgo_decode("\u{349}").unwrap(), "i");
+        assert_eq!(zalgo_encode("j").unwrap(), "\u{34a}");
+        assert_eq!(zalgo_decode("\u{34a}").unwrap(), "j");
+        assert_eq!(zalgo_encode("k").unwrap(), "\u{34b}");
+        assert_eq!(zalgo_decode("\u{34b}").unwrap(), "k");
+        assert_eq!(zalgo_encode("l").unwrap(), "\u{34c}");
+        assert_eq!(zalgo_decode("\u{34c}").unwrap(), "l");
+        assert_eq!(zalgo_encode("m").unwrap(), "\u{34d}");
+        assert_eq!(zalgo_decode("\u{34d}").unwrap(), "m");
+        assert_eq!(zalgo_encode("n").unwrap(), "\u{34e}");
+        assert_eq!(zalgo_decode("\u{34e}").unwrap(), "n");
+        assert_eq!(zalgo_encode("o").unwrap(), "\u{34f}");
+        assert_eq!(zalgo_decode("\u{34f}").unwrap(), "o");
+        assert_eq!(zalgo_encode("p").unwrap(), "\u{350}");
+        assert_eq!(zalgo_decode("\u{350}").unwrap(), "p");
+        assert_eq!(zalgo_encode("q").unwrap(), "\u{351}");
+        assert_eq!(zalgo_decode("\u{351}").unwrap(), "q");
+        assert_eq!(zalgo_encode("r").unwrap(), "\u{352}");
+        assert_eq!(zalgo_decode("\u{352}").unwrap(), "r");
+        assert_eq!(zalgo_encode("s").unwrap(), "\u{353}");
+        assert_eq!(zalgo_decode("\u{353}").unwrap(), "s");
+        assert_eq!(zalgo_encode("t").unwrap(), "\u{354}");
+        assert_eq!(zalgo_decode("\u{354}").unwrap(), "t");
+        assert_eq!(zalgo_encode("u").unwrap(), "\u{355}");
+        assert_eq!(zalgo_decode("\u{355}").unwrap(), "u");
+        assert_eq!(zalgo_encode("v").unwrap(), "\u{356}");
+        assert_eq!(zalgo_decode("\u{356}").unwrap(), "v");
+        assert_eq!(zalgo_encode("w").unwrap(), "\u{357}");
+        assert_eq!(zalgo_decode("\u{357}").unwrap(), "w");
+        assert_eq!(zalgo_encode("x").unwrap(), "\u{358}");
+        assert_eq!(zalgo_decode("\u{358}").unwrap(), "x");
+        assert_eq!(zalgo_encode("y").unwrap(), "\u{359}");
+        assert_eq!(zalgo_decode("\u{359}").unwrap(), "y");
+        assert_eq!(zalgo_encode("z").unwrap(), "\u{35a}");
+        assert_eq!(zalgo_decode("\u{35a}").unwrap(), "z");
+        assert_eq!(zalgo_encode("1").unwrap(), "\u{311}");
+        assert_eq!(zalgo_decode("\u{311}").unwrap(), "1");
+        assert_eq!(zalgo_encode("2").unwrap(), "\u{312}");
+        assert_eq!(zalgo_decode("\u{312}").unwrap(), "2");
+        assert_eq!(zalgo_encode("3").unwrap(), "\u{313}");
+        assert_eq!(zalgo_decode("\u{313}").unwrap(), "3");
+        assert_eq!(zalgo_encode("4").unwrap(), "\u{314}");
+        assert_eq!(zalgo_decode("\u{314}").unwrap(), "4");
+        assert_eq!(zalgo_encode("5").unwrap(), "\u{315}");
+        assert_eq!(zalgo_decode("\u{315}").unwrap(), "5");
+        assert_eq!(zalgo_encode("6").unwrap(), "\u{316}");
+        assert_eq!(zalgo_decode("\u{316}").unwrap(), "6");
+        assert_eq!(zalgo_encode("7").unwrap(), "\u{317}");
+        assert_eq!(zalgo_decode("\u{317}").unwrap(), "7");
+        assert_eq!(zalgo_encode("8").unwrap(), "\u{318}");
+        assert_eq!(zalgo_decode("\u{318}").unwrap(), "8");
+        assert_eq!(zalgo_encode("9").unwrap(), "\u{319}");
+        assert_eq!(zalgo_decode("\u{319}").unwrap(), "9");
+        assert_eq!(zalgo_encode("0").unwrap(), "\u{310}");
+        assert_eq!(zalgo_decode("\u{310}").unwrap(), "0");
+        assert_eq!(zalgo_encode(" ").unwrap(), "\u{300}");
+        assert_eq!(zalgo_decode("\u{300}").unwrap(), " ");
+        assert_eq!(zalgo_encode("!").unwrap(), "\u{301}");
+        assert_eq!(zalgo_decode("\u{301}").unwrap(), "!");
+        assert_eq!(zalgo_encode("\"").unwrap(), "\u{302}");
+        assert_eq!(zalgo_decode("\u{302}").unwrap(), "\"");
+        assert_eq!(zalgo_encode("#").unwrap(), "\u{303}");
+        assert_eq!(zalgo_decode("\u{303}").unwrap(), "#");
+        assert_eq!(zalgo_encode("$").unwrap(), "\u{304}");
+        assert_eq!(zalgo_decode("\u{304}").unwrap(), "$");
+        assert_eq!(zalgo_encode("%").unwrap(), "\u{305}");
+        assert_eq!(zalgo_decode("\u{305}").unwrap(), "%");
+        assert_eq!(zalgo_encode("&").unwrap(), "\u{306}");
+        assert_eq!(zalgo_decode("\u{306}").unwrap(), "&");
+        assert_eq!(zalgo_encode("'").unwrap(), "\u{307}");
+        assert_eq!(zalgo_decode("\u{307}").unwrap(), "'");
+        assert_eq!(zalgo_encode("(").unwrap(), "\u{308}");
+        assert_eq!(zalgo_decode("\u{308}").unwrap(), "(");
+        assert_eq!(zalgo_encode(")").unwrap(), "\u{309}");
+        assert_eq!(zalgo_decode("\u{309}").unwrap(), ")");
+        assert_eq!(zalgo_encode("*").unwrap(), "\u{30a}");
+        assert_eq!(zalgo_decode("\u{30a}").unwrap(), "*");
+        assert_eq!(zalgo_encode("+").unwrap(), "\u{30b}");
+        assert_eq!(zalgo_decode("\u{30b}").unwrap(), "+");
+        assert_eq!(zalgo_encode(",").unwrap(), "\u{30c}");
+        assert_eq!(zalgo_decode("\u{30c}").unwrap(), ",");
+        assert_eq!(zalgo_encode("-").unwrap(), "\u{30d}");
+        assert_eq!(zalgo_decode("\u{30d}").unwrap(), "-");
+        assert_eq!(zalgo_encode("\\").unwrap(), "\u{33c}");
+        assert_eq!(zalgo_decode("\u{33c}").unwrap(), "\\");
+        assert_eq!(zalgo_encode(".").unwrap(), "\u{30e}");
+        assert_eq!(zalgo_decode("\u{30e}").unwrap(), ".");
+        assert_eq!(zalgo_encode("/").unwrap(), "\u{30f}");
+        assert_eq!(zalgo_decode("\u{30f}").unwrap(), "/");
+        assert_eq!(zalgo_encode(":").unwrap(), "\u{31a}");
+        assert_eq!(zalgo_decode("\u{31a}").unwrap(), ":");
+        assert_eq!(zalgo_encode(";").unwrap(), "\u{31b}");
+        assert_eq!(zalgo_decode("\u{31b}").unwrap(), ";");
+        assert_eq!(zalgo_encode("<").unwrap(), "\u{31c}");
+        assert_eq!(zalgo_decode("\u{31c}").unwrap(), "<");
+        assert_eq!(zalgo_encode("=").unwrap(), "\u{31d}");
+        assert_eq!(zalgo_decode("\u{31d}").unwrap(), "=");
+        assert_eq!(zalgo_encode(">").unwrap(), "\u{31e}");
+        assert_eq!(zalgo_decode("\u{31e}").unwrap(), ">");
+        assert_eq!(zalgo_encode("?").unwrap(), "\u{31f}");
+        assert_eq!(zalgo_decode("\u{31f}").unwrap(), "?");
+        assert_eq!(zalgo_encode("@").unwrap(), "\u{320}");
+        assert_eq!(zalgo_decode("\u{320}").unwrap(), "@");
+        assert_eq!(zalgo_encode("\n").unwrap(), "\u{36f}");
+        assert_eq!(zalgo_decode("\u{36f}").unwrap(), "\n");
     }
 }
