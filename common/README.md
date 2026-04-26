@@ -15,13 +15,13 @@ Encode a string to a grapheme cluster with `zalgo_encode`:
 ```rust
 let s = "Zalgo";
 let encoded = zalgo_encode(s)?;
-assert_eq!(encoded, "É̺͇͌͏");
+assert_eq!(encoded, "̺͇́͌͏");
 ```
 
 Decode a grapheme cluster back into a string:
 
 ```rust
-let encoded = "É̺͇͌͏";
+let encoded = "̺͇́͌͏";
 let s = zalgo_decode(encoded)?;
 assert_eq!(s, "Zalgo");
 ```
@@ -32,10 +32,10 @@ various ways:
 ```rust
 let s = "Zalgo";
 let zstr = ZalgoString::new(s)?;
-assert_eq!(zstr, "É̺͇͌͏");
-assert_eq!(zstr.len(), 2 * s.len() + 1);
+assert_eq!(zstr, "̺͇́͌͏");
+assert_eq!(zstr.len(), 2 * s.len());
 assert_eq!(zstr.decoded_len(), s.len());
-assert_eq!(zstr.bytes().next(), Some(69));
+assert_eq!(zstr.bytes().next(), Some(204));
 assert_eq!(zstr.decoded_chars().next_back(), Some('o'));
 ```
 
