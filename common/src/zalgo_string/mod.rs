@@ -458,15 +458,16 @@ impl ZalgoString {
         self.len() / 2
     }
 
-    /// Returns whether the string would be empty if decoded.
+    /// Returns whether the `ZalgoString` is empty.
     ///
     /// # Example
     ///
     /// Basic usage
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
-    /// let zs = ZalgoString::try_from("")?;
+    /// let zs = ZalgoString::new();
     /// assert!(zs.is_empty());
+    ///
     /// let zs = ZalgoString::try_from("Blargh")?;
     /// assert!(!zs.is_empty());
     /// # Ok::<(), EncodeError>(())
@@ -474,7 +475,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "the method returns a new value and does not modify `self`"]
     pub fn is_empty(&self) -> bool {
-        self.decoded_len() == 0
+        self.len() == 0
     }
 
     // endregion: metadata methods
@@ -580,8 +581,8 @@ impl ZalgoString {
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
     /// let c = zs.capacity();
-    /// zs.reserve_exact(5);
-    /// assert!(zs.capacity() >= c + 5);
+    /// zs.reserve_exact(4);
+    /// assert!(zs.capacity() >= c + 4);
     /// # Ok::<(), EncodeError>(())
     /// ```
     #[inline]
