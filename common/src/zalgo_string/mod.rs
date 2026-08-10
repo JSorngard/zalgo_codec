@@ -104,7 +104,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
     pub fn with_capacity(capacity: usize) -> Self {
-        Self(String::with_capacity(2*capacity))
+        Self(String::with_capacity(2 * capacity))
     }
 
     // region: character access methods
