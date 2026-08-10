@@ -530,7 +530,7 @@ impl ZalgoString {
 
     // region: capacity manipulation methods
 
-    /// Reserves capacity for at least `additional` bytes more than the current length.
+    /// Reserves capacity for at least `additional` more encoded characters than the current length.
     ///
     /// Same as [`String::reserve`].
     ///
@@ -539,25 +539,22 @@ impl ZalgoString {
     ///
     /// Does nothing if the capacity is already sufficient.
     ///
-    /// Keep in mind that an encoded ASCII character takes up two bytes,
-    /// which means that the total length in bytes is always an even number.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
     /// let c = zs.capacity();
-    /// zs.reserve(4);
-    /// assert!(zs.capacity() >= c + 4);
+    /// zs.reserve(2);
+    /// assert!(zs.capacity() >= c + 2);
     /// # Ok::<(), EncodeError>(())
     /// ```
     #[inline]
     pub fn reserve(&mut self, additional: usize) {
-        self.0.reserve(additional)
+        self.0.reserve(2 * additional)
     }
 
-    /// Reserves capacity for exactly `additional` bytes more than the current length.
+    /// Reserves capacity for exactly `additional` more encoded characters than the current length.
     ///
     /// Same as [`String::reserve_exact`].
     ///
@@ -567,22 +564,19 @@ impl ZalgoString {
     ///
     /// Does nothing if the capacity is already sufficient.
     ///
-    /// Keep in mind that an encoded ASCII character takes up two bytes,
-    /// which means that the total length in bytes is always an odd number.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
     /// let c = zs.capacity();
-    /// zs.reserve_exact(4);
-    /// assert!(zs.capacity() >= c + 4);
+    /// zs.reserve_exact(2);
+    /// assert!(zs.capacity() >= c + 2);
     /// # Ok::<(), EncodeError>(())
     /// ```
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
-        self.0.reserve_exact(additional)
+        self.0.reserve_exact(2 * additional)
     }
 
     // endregion: capacity manipulation methods
