@@ -80,16 +80,13 @@ impl ZalgoString {
 
     /// Creates a new `ZalgoString` with at least the specified capacity.
     ///
-    /// If you want the ZalgoString to have capacity for x encoded characters
-    /// you must reserve a capacity of 2x.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     ///
     /// // Reserve capacity for two encoded characters
-    /// let mut zs = ZalgoString::with_capacity(2*2);
+    /// let mut zs = ZalgoString::with_capacity(2);
     ///
     /// // This ZalgoString would decode into an empty string
     /// assert_eq!(zs.decoded_len(), 0);
@@ -107,7 +104,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
     pub fn with_capacity(capacity: usize) -> Self {
-        Self(String::with_capacity(capacity))
+        Self(String::with_capacity(2*capacity))
     }
 
     // region: character access methods
