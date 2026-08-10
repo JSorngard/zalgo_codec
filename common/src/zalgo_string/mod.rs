@@ -816,7 +816,7 @@ mod test {
     fn test_reserve() {
         let mut zs = ZalgoString::try_from("Zalgo").unwrap();
         zs.reserve(5);
-        assert!(zs.capacity() >= 10 + 5);
+        assert!(zs.capacity() >= 10 + 10);
         let c = zs.capacity();
         zs.reserve(1);
         assert_eq!(zs.capacity(), c);
@@ -826,7 +826,7 @@ mod test {
     fn test_reserve_exact() {
         let mut zs = ZalgoString::try_from("Zalgo").unwrap();
         zs.reserve_exact(5);
-        assert_eq!(zs.capacity(), 10 + 5);
+        assert_eq!(zs.capacity(), 10 + 10);
         let c = zs.capacity();
         zs.reserve_exact(1);
         assert_eq!(zs.capacity(), c);
@@ -856,7 +856,7 @@ mod test {
 
     #[test]
     fn test_with_capacity() {
-        let mut zs = ZalgoString::with_capacity(10.try_into().unwrap());
+        let mut zs = ZalgoString::with_capacity(5.try_into().unwrap());
         assert_eq!(zs.capacity(), 10);
         zs.encode_and_push_str("Hi!").unwrap();
         assert_eq!(zs.capacity(), 10);
