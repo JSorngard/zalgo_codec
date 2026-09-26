@@ -80,16 +80,13 @@ impl ZalgoString {
 
     /// Creates a new `ZalgoString` with at least the specified capacity.
     ///
-    /// If you want the ZalgoString to have capacity for x encoded characters
-    /// you must reserve a capacity of 2x.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     ///
     /// // Reserve capacity for two encoded characters
-    /// let mut zs = ZalgoString::with_capacity(2*2);
+    /// let mut zs = ZalgoString::with_capacity(2);
     ///
     /// // This ZalgoString would decode into an empty string
     /// assert_eq!(zs.decoded_len(), 0);
@@ -107,7 +104,7 @@ impl ZalgoString {
     #[inline]
     #[must_use = "this associated method return a new `ZalgoString` and does not modify the input"]
     pub fn with_capacity(capacity: usize) -> Self {
-        Self(String::with_capacity(capacity))
+        Self(String::with_capacity(2 * capacity))
     }
 
     // region: character access methods
@@ -533,7 +530,7 @@ impl ZalgoString {
 
     // region: capacity manipulation methods
 
-    /// Reserves capacity for at least `additional` bytes more than the current length.
+    /// Reserves capacity for at least `additional` more encoded characters than the current length.
     ///
     /// Same as [`String::reserve`].
     ///
@@ -542,25 +539,22 @@ impl ZalgoString {
     ///
     /// Does nothing if the capacity is already sufficient.
     ///
-    /// Keep in mind that an encoded ASCII character takes up two bytes,
-    /// which means that the total length in bytes is always an even number.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
     /// let c = zs.capacity();
-    /// zs.reserve(4);
-    /// assert!(zs.capacity() >= c + 4);
+    /// zs.reserve(2);
+    /// assert!(zs.capacity() >= c + 2);
     /// # Ok::<(), EncodeError>(())
     /// ```
     #[inline]
     pub fn reserve(&mut self, additional: usize) {
-        self.0.reserve(additional)
+        self.0.reserve(2 * additional)
     }
 
-    /// Reserves capacity for exactly `additional` bytes more than the current length.
+    /// Reserves capacity for exactly `additional` more encoded characters than the current length.
     ///
     /// Same as [`String::reserve_exact`].
     ///
@@ -570,22 +564,19 @@ impl ZalgoString {
     ///
     /// Does nothing if the capacity is already sufficient.
     ///
-    /// Keep in mind that an encoded ASCII character takes up two bytes,
-    /// which means that the total length in bytes is always an odd number.
-    ///
     /// # Example
     ///
     /// ```
     /// # use zalgo_codec_common::{EncodeError, ZalgoString};
     /// let mut zs = ZalgoString::try_from("Zalgo")?;
     /// let c = zs.capacity();
-    /// zs.reserve_exact(4);
-    /// assert!(zs.capacity() >= c + 4);
+    /// zs.reserve_exact(2);
+    /// assert!(zs.capacity() >= c + 2);
     /// # Ok::<(), EncodeError>(())
     /// ```
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
-        self.0.reserve_exact(additional)
+        self.0.reserve_exact(2 * additional)
     }
 
     // endregion: capacity manipulation methods
@@ -825,7 +816,7 @@ mod test {
     fn test_reserve() {
         let mut zs = ZalgoString::try_from("Zalgo").unwrap();
         zs.reserve(5);
-        assert!(zs.capacity() >= 10 + 5);
+        assert!(zs.capacity() >= 10 + 10);
         let c = zs.capacity();
         zs.reserve(1);
         assert_eq!(zs.capacity(), c);
@@ -835,7 +826,7 @@ mod test {
     fn test_reserve_exact() {
         let mut zs = ZalgoString::try_from("Zalgo").unwrap();
         zs.reserve_exact(5);
-        assert_eq!(zs.capacity(), 10 + 5);
+        assert_eq!(zs.capacity(), 10 + 10);
         let c = zs.capacity();
         zs.reserve_exact(1);
         assert_eq!(zs.capacity(), c);
@@ -865,7 +856,7 @@ mod test {
 
     #[test]
     fn test_with_capacity() {
-        let mut zs = ZalgoString::with_capacity(10.try_into().unwrap());
+        let mut zs = ZalgoString::with_capacity(5.try_into().unwrap());
         assert_eq!(zs.capacity(), 10);
         zs.encode_and_push_str("Hi!").unwrap();
         assert_eq!(zs.capacity(), 10);
